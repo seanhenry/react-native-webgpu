@@ -10,7 +10,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/seanhenry/react-native-webgpu.git"
+    "url": "git+https://github.com/seanhenry/react-native-webgpu.git"
   },
   "bugs": {
     "url": "https://github.com/seanhenry/react-native-webgpu/issues"

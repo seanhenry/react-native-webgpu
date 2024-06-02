@@ -1,0 +1,19 @@
+{
+  "name": "react-native-webgpu",
+  "version": "0.0.1",
+  "description": "Coming soon. A [WebGPU](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API) port for react native which aims to provide direct access to Metal and Vulkan for iOS and Android, and support for libraries like [Three.js](https://threejs.org).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sean Henry <sean.henry6@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seanhenry/react-native-webgpu.git"
+  },
+  "bugs": {
+    "url": "https://github.com/seanhenry/react-native-webgpu/issues"
+  },
+  "homepage": "https://github.com/seanhenry/react-native-webgpu"
+}

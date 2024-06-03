@@ -7,14 +7,30 @@ Interested in this project? Star it in GitHub to show your support.
 Dependent projects:
 - [react-native-webgpu-three](https://github.com/seanhenry/react-native-webgpu-three)
 
-# Build locally
+## Installation
 
-## Build C bindings
+```sh
+npm install react-native-webgpu
+```
+
+## Contributing
+
+See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
+
+## License
+
+MIT
+
+---
+
+Made with [create-react-native-library](https://github.com/callstack/react-native-builder-bob)
+
+## Build locally
+
+### Build C bindings
 
 ```shell
 git submodule update --init --recursive
 ./scripts/build-android.sh
 ./scripts/build-ios.sh
 ```
-
-

@@ -164,4 +164,4 @@ vendor/
 
 /.yarn
 /.idea
-/bin
+/ios/Pods

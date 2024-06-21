@@ -27,7 +27,7 @@ struct demo {
   WGPUSurfaceCapabilities surface_capabilities;
 };
 void launch(struct demo *demo, CAMetalLayer *metalLayer);
-void on_frame(struct demo *demo, CAMetalLayer *metalLayer);
+void on_frame(struct demo *demo, int width, int height);
 void terminate(struct demo *demo);
 
 @interface ViewController ()
@@ -66,7 +66,7 @@ void terminate(struct demo *demo);
 }
 
 - (void)tick {
-  on_frame(&_demo, self.metalView.metalLayer);
+  on_frame(&_demo, self.metalView.metalLayer.frame.size.width, self.metalView.metalLayer.frame.size.height);
 }
 
 @end
@@ -97,26 +97,26 @@ static void handle_request_device(WGPURequestDeviceStatus status,
 void launch(struct demo *demo, CAMetalLayer *metalLayer) {
   frmwrk_setup_logging(WGPULogLevel_Warn);
 
-  demo->surface = wgpuInstanceCreateSurface(
-                                            demo->instance,
-                                            &(const WGPUSurfaceDescriptor){
-                                              .nextInChain =
-                                              (const WGPUChainedStruct *)&(
-                                                                           const WGPUSurfaceDescriptorFromMetalLayer){
-                                                                             .chain =
-                                                                             (const WGPUChainedStruct){
-                                                                               .sType = WGPUSType_SurfaceDescriptorFromMetalLayer,
-                                                                             },
-                                                                               .layer = (__bridge void *)metalLayer,
-                                                                           },
-                                            });
+  struct WGPUSurfaceDescriptorFromMetalLayer descriptorFromMetalLayer = {
+    .chain = (const WGPUChainedStruct){
+      .sType = WGPUSType_SurfaceDescriptorFromMetalLayer,
+    },
+    .layer = (__bridge void *)metalLayer,
+  };
+  struct WGPUSurfaceDescriptor descriptor = {
+    .nextInChain = (const WGPUChainedStruct *)&descriptorFromMetalLayer,
+  };
+  demo->surface = wgpuInstanceCreateSurface(demo->instance, &descriptor);
   assert(demo->surface);
 
-  wgpuInstanceRequestAdapter(demo->instance,
-                             &(const WGPURequestAdapterOptions){
-    .compatibleSurface = demo->surface,
-  },
-                             handle_request_adapter, demo);
+  wgpuInstanceRequestAdapter(
+    demo->instance,
+    &(const WGPURequestAdapterOptions){
+      .compatibleSurface = demo->surface,
+    },
+    handle_request_adapter,
+    demo
+  );
   assert(demo->adapter);
 
   wgpuAdapterRequestDevice(demo->adapter, NULL, handle_request_device, demo);
@@ -126,15 +126,17 @@ void launch(struct demo *demo, CAMetalLayer *metalLayer) {
   assert(queue);
   demo->queue = queue;
 
-  WGPUShaderModule shader_module =
-  frmwrk_load_shader_module(demo->device, [NSBundle.mainBundle pathForResource:@"shader" ofType:@"wgsl"].UTF8String);
+  const char *shaderPath = [NSBundle.mainBundle pathForResource:@"shader" ofType:@"wgsl"].UTF8String;
+  WGPUShaderModule shader_module = frmwrk_load_shader_module(demo->device, shaderPath);
   assert(shader_module);
   demo->shader_module = shader_module;
 
   WGPUPipelineLayout pipeline_layout = wgpuDeviceCreatePipelineLayout(
-                                                                      demo->device, &(const WGPUPipelineLayoutDescriptor){
-                                                                        .label = "pipeline_layout",
-                                                                      });
+    demo->device,
+    &(const WGPUPipelineLayoutDescriptor){
+      .label = "pipeline_layout",
+    }
+  );
   assert(pipeline_layout);
   demo->pipeline_layout = pipeline_layout;
 
@@ -143,38 +145,34 @@ void launch(struct demo *demo, CAMetalLayer *metalLayer) {
   demo->surface_capabilities = surface_capabilities;
 
   WGPURenderPipeline render_pipeline = wgpuDeviceCreateRenderPipeline(
-                                                                      demo->device,
-                                                                      &(const WGPURenderPipelineDescriptor){
-                                                                        .label = "render_pipeline",
-                                                                        .layout = pipeline_layout,
-                                                                        .vertex =
-                                                                        (const WGPUVertexState){
-                                                                          .module = shader_module,
-                                                                          .entryPoint = "vs_main",
-                                                                        },
-                                                                          .fragment =
-                                                                        &(const WGPUFragmentState){
-                                                                          .module = shader_module,
-                                                                          .entryPoint = "fs_main",
-                                                                          .targetCount = 1,
-                                                                          .targets =
-                                                                          (const WGPUColorTargetState[]){
-                                                                            (const WGPUColorTargetState){
-                                                                              .format = surface_capabilities.formats[0],
-                                                                              .writeMask = WGPUColorWriteMask_All,
-                                                                            },
-                                                                          },
-                                                                        },
-                                                                          .primitive =
-                                                                        (const WGPUPrimitiveState){
-                                                                          .topology = WGPUPrimitiveTopology_TriangleList,
-                                                                        },
-                                                                          .multisample =
-                                                                        (const WGPUMultisampleState){
-                                                                          .count = 1,
-                                                                          .mask = 0xFFFFFFFF,
-                                                                        },
-                                                                      });
+    demo->device,
+    &(const WGPURenderPipelineDescriptor){
+      .label = "render_pipeline",
+      .layout = pipeline_layout,
+      .vertex = (const WGPUVertexState){
+        .module = shader_module,
+        .entryPoint = "vs_main",
+      },
+      .fragment = &(const WGPUFragmentState){
+        .module = shader_module,
+        .entryPoint = "fs_main",
+        .targetCount = 1,
+        .targets = (const WGPUColorTargetState[]){
+          (const WGPUColorTargetState){
+            .format = surface_capabilities.formats[0],
+            .writeMask = WGPUColorWriteMask_All,
+          },
+        },
+      },
+      .primitive = (const WGPUPrimitiveState){
+        .topology = WGPUPrimitiveTopology_TriangleList,
+      },
+      .multisample = (const WGPUMultisampleState){
+        .count = 1,
+        .mask = 0xFFFFFFFF,
+      },
+    }
+  );
   assert(render_pipeline);
   demo->render_pipeline = render_pipeline;
 
@@ -192,7 +190,7 @@ void launch(struct demo *demo, CAMetalLayer *metalLayer) {
   wgpuSurfaceConfigure(demo->surface, &demo->config);
 }
 
-void on_frame(struct demo *demo, CAMetalLayer *metalLayer) {
+void on_frame(struct demo *demo, int width, int height) {
   WGPUSurfaceTexture surface_texture;
   wgpuSurfaceGetCurrentTexture(demo->surface, &surface_texture);
   switch (surface_texture.status) {
@@ -206,8 +204,6 @@ void on_frame(struct demo *demo, CAMetalLayer *metalLayer) {
     if (surface_texture.texture != NULL) {
       wgpuTextureRelease(surface_texture.texture);
     }
-    int width = metalLayer.frame.size.width;
-    int height = metalLayer.frame.size.height;
     if (width != 0 && height != 0) {
       demo->config.width = width;
       demo->config.height = height;
@@ -225,38 +221,38 @@ void on_frame(struct demo *demo, CAMetalLayer *metalLayer) {
   }
   assert(surface_texture.texture);
 
-  WGPUTextureView frame =
-      wgpuTextureCreateView(surface_texture.texture, NULL);
+  WGPUTextureView frame = wgpuTextureCreateView(surface_texture.texture, NULL);
   assert(frame);
 
   WGPUCommandEncoder command_encoder = wgpuDeviceCreateCommandEncoder(
-      demo->device, &(const WGPUCommandEncoderDescriptor){
-                       .label = "command_encoder",
-                   });
+    demo->device, 
+    &(const WGPUCommandEncoderDescriptor){
+      .label = "command_encoder",
+    }
+  );
   assert(command_encoder);
 
-  WGPURenderPassEncoder render_pass_encoder =
-      wgpuCommandEncoderBeginRenderPass(
-          command_encoder, &(const WGPURenderPassDescriptor){
-                               .label = "render_pass_encoder",
-                               .colorAttachmentCount = 1,
-                               .colorAttachments =
-                                   (const WGPURenderPassColorAttachment[]){
-                                       (const WGPURenderPassColorAttachment){
-                                           .view = frame,
-                                           .loadOp = WGPULoadOp_Clear,
-                                           .storeOp = WGPUStoreOp_Store,
-                                           .depthSlice = WGPU_DEPTH_SLICE_UNDEFINED,
-                                           .clearValue =
-                                               (const WGPUColor){
-                                                   .r = 0.0,
-                                                   .g = 1.0,
-                                                   .b = 0.0,
-                                                   .a = 1.0,
-                                               },
-                                       },
-                                   },
-                           });
+  WGPURenderPassEncoder render_pass_encoder = wgpuCommandEncoderBeginRenderPass(
+    command_encoder,
+    &(const WGPURenderPassDescriptor){
+      .label = "render_pass_encoder",
+      .colorAttachmentCount = 1,
+      .colorAttachments = (const WGPURenderPassColorAttachment[]){
+        (const WGPURenderPassColorAttachment){
+          .view = frame,
+          .loadOp = WGPULoadOp_Clear,
+          .storeOp = WGPUStoreOp_Store,
+          .depthSlice = WGPU_DEPTH_SLICE_UNDEFINED,
+          .clearValue = (const WGPUColor){
+            .r = 0.0,
+            .g = 1.0,
+            .b = 0.0,
+            .a = 1.0,
+          },
+        },
+      },
+    }
+  );
   assert(render_pass_encoder);
 
   wgpuRenderPassEncoderSetPipeline(render_pass_encoder, demo->render_pipeline);
@@ -264,9 +260,11 @@ void on_frame(struct demo *demo, CAMetalLayer *metalLayer) {
   wgpuRenderPassEncoderEnd(render_pass_encoder);
 
   WGPUCommandBuffer command_buffer = wgpuCommandEncoderFinish(
-      command_encoder, &(const WGPUCommandBufferDescriptor){
-                           .label = "command_buffer",
-                       });
+    command_encoder,
+    &(const WGPUCommandBufferDescriptor){
+      .label = "command_buffer",
+    }
+  );
   assert(command_buffer);
 
   wgpuQueueSubmit(demo->queue, 1, (const WGPUCommandBuffer[]){command_buffer});

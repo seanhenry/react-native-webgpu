@@ -1,22 +1,10 @@
-import { NativeModules, Platform } from 'react-native';
+import './constants'
+import { WGPUWebGPUView, type WGPUWebGPUViewProps } from './native';
+import React, { useCallback } from 'react';
 
-const LINKING_ERROR =
-  `The package 'react-native-webgpu' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo Go\n';
-
-const Webgpu = NativeModules.Webgpu
-  ? NativeModules.Webgpu
-  : new Proxy(
-      {},
-      {
-        get() {
-          throw new Error(LINKING_ERROR);
-        },
-      }
-    );
-
-export function multiply(a: number, b: number): Promise<number> {
-  return Webgpu.multiply(a, b);
+export const WebGpuView = ({identifier, onInit, ...props}: WGPUWebGPUViewProps) => {
+  const onInitInternal = useCallback(({nativeEvent}: any) => onInit(nativeEvent), [onInit])
+  return (
+    <WGPUWebGPUView {...props} identifier={identifier ?? 'main'} onInit={onInitInternal} />
+  )
 }

@@ -1,27 +1,29 @@
-// https://webgpu.github.io/webgpu-samples/?sample=helloTriangle
 import { WebGpuView } from 'react-native-webgpu';
 import triangleVertWGSL from '../../shaders/triangle.vert.wgsl';
 import redFragWGSL from '../../shaders/red.frag.wgsl';
-import React from 'react';
 import { CenterSquare } from '../../../Components/CenterSquare';
+import React from 'react';
 
-export function HelloTriangle() {
+export function HelloTriangleMSAA() {
+  const onInit = async ({ identifier }: { identifier: string }) => {
 
-  const onInit = async ({identifier}: {identifier: string}) => {
     const { navigator, getContext } = global.webGPU;
 
-    const context = getContext({identifier});
-    const adapter = await navigator.gpu.requestAdapter({ context });
+    const context = getContext({ identifier });
+    const adapter = await navigator.gpu.requestAdapter({context});
     const device = await adapter!.requestDevice();
 
     const { formats, alphaModes } = context.surfaceCapabilities;
+    const { width, height } = context;
+    const presentationFormat = formats[0]!
 
-    const presentationFormat = formats[0]!;
     context.configure({
       device,
       format: presentationFormat,
       alphaMode: alphaModes[0],
     });
+
+    const sampleCount = 4;
 
     const pipeline = device.createRenderPipeline({
       layout: 'auto',
@@ -35,52 +37,66 @@ export function HelloTriangle() {
         module: device.createShaderModule({
           code: redFragWGSL,
         }),
+        entryPoint: 'main',
         targets: [
           {
             format: presentationFormat,
           },
         ],
-        entryPoint: 'main',
       },
       primitive: {
         topology: 'triangle-list',
       },
+      multisample: {
+        count: sampleCount,
+      },
     });
+
+    const texture = device.createTexture({
+      size: [width, height],
+      sampleCount,
+      format: presentationFormat,
+      usage: GPUTextureUsage.RENDER_ATTACHMENT,
+    });
+    const view = texture.createView();
 
     function frame() {
       const commandEncoder = device.createCommandEncoder();
-      const texture = context.getCurrentTexture();
-      if (!texture) {
+      const framebuffer = context.getCurrentTexture();
+      if (!framebuffer) {
         requestAnimationFrame(frame);
-        return;
+        return
       }
-      const textureView = texture.createView();
 
-      const passEncoder = commandEncoder.beginRenderPass({
+      const renderPassDescriptor: GPURenderPassDescriptor = {
         colorAttachments: [
           {
-            view: textureView,
+            view,
+            resolveTarget: framebuffer.createView(),
             clearValue: [0, 0, 0, 1],
             loadOp: 'clear',
-            storeOp: 'store',
+            storeOp: 'discard',
           },
         ],
-      });
+      };
+
+      const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
       passEncoder.setPipeline(pipeline);
       passEncoder.draw(3);
       passEncoder.end();
 
       device.queue.submit([commandEncoder.finish()]);
       context.presentSurface();
-      texture.destroy();
+
+      framebuffer.destroy();
       requestAnimationFrame(frame);
     }
+
     requestAnimationFrame(frame);
   };
-
   return (
     <CenterSquare>
-      <WebGpuView identifier="HwlloTriangle" onInit={onInit} style={{ flex: 1, width: '100%' }} />
+      <WebGpuView identifier="HelloTriangleMSAA" onInit={onInit} style={{ width: '100%', height: '100%' }} />
     </CenterSquare>
   );
 }

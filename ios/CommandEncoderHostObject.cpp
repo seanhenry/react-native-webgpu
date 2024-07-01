@@ -30,6 +30,7 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
                     .storeOp = StringToWGPUStoreOp(storeOp.data()),
                     .depthSlice = WGPU_DEPTH_SLICE_UNDEFINED,
                     .clearValue = makeWGPUColorFromProp(runtime, attachment, "clearValue"),
+                    .resolveTarget = WGPU_HOST_OBJ_VALUE_OPT(attachment, resolveTarget, TextureViewHostObject, NULL),
                 };
             });
 

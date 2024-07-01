@@ -104,8 +104,8 @@ type GPUIntegerCoordinateOut =
 //   | GPUOrigin3DDict;
 // type GPUPipelineConstantValue =
 //   number;
-// type GPUSampleMask =
-//   number;
+type GPUSampleMask =
+  number;
 // type GPUShaderStageFlags =
 //   number;
 // type GPUSignedOffset32 =
@@ -978,24 +978,24 @@ interface GPUFragmentState
 //   rowsPerImage?: GPUSize32;
 // }
 //
-// interface GPUMultisampleState {
-//   /**
-//    * Number of samples per pixel. This {@link GPURenderPipeline} will be compatible only
-//    * with attachment textures ({@link GPURenderPassDescriptor#colorAttachments}
-//    * and {@link GPURenderPassDescriptor#depthStencilAttachment})
-//    * with matching {@link GPUTextureDescriptor#sampleCount}s.
-//    */
-//   count?: GPUSize32;
-//   /**
-//    * Mask determining which samples are written to.
-//    */
-//   mask?: GPUSampleMask;
-//   /**
-//    * When `true` indicates that a fragment's alpha channel should be used to generate a sample
-//    * coverage mask.
-//    */
-//   alphaToCoverageEnabled?: boolean;
-// }
+interface GPUMultisampleState {
+  /**
+   * Number of samples per pixel. This {@link GPURenderPipeline} will be compatible only
+   * with attachment textures ({@link GPURenderPassDescriptor#colorAttachments}
+   * and {@link GPURenderPassDescriptor#depthStencilAttachment})
+   * with matching {@link GPUTextureDescriptor#sampleCount}s.
+   */
+  count?: GPUSize32;
+  /**
+   * Mask determining which samples are written to.
+   */
+  mask?: GPUSampleMask;
+  /**
+   * When `true` indicates that a fragment's alpha channel should be used to generate a sample
+   * coverage mask.
+   */
+  alphaToCoverageEnabled?: boolean;
+}
 
 interface GPUObjectDescriptorBase {
   // /**
@@ -1158,12 +1158,12 @@ interface GPURenderPassColorAttachment {
 //    * that will be output to for this color attachment.
 //    */
 //   depthSlice?: GPUIntegerCoordinate;
-//   /**
-//    * A {@link GPUTextureView} describing the texture subresource that will receive the resolved
-//    * output for this color attachment if {@link GPURenderPassColorAttachment#view} is
-//    * multisampled.
-//    */
-//   resolveTarget?: GPUTextureView;
+  /**
+   * A {@link GPUTextureView} describing the texture subresource that will receive the resolved
+   * output for this color attachment if {@link GPURenderPassColorAttachment#view} is
+   * multisampled.
+   */
+  resolveTarget?: GPUTextureView;
   /**
    * Indicates the value to clear {@link GPURenderPassColorAttachment#view} to prior to executing the
    * render pass. If not map/exist|provided, defaults to `{r: 0, g: 0, b: 0, a: 0}`. Ignored
@@ -1321,10 +1321,10 @@ interface GPURenderPipelineDescriptor
    * Describes the optional depth-stencil properties, including the testing, operations, and bias.
    */
   depthStencil?: GPUDepthStencilState;
-//   /**
-//    * Describes the multi-sampling properties of the pipeline.
-//    */
-//   multisample?: GPUMultisampleState;
+  /**
+   * Describes the multi-sampling properties of the pipeline.
+   */
+  multisample?: GPUMultisampleState;
   /**
    * Describes the fragment shader entry point of the pipeline and its output colors. If
    * not map/exist|provided, the [[#no-color-output]] mode is enabled.
@@ -1560,11 +1560,11 @@ interface GPUTextureDescriptor
 //    * The number of mip levels the texture will contain.
 //    */
 //   mipLevelCount?: GPUIntegerCoordinate;
-//   /**
-//    * The sample count of the texture. A {@link GPUTextureDescriptor#sampleCount} &gt; `1` indicates
-//    * a multisampled texture.
-//    */
-//   sampleCount?: GPUSize32;
+  /**
+   * The sample count of the texture. A {@link GPUTextureDescriptor#sampleCount} &gt; `1` indicates
+   * a multisampled texture.
+   */
+  sampleCount?: GPUSize32;
 //   /**
 //    * Whether the texture is one-dimensional, an array of two-dimensional layers, or three-dimensional.
 //    */

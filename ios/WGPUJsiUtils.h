@@ -7,6 +7,7 @@
 #define WGPU_BOOL_OPT(__obj, __propName, __default) __obj.hasProperty(runtime, #__propName) ? __obj.getProperty(runtime, #__propName).asBool() : __default
 #define WGPU_UTF8_OPT(__obj, __propName, __default) __obj.hasProperty(runtime, #__propName) ? __obj.getProperty(runtime, #__propName).asString(runtime).utf8(runtime) : __default
 #define WGPU_NUMBER_OPT(__obj, __propName, __type, __default) __obj.hasProperty(runtime, #__propName) ? (__type)__obj.getProperty(runtime, #__propName).asNumber() : __default
+#define WGPU_HOST_OBJ_VALUE_OPT(__obj, __propName, __type, __default) __obj.hasProperty(runtime, #__propName) ? __obj.getPropertyAsObject(runtime, #__propName).asHostObject<__type>(runtime)->_value : __default
 
 // Required jsi getters
 #define WGPU_UTF8(__obj, __propName) __obj.getProperty(runtime, #__propName).asString(runtime).utf8(runtime)

@@ -18,6 +18,7 @@ export function RotatingCube() {
     const device = await adapter!.requestDevice();
 
     const { formats, alphaModes} = context.surfaceCapabilities;
+    const {width, height} = context;
     context.configure({
       device,
       format: formats[0]!,
@@ -90,16 +91,6 @@ export function RotatingCube() {
       },
     });
 
-    let texture = context.getCurrentTexture();
-    if (!texture) {
-      console.error('Missing texture')
-      return
-    }
-    const width = texture.width;
-    const height = texture.height;
-    texture.destroy()
-    texture = null
-
     const depthTexture = device.createTexture({
       size: [width, height],
       format: 'depth24plus',
@@ -163,8 +154,7 @@ export function RotatingCube() {
       return modelViewProjectionMatrix;
     }
 
-    setInterval(() => {
-
+    function frame() {
       const transformationMatrix = getTransformationMatrix();
       device.queue.writeBuffer(
         uniformBuffer,
@@ -174,7 +164,10 @@ export function RotatingCube() {
         transformationMatrix.byteLength,
       );
       const texture = context.getCurrentTexture();
-      if (!texture) { return }
+      if (!texture) {
+        requestAnimationFrame(frame);
+        return
+      }
       (renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[])[0]!.view = texture.createView();
 
       const commandEncoder = device.createCommandEncoder();
@@ -187,7 +180,9 @@ export function RotatingCube() {
       device.queue.submit([commandEncoder.finish()]);
       context.presentSurface();
       texture.destroy();
-    }, 1000/60)
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
   };
 
   return (

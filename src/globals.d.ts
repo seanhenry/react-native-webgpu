@@ -3,6 +3,8 @@ interface WGPUContext {
   surfaceCapabilities: SurfaceCapabilities;
   getCurrentTexture(): GPUTexture | null;
   presentSurface(): void;
+  width: number;
+  height: number;
 }
 
 interface SurfaceCapabilities {

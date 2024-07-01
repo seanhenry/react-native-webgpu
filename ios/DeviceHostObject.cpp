@@ -30,7 +30,6 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
             WGPURenderPipelineDescriptor descriptor = {
                 .layout = NULL, // TODO: GPUPipelineLayout
                 .vertex = vertex,
-                .multisample = makeDefaultWGPUMultisampleState(),
             };
             if (options.hasProperty(runtime, "primitive")) {
                 descriptor.primitive = makeWGPUPrimitiveState(runtime, WGPU_OBJ(options, primitive));
@@ -45,6 +44,15 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
                 fragment = makeGPUFragmentState(runtime, &autoReleasePool, WGPU_OBJ(options, fragment));
                 descriptor.fragment = &fragment;
             }
+            WGPUMultisampleState multisample = makeDefaultWGPUMultisampleState();
+            if (options.hasProperty(runtime, "multisample")) {
+                auto multisampleIn = options.getPropertyAsObject(runtime, "multisample");
+                multisample.alphaToCoverageEnabled = WGPU_BOOL_OPT(multisampleIn, alphaToCoverageEnabled, false);
+                multisample.count = WGPU_NUMBER_OPT(multisampleIn, count, uint32_t, 1);
+                multisample.mask = WGPU_NUMBER_OPT(multisampleIn, mask, uint32_t, 0xFFFFFFFF);
+            }
+            descriptor.multisample = multisample;
+
             auto pipeline = wgpuDeviceCreateRenderPipeline(_value, &descriptor);
 
             return Object::createFromHostObject(runtime, std::make_shared<RenderPipelineHostObject>(pipeline, _context));
@@ -109,6 +117,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
             WGPUTextureDescriptor descriptor = makeDefaultWGPUTextureDescriptor(StringToWGPUTextureFormat(format));
             descriptor.size = makeGPUExtent3D(runtime, WGPU_OBJ(desc, size));
             descriptor.usage = WGPU_NUMBER(desc, usage, WGPUTextureUsageFlags);
+            descriptor.sampleCount = WGPU_NUMBER_OPT(desc, sampleCount, uint32_t, 1);
             auto texture = wgpuDeviceCreateTexture(_value, &descriptor);
             return Object::createFromHostObject(runtime, std::make_shared<TextureHostObject>(texture, _context));
         });

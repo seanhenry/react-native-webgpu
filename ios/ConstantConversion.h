@@ -18,3 +18,6 @@ WGPUVertexStepMode StringToWGPUVertexStepMode(const char *str);
 WGPUCullMode StringToWGPUCullMode(const char *str);
 WGPUCompareFunction StringToWGPUCompareFunction(const char *str);
 WGPUFilterMode StringToWGPUFilterMode(const char *str);
+WGPUTextureDimension StringToWGPUTextureDimension(const char *str);
+WGPUTextureViewDimension StringToWGPUTextureViewDimension(const char *str);
+WGPUTextureAspect StringToWGPUTextureAspect(const char *str);

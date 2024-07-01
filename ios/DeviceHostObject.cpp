@@ -116,10 +116,12 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         return WGPU_FUNC_FROM_HOST_FUNC(createTexture, 1, [this]) {
             auto desc = arguments[0].asObject(runtime);
             auto format = desc.getProperty(runtime, "format").asString(runtime).utf8(runtime);
+            auto dimension = WGPU_UTF8_OPT(desc, dimension, "2d");
             WGPUTextureDescriptor descriptor = makeDefaultWGPUTextureDescriptor(StringToWGPUTextureFormat(format));
             descriptor.size = makeGPUExtent3D(runtime, WGPU_OBJ(desc, size));
             descriptor.usage = WGPU_NUMBER(desc, usage, WGPUTextureUsageFlags);
             descriptor.sampleCount = WGPU_NUMBER_OPT(desc, sampleCount, uint32_t, 1);
+            descriptor.dimension = StringToWGPUTextureDimension(dimension.data());
             auto texture = wgpuDeviceCreateTexture(_value, &descriptor);
             return Object::createFromHostObject(runtime, std::make_shared<TextureHostObject>(texture, _context));
         });

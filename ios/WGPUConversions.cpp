@@ -169,5 +169,24 @@ WGPUColor wgpu::makeWGPUColorFromProp(Runtime &runtime, Object &obj, const char 
 WGPUImageCopyTexture wgpu::makeWGPUImageCopyTexture(Runtime &runtime, Object obj) {
     auto textureIn = WGPU_HOST_OBJ(obj, texture, TextureHostObject)->_value;
     auto textureOut = makeDefaultImageCopyTexture(textureIn);
+    if (obj.hasProperty(runtime, "origin")) {
+        textureOut.origin = makeWGPUOrigin3D(runtime, obj.getPropertyAsObject(runtime, "origin"));
+    }
     return textureOut;
+}
+
+WGPUOrigin3D wgpu::makeWGPUOrigin3D(Runtime &runtime, Object obj) {
+    WGPUOrigin3D origin = {0};
+    if (obj.isArray(runtime)) {
+        auto array = obj.asArray(runtime);
+        auto size = array.size(runtime);
+        origin.x = size > 0 ? (uint32_t)array.getValueAtIndex(runtime, 0).asNumber() : 0;
+        origin.y = size > 1 ? (uint32_t)array.getValueAtIndex(runtime, 1).asNumber() : 0;
+        origin.z = size > 2 ? (uint32_t)array.getValueAtIndex(runtime, 2).asNumber() : 0;
+    } else {
+        origin.x = WGPU_NUMBER_OPT(obj, x, uint32_t, 0);
+        origin.y = WGPU_NUMBER_OPT(obj, y, uint32_t, 0);
+        origin.z = WGPU_NUMBER_OPT(obj, z, uint32_t, 0);
+    }
+    return origin;
 }

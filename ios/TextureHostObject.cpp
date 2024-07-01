@@ -2,6 +2,8 @@
 #include "WGPUJsiUtils.h"
 #include "WGPUContext.h"
 #include "TextureViewHostObject.h"
+#include "ConstantConversion.h"
+#include "WGPUDefaults.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
@@ -11,7 +13,14 @@ Value TextureHostObject::get(Runtime &runtime, const PropNameID &propName) {
 
     if (name == "createView") {
         return WGPU_FUNC_FROM_HOST_FUNC(createView, 1, [this]) {
-            auto view = wgpuTextureCreateView(_value, NULL);
+            WGPUTextureView view = NULL;
+            if (count > 0) {
+                auto descriptor = makeDefaultWGPUTextureViewDescriptor(runtime, arguments[0].asObject(runtime), _value);
+                view = wgpuTextureCreateView(_value, &descriptor);
+            } else {
+                view = wgpuTextureCreateView(_value, NULL);
+            }
+
             return Object::createFromHostObject(runtime, std::make_shared<TextureViewHostObject>(view, _context));
         });
     }

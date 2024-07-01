@@ -98,10 +98,10 @@ type GPUIntegerCoordinateOut =
 //
 //   | Iterable<GPUIntegerCoordinate>
 //   | GPUOrigin2DDict;
-// type GPUOrigin3D =
-//
-//   | Iterable<GPUIntegerCoordinate>
-//   | GPUOrigin3DDict;
+type GPUOrigin3D =
+
+  | Iterable<GPUIntegerCoordinate>
+  | GPUOrigin3DDict;
 // type GPUPipelineConstantValue =
 //   number;
 type GPUSampleMask =
@@ -279,11 +279,11 @@ type GPUStoreOp =
 //   | "all"
 //   | "stencil-only"
 //   | "depth-only";
-// type GPUTextureDimension =
-//
-//   | "1d"
-//   | "2d"
-//   | "3d";
+type GPUTextureDimension =
+
+  | "1d"
+  | "2d"
+  | "3d";
 type GPUTextureFormat =
 
   | "r8unorm"
@@ -388,14 +388,14 @@ type GPUTextureFormat =
 //   | "depth"
 //   | "sint"
 //   | "uint";
-// type GPUTextureViewDimension =
-//
-//   | "1d"
-//   | "2d"
-//   | "2d-array"
-//   | "cube"
-//   | "cube-array"
-//   | "3d";
+type GPUTextureViewDimension =
+
+  | "1d"
+  | "2d"
+  | "2d-array"
+  | "cube"
+  | "cube-array"
+  | "3d";
 type GPUVertexFormat =
 
   | "uint8x2"
@@ -921,11 +921,11 @@ interface GPUImageCopyTexture {
 //    * Mip-map level of the {@link GPUImageCopyTexture#texture} to copy to/from.
 //    */
 //   mipLevel?: GPUIntegerCoordinate;
-//   /**
-//    * Defines the origin of the copy - the minimum corner of the texture sub-region to copy to/from.
-//    * Together with `copySize`, defines the full copy sub-region.
-//    */
-//   origin?: GPUOrigin3D;
+  /**
+   * Defines the origin of the copy - the minimum corner of the texture sub-region to copy to/from.
+   * Together with `copySize`, defines the full copy sub-region.
+   */
+  origin?: GPUOrigin3D;
 //   /**
 //    * Defines which aspects of the {@link GPUImageCopyTexture#texture} to copy to/from.
 //    */
@@ -1009,12 +1009,12 @@ interface GPUObjectDescriptorBase {
 //   y?: GPUIntegerCoordinate;
 // }
 //
-// interface GPUOrigin3DDict {
-//   x?: GPUIntegerCoordinate;
-//   y?: GPUIntegerCoordinate;
-//   z?: GPUIntegerCoordinate;
-// }
-//
+interface GPUOrigin3DDict {
+  x?: GPUIntegerCoordinate;
+  y?: GPUIntegerCoordinate;
+  z?: GPUIntegerCoordinate;
+}
+
 interface GPUPipelineDescriptorBase
   extends GPUObjectDescriptorBase {
   /**
@@ -1565,10 +1565,10 @@ interface GPUTextureDescriptor
    * a multisampled texture.
    */
   sampleCount?: GPUSize32;
-//   /**
-//    * Whether the texture is one-dimensional, an array of two-dimensional layers, or three-dimensional.
-//    */
-//   dimension?: GPUTextureDimension;
+  /**
+   * Whether the texture is one-dimensional, an array of two-dimensional layers, or three-dimensional.
+   */
+  dimension?: GPUTextureDimension;
   /**
    * The format of the texture.
    */
@@ -1610,10 +1610,10 @@ interface GPUTextureViewDescriptor
 //    * texture or one of the {@link GPUTextureDescriptor#viewFormats} specified during its creation.
 //    */
 //   format?: GPUTextureFormat;
-//   /**
-//    * The dimension to view the texture as.
-//    */
-//   dimension?: GPUTextureViewDimension;
+  /**
+   * The dimension to view the texture as.
+   */
+  dimension?: GPUTextureViewDimension;
 //   /**
 //    * Which {@link GPUTextureAspect|aspect(s)} of the texture are accessible to the texture view.
 //    */
@@ -3071,7 +3071,7 @@ interface GPUTexture
    * @param descriptor - Description of the {@link GPUTextureView} to create.
    */
   createView(
-    // descriptor?: GPUTextureViewDescriptor
+    descriptor?: GPUTextureViewDescriptor
   ): GPUTextureView;
   /**
    * Destroys the {@link GPUTexture}.

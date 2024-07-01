@@ -18,5 +18,6 @@ void makeWGPUBindingResource(Runtime &runtime, Value value, WGPUBindGroupEntry *
 WGPUColor makeWGPUColor(Runtime &runtime, Value &value);
 WGPUColor makeWGPUColorFromProp(Runtime &runtime, Object &obj, const char *propName);
 WGPUImageCopyTexture makeWGPUImageCopyTexture(Runtime &runtime, Object obj);
+WGPUOrigin3D makeWGPUOrigin3D(Runtime &runtime, Object obj);
 
 }

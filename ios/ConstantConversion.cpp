@@ -330,3 +330,27 @@ WGPUFilterMode StringToWGPUFilterMode(const char *str) {
     if (strcmp(str, "linear") == 0) { return WGPUFilterMode_Linear; }
     return WGPUFilterMode_Nearest;
 }
+
+WGPUTextureDimension StringToWGPUTextureDimension(const char *str) {
+    if (strcmp(str, "1d") == 0) { return WGPUTextureDimension_1D; }
+    if (strcmp(str, "2d") == 0) { return WGPUTextureDimension_2D; }
+    if (strcmp(str, "3d") == 0) { return WGPUTextureDimension_3D; }
+    return WGPUTextureDimension_2D;
+}
+
+WGPUTextureViewDimension StringToWGPUTextureViewDimension(const char *str) {
+    if (strcmp(str, "1d") == 0) { return WGPUTextureViewDimension_1D; }
+    if (strcmp(str, "2d") == 0) { return WGPUTextureViewDimension_2D; }
+    if (strcmp(str, "2d-array") == 0) { return WGPUTextureViewDimension_2DArray; }
+    if (strcmp(str, "cube") == 0) { return WGPUTextureViewDimension_Cube; }
+    if (strcmp(str, "cube-array") == 0) { return WGPUTextureViewDimension_CubeArray; }
+    if (strcmp(str, "3d") == 0) { return WGPUTextureViewDimension_3D; }
+    return WGPUTextureViewDimension_Undefined;
+}
+
+WGPUTextureAspect StringToWGPUTextureAspect(const char *str) {
+    if (strcmp(str, "all") == 0) { return WGPUTextureAspect_All; }
+    if (strcmp(str, "depth-only") == 0) { return WGPUTextureAspect_DepthOnly; }
+    if (strcmp(str, "stencil-only") == 0) { return WGPUTextureAspect_StencilOnly; }
+    return WGPUTextureAspect_All;
+}

@@ -9,6 +9,7 @@ import { TwoCubes } from './WebGPUSamples/src/TwoCubes/TwoCubes';
 import { TexturedCube } from './WebGPUSamples/src/TexturedCube/TexturedCube';
 import { InstancedCube } from './WebGPUSamples/src/InstancedCube/InstancedCube';
 import { FractalCube } from './WebGPUSamples/src/FractalCube/FractalCube';
+import { CubeMap } from './WebGPUSamples/src/CubeMap/CubeMap';
 
 type Example = 'HelloTriangle'
   | 'HelloTriangleMSAA'
@@ -17,6 +18,7 @@ type Example = 'HelloTriangle'
   | 'TexturedCube'
   | 'InstancedCube'
   | 'FractalCube'
+  | 'CubeMap'
 
 // const example: string = 'HelloTriangle'
 // const example: string = 'HelloTriangleMSAA'
@@ -24,7 +26,8 @@ type Example = 'HelloTriangle'
 // const example: Example = 'TwoCubes'
 // const example: Example = 'TexturedCube'
 // const example: Example = 'InstancedCube'
-const example: Example = 'FractalCube'
+// const example: Example = 'FractalCube'
+const example: Example = 'CubeMap'
 
 const examples: Record<Example, ComponentType> = {
   HelloTriangle: HelloTriangle,
@@ -34,6 +37,7 @@ const examples: Record<Example, ComponentType> = {
   TexturedCube: TexturedCube,
   InstancedCube: InstancedCube,
   FractalCube: FractalCube,
+  CubeMap: CubeMap,
 }
 
 export default function App() {

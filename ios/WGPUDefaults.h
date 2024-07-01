@@ -1,6 +1,9 @@
 #pragma once
 
 #include "wgpu.h"
+#include <jsi/jsi.h>
+
+using namespace facebook::jsi;
 
 // Defaults can often be found
 // https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API
@@ -13,5 +16,6 @@ WGPUExtent3D makeDefaultWGPUExtent3D();
 WGPUTextureDescriptor makeDefaultWGPUTextureDescriptor(WGPUTextureFormat format);
 WGPUSamplerDescriptor makeDefaultSamplerDescriptor();
 WGPUImageCopyTexture makeDefaultImageCopyTexture(WGPUTexture texture);
+WGPUTextureViewDescriptor makeDefaultWGPUTextureViewDescriptor(Runtime &runtime, Object desc, WGPUTexture texture);
 
 }

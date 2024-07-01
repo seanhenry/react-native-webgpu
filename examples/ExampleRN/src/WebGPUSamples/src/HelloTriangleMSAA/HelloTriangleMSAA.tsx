@@ -1,3 +1,4 @@
+// https://webgpu.github.io/webgpu-samples/?sample=helloTriangleMSAA
 import { WebGpuView } from 'react-native-webgpu';
 import triangleVertWGSL from '../../shaders/triangle.vert.wgsl';
 import redFragWGSL from '../../shaders/red.frag.wgsl';

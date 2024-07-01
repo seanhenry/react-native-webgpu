@@ -616,14 +616,14 @@ interface GPUCanvasConfiguration {
    * Must be one of the Supported context formats.
    */
   format: GPUTextureFormat;
-  // /**
-  //  * The usage that textures returned by {@link GPUCanvasContext#getCurrentTexture} will have.
-  //  * {@link GPUTextureUsage#RENDER_ATTACHMENT} is the default, but is not automatically included
-  //  * if the usage is explicitly set. Be sure to include {@link GPUTextureUsage#RENDER_ATTACHMENT}
-  //  * when setting a custom usage if you wish to use textures returned by
-  //  * {@link GPUCanvasContext#getCurrentTexture} as color targets for a render pass.
-  //  */
-  // usage?: GPUTextureUsageFlags;
+  /**
+   * The usage that textures returned by {@link GPUCanvasContext#getCurrentTexture} will have.
+   * {@link GPUTextureUsage#RENDER_ATTACHMENT} is the default, but is not automatically included
+   * if the usage is explicitly set. Be sure to include {@link GPUTextureUsage#RENDER_ATTACHMENT}
+   * when setting a custom usage if you wish to use textures returned by
+   * {@link GPUCanvasContext#getCurrentTexture} as color targets for a render pass.
+   */
+  usage?: GPUTextureUsageFlags;
   // /**
   //  * The formats that views created from textures returned by
   //  * {@link GPUCanvasContext#getCurrentTexture} may use.
@@ -2194,19 +2194,19 @@ interface GPUCommandEncoder
 //     destination: GPUImageCopyBuffer,
 //     copySize: GPUExtent3DStrict
 //   ): undefined;
-//   /**
-//    * Encode a command into the {@link GPUCommandEncoder} that copies data from a sub-region of one
-//    * or multiple contiguous texture subresources to another sub-region of one or
-//    * multiple continuous texture subresources.
-//    * @param source - Combined with `copySize`, defines the region of the source texture subresources.
-//    * @param destination - Combined with `copySize`, defines the region of the destination texture subresources.
-//    * 	`copySize`:
-//    */
-//   copyTextureToTexture(
-//     source: GPUImageCopyTexture,
-//     destination: GPUImageCopyTexture,
-//     copySize: GPUExtent3DStrict
-//   ): undefined;
+  /**
+   * Encode a command into the {@link GPUCommandEncoder} that copies data from a sub-region of one
+   * or multiple contiguous texture subresources to another sub-region of one or
+   * multiple continuous texture subresources.
+   * @param source - Combined with `copySize`, defines the region of the source texture subresources.
+   * @param destination - Combined with `copySize`, defines the region of the destination texture subresources.
+   * 	`copySize`:
+   */
+  copyTextureToTexture(
+    source: GPUImageCopyTexture,
+    destination: GPUImageCopyTexture,
+    copySize: GPUExtent3DStrict
+  ): undefined;
 //   /**
 //    * Encode a command into the {@link GPUCommandEncoder} that fills a sub-region of a
 //    * {@link GPUBuffer} with zeros.

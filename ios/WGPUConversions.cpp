@@ -6,6 +6,7 @@
 #include "SamplerHostObject.h"
 #include "BufferHostObject.h"
 #include "TextureViewHostObject.h"
+#include "TextureHostObject.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
@@ -163,4 +164,10 @@ WGPUColor wgpu::makeWGPUColorFromProp(Runtime &runtime, Object &obj, const char 
         return makeWGPUColor(runtime, clearValueIn);
     }
     return {.r = 0.0, .g = 0.0, .b = 0.0, .a = 0.0};
+}
+
+WGPUImageCopyTexture wgpu::makeWGPUImageCopyTexture(Runtime &runtime, Object obj) {
+    auto textureIn = WGPU_HOST_OBJ(obj, texture, TextureHostObject)->_value;
+    auto textureOut = makeDefaultImageCopyTexture(textureIn);
+    return textureOut;
 }

@@ -38,7 +38,7 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
               .height = height,
               .device = device->_value,
               .format = StringToWGPUTextureFormat(format),
-              .usage = WGPUTextureUsage_RenderAttachment, // TODO: this is the default
+              .usage = WGPU_NUMBER_OPT(options, usage, WGPUTextureUsage, WGPUTextureUsage_RenderAttachment),
               .presentMode = WGPUPresentMode_Fifo, // TODO:
 //              .viewFormats = {},
 //              .viewFormatCount = 0,

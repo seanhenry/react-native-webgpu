@@ -67,6 +67,19 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
         });
     }
 
+    if (name == "copyTextureToTexture") {
+        return WGPU_FUNC_FROM_HOST_FUNC(copyTextureToTexture, 3, [this]) {
+            auto source = arguments[0].asObject(runtime);
+            auto destination = arguments[1].asObject(runtime);
+            auto copySize = makeGPUExtent3D(runtime, arguments[2].asObject(runtime));
+
+            auto sourceCopyTexture = makeWGPUImageCopyTexture(runtime, std::move(source));
+            auto destCopyTexture = makeWGPUImageCopyTexture(runtime, std::move(destination));
+            wgpuCommandEncoderCopyTextureToTexture(_value, &sourceCopyTexture, &destCopyTexture, &copySize);
+            return Value::undefined();
+        });
+    }
+
     return Value::undefined();
 }
 

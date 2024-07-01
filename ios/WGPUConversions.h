@@ -17,5 +17,6 @@ WGPUExtent3D makeGPUExtent3D(Runtime &runtime, Object obj);
 void makeWGPUBindingResource(Runtime &runtime, Value value, WGPUBindGroupEntry *entry);
 WGPUColor makeWGPUColor(Runtime &runtime, Value &value);
 WGPUColor makeWGPUColorFromProp(Runtime &runtime, Object &obj, const char *propName);
+WGPUImageCopyTexture makeWGPUImageCopyTexture(Runtime &runtime, Object obj);
 
 }

@@ -1,3 +1,4 @@
+// https://webgpu.github.io/webgpu-samples/?sample=texturedCube
 import { mat4, vec3 } from 'wgpu-matrix';
 
 import {

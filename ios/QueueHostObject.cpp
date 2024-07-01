@@ -67,9 +67,8 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
                 throw JSError(runtime, "Only supports ImageBitmap");
             }
 
-            auto destinationParam = arguments[1].asObject(runtime);
-            auto textureIn = destinationParam.getPropertyAsObject(runtime, "texture").asHostObject<TextureHostObject>(runtime);
-            WGPUImageCopyTexture copyTexture = makeDefaultImageCopyTexture(textureIn->_value);
+            auto destination = arguments[1].asObject(runtime);
+            auto copyTexture = makeWGPUImageCopyTexture(runtime, std::move(destination));
 
             auto copySize = makeGPUExtent3D(runtime, arguments[2].asObject(runtime));
 

@@ -1,8 +1,9 @@
-// https://webgpu.github.io/webgpu-samples/?sample=instancedCube
+// https://webgpu.github.io/webgpu-samples/?sample=fractalCube
 import { CenterSquare } from '../../../Components/CenterSquare';
 import { WebGpuView } from 'react-native-webgpu';
+import { globalStyles } from '../../../Components/globalStyles';
 import React from 'react'
-import { mat4, type Mat4, vec3 } from 'wgpu-matrix';
+import { mat4, vec3 } from 'wgpu-matrix';
 
 import {
   cubeVertexArray,
@@ -11,25 +12,30 @@ import {
   cubePositionOffset,
   cubeVertexCount,
 } from '../../meshes/cube';
-import instancedVertWGSL from './instanced.vert.wgsl';
-import vertexPositionColorWGSL from '../../shaders/vertexPositionColor.frag.wgsl';
-import { globalStyles } from '../../../Components/globalStyles';
 
-export const InstancedCube = () => {
+import basicVertWGSL from '../../shaders/basic.vert.wgsl';
+import sampleSelfWGSL from './sampleSelf.frag.wgsl';
+
+export const FractalCube = () => {
   const onInit = async ({identifier}: {identifier: string}) => {
-    const {navigator, getContext} = global.webGPU
 
+    const {navigator, getContext} = global.webGPU;
     const context = getContext({identifier});
     const adapter = await navigator.gpu.requestAdapter({context});
     const device = await adapter!.requestDevice();
 
-    const {formats, alphaModes} = context.surfaceCapabilities;
     const {width, height} = context;
+    const {formats, alphaModes} = context.surfaceCapabilities;
+
     const presentationFormat = formats[0]!;
 
     context.configure({
       device,
       format: presentationFormat,
+
+      // Specify we want both RENDER_ATTACHMENT and COPY_SRC since we
+      // will copy out of the swapchain texture.
+      usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
       alphaMode: alphaModes[0],
     });
 
@@ -46,7 +52,7 @@ export const InstancedCube = () => {
       layout: 'auto',
       vertex: {
         module: device.createShaderModule({
-          code: instancedVertWGSL,
+          code: basicVertWGSL,
         }),
         entryPoint: 'main',
         buffers: [
@@ -71,7 +77,7 @@ export const InstancedCube = () => {
       },
       fragment: {
         module: device.createShaderModule({
-          code: vertexPositionColorWGSL,
+          code: sampleSelfWGSL,
         }),
         entryPoint: 'main',
         targets: [
@@ -104,18 +110,24 @@ export const InstancedCube = () => {
       usage: GPUTextureUsage.RENDER_ATTACHMENT,
     });
 
-    const xCount = 4;
-    const yCount = 4;
-    const numInstances = xCount * yCount;
-    const matrixFloatCount = 16; // 4x4 matrix
-    const matrixSize = 4 * matrixFloatCount;
-    const uniformBufferSize = numInstances * matrixSize;
-
-    // Allocate a buffer large enough to hold transforms for every
-    // instance.
+    const uniformBufferSize = 4 * 16; // 4x4 matrix
     const uniformBuffer = device.createBuffer({
       size: uniformBufferSize,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
+
+    // We will copy the frame's rendering results into this texture and
+    // sample it on the next frame.
+    const cubeTexture = device.createTexture({
+      size: [width, height],
+      format: presentationFormat,
+      usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+    });
+
+    // Create a sampler with linear filtering for smooth interpolation.
+    const sampler = device.createSampler({
+      magFilter: 'linear',
+      minFilter: 'linear',
     });
 
     const uniformBindGroup = device.createBindGroup({
@@ -127,65 +139,16 @@ export const InstancedCube = () => {
             buffer: uniformBuffer,
           },
         },
+        {
+          binding: 1,
+          resource: sampler,
+        },
+        {
+          binding: 2,
+          resource: cubeTexture.createView(),
+        },
       ],
     });
-
-    const aspect = width / height;
-    const projectionMatrix = mat4.perspective((2 * Math.PI) / 5, aspect, 1, 100.0);
-
-    const modelMatrices = new Array<Mat4>(numInstances);
-    const mvpMatricesData = new Float32Array(matrixFloatCount * numInstances);
-
-    const step = 4.0;
-
-    // Initialize the matrix data for every instance.
-    let m = 0;
-    for (let x = 0; x < xCount; x++) {
-      for (let y = 0; y < yCount; y++) {
-        modelMatrices[m] = mat4.translation(
-          vec3.fromValues(
-            step * (x - xCount / 2 + 0.5),
-            step * (y - yCount / 2 + 0.5),
-            0
-          )
-        );
-        m++;
-      }
-    }
-
-    const viewMatrix = mat4.translation(vec3.fromValues(0, 0, -12));
-
-    const tmpMat4 = mat4.create();
-
-    // Update the transformation matrix data for each instance.
-    function updateTransformationMatrix() {
-      const now = Date.now() / 1000;
-
-      let m = 0,
-        i = 0;
-      for (let x = 0; x < xCount; x++) {
-        for (let y = 0; y < yCount; y++) {
-          mat4.rotate(
-            modelMatrices[i]!,
-            vec3.fromValues(
-              Math.sin((x + 0.5) * now),
-              Math.cos((y + 0.5) * now),
-              0
-            ),
-            1,
-            tmpMat4
-          );
-
-          mat4.multiply(viewMatrix, tmpMat4, tmpMat4);
-          mat4.multiply(projectionMatrix, tmpMat4, tmpMat4);
-
-          mvpMatricesData.set(tmpMat4, m);
-
-          i++;
-          m += matrixFloatCount;
-        }
-      }
-    }
 
     const renderPassDescriptor: GPURenderPassDescriptor = {
       colorAttachments: [
@@ -206,42 +169,76 @@ export const InstancedCube = () => {
       },
     };
 
+    const aspect = width / height;
+    const projectionMatrix = mat4.perspective((2 * Math.PI) / 5, aspect, 1, 100.0);
+    const modelViewProjectionMatrix = mat4.create();
+
+    function getTransformationMatrix() {
+      const viewMatrix = mat4.identity();
+      mat4.translate(viewMatrix, vec3.fromValues(0, 0, -4), viewMatrix);
+      const now = Date.now() / 1000;
+      mat4.rotate(
+        viewMatrix,
+        vec3.fromValues(Math.sin(now), Math.cos(now), 0),
+        1,
+        viewMatrix
+      );
+
+      mat4.multiply(projectionMatrix, viewMatrix, modelViewProjectionMatrix);
+
+      return modelViewProjectionMatrix;
+    }
+
     function frame() {
-      const framebuffer = context.getCurrentTexture();
-      if (!framebuffer) {
+      const swapChainTexture = context.getCurrentTexture();
+      if (!swapChainTexture) {
         requestAnimationFrame(frame);
         return;
       }
-      // Update the matrix data.
-      updateTransformationMatrix();
+      const transformationMatrix = getTransformationMatrix();
       device.queue.writeBuffer(
         uniformBuffer,
         0,
-        mvpMatricesData.buffer,
-        mvpMatricesData.byteOffset,
-        mvpMatricesData.byteLength
+        transformationMatrix.buffer,
+        transformationMatrix.byteOffset,
+        transformationMatrix.byteLength
       );
 
-      (renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[])[0]!.view = framebuffer.createView();
+      // prettier-ignore
+      (renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[])[0]!.view = swapChainTexture.createView();
 
       const commandEncoder = device.createCommandEncoder();
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
       passEncoder.setPipeline(pipeline);
       passEncoder.setBindGroup(0, uniformBindGroup);
       passEncoder.setVertexBuffer(0, verticesBuffer);
-      passEncoder.draw(cubeVertexCount, numInstances, 0, 0);
+      passEncoder.draw(cubeVertexCount);
       passEncoder.end();
+
+      // Copy the rendering results from the swapchain into |cubeTexture|.
+      commandEncoder.copyTextureToTexture(
+        {
+          texture: swapChainTexture,
+        },
+        {
+          texture: cubeTexture,
+        },
+        [width, height]
+      );
+
       device.queue.submit([commandEncoder.finish()]);
 
       context.presentSurface();
-      framebuffer.destroy();
+      swapChainTexture.destroy();
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
+
   }
+
   return (
     <CenterSquare>
-      <WebGpuView identifier="InstancedCube" onInit={onInit} style={globalStyles.fill} />
+      <WebGpuView identifier="globalStyles" onInit={onInit} style={globalStyles.fill} />
     </CenterSquare>
   )
 }

@@ -4,6 +4,7 @@ import triangleVertWGSL from '../../shaders/triangle.vert.wgsl';
 import redFragWGSL from '../../shaders/red.frag.wgsl';
 import React from 'react';
 import { CenterSquare } from '../../../Components/CenterSquare';
+import { globalStyles } from '../../../Components/globalStyles';
 
 export function HelloTriangle() {
 
@@ -81,7 +82,7 @@ export function HelloTriangle() {
 
   return (
     <CenterSquare>
-      <WebGpuView identifier="HwlloTriangle" onInit={onInit} style={{ flex: 1, width: '100%' }} />
+      <WebGpuView identifier="HwlloTriangle" onInit={onInit} style={globalStyles.fill} />
     </CenterSquare>
   );
 }

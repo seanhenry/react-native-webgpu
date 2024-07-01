@@ -13,6 +13,7 @@ import sampleTextureMixColorWGSL from './sampleTextureMixColor.frag.wgsl';
 import { CenterSquare } from '../../../Components/CenterSquare';
 import { WebGpuView } from 'react-native-webgpu';
 import React from 'react';
+import { globalStyles } from '../../../Components/globalStyles';
 
 export const TexturedCube = () => {
   const onInit = async ({identifier}: {identifier: string}) => {
@@ -231,7 +232,7 @@ export const TexturedCube = () => {
   }
   return (
     <CenterSquare>
-      <WebGpuView identifier="TexturedCube" onInit={onInit} style={{width: '100%', height: '100%'}} />
+      <WebGpuView identifier="TexturedCube" onInit={onInit} style={globalStyles.fill} />
     </CenterSquare>
   )
 }

@@ -4,6 +4,7 @@ import triangleVertWGSL from '../../shaders/triangle.vert.wgsl';
 import redFragWGSL from '../../shaders/red.frag.wgsl';
 import { CenterSquare } from '../../../Components/CenterSquare';
 import React from 'react';
+import { globalStyles } from '../../../Components/globalStyles';
 
 export function HelloTriangleMSAA() {
   const onInit = async ({ identifier }: { identifier: string }) => {
@@ -98,7 +99,7 @@ export function HelloTriangleMSAA() {
   };
   return (
     <CenterSquare>
-      <WebGpuView identifier="HelloTriangleMSAA" onInit={onInit} style={{ width: '100%', height: '100%' }} />
+      <WebGpuView identifier="HelloTriangleMSAA" onInit={onInit} style={globalStyles.fill} />
     </CenterSquare>
   );
 }

@@ -7,18 +7,21 @@ import { HelloTriangleMSAA } from './WebGPUSamples/src/HelloTriangleMSAA/HelloTr
 import { RotatingCube } from './WebGPUSamples/src/RotatingCube/RotatingCube';
 import { TwoCubes } from './WebGPUSamples/src/TwoCubes/TwoCubes';
 import { TexturedCube } from './WebGPUSamples/src/TexturedCube/TexturedCube';
+import { InstancedCube } from './WebGPUSamples/src/InstancedCube/InstancedCube';
 
 type Example = 'HelloTriangle'
   | 'HelloTriangleMSAA'
   | 'RotatingCube'
   | 'TwoCubes'
   | 'TexturedCube'
+  | 'InstancedCube'
 
 // const example: string = 'HelloTriangle'
 // const example: string = 'HelloTriangleMSAA'
 // const example: string = 'RotatingCube'
 // const example: Example = 'TwoCubes'
-const example: Example = 'TexturedCube'
+// const example: Example = 'TexturedCube'
+const example: Example = 'InstancedCube'
 
 const examples: Record<Example, ComponentType> = {
   HelloTriangle: HelloTriangle,
@@ -26,6 +29,7 @@ const examples: Record<Example, ComponentType> = {
   RotatingCube: RotatingCube,
   TwoCubes: TwoCubes,
   TexturedCube: TexturedCube,
+  InstancedCube: InstancedCube,
 }
 
 export default function App() {

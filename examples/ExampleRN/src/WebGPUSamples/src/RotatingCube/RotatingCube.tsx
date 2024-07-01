@@ -8,6 +8,7 @@ import vertexPositionColorWGSL from '../../shaders/vertexPositionColor.frag.wgsl
 import { WebGpuView } from 'react-native-webgpu';
 import React from 'react';
 import { CenterSquare } from '../../../Components/CenterSquare';
+import { globalStyles } from '../../../Components/globalStyles';
 
 export function RotatingCube() {
   const onInit = async ({identifier}: {identifier: string}) => {
@@ -188,7 +189,7 @@ export function RotatingCube() {
 
   return (
     <CenterSquare>
-      <WebGpuView identifier="RotatingCube" onInit={onInit} style={{ flex: 1, width: '100%' }} />
+      <WebGpuView identifier="RotatingCube" onInit={onInit} style={globalStyles.fill} />
     </CenterSquare>
   )
 }

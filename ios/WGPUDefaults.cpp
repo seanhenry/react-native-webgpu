@@ -39,3 +39,29 @@ WGPUTextureDescriptor wgpu::makeDefaultWGPUTextureDescriptor(WGPUTextureFormat f
         .viewFormatCount = 0,
     };
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/API/GPUDevice/createSampler#parameters
+WGPUSamplerDescriptor wgpu::makeDefaultSamplerDescriptor() {
+    return {
+        .addressModeU = WGPUAddressMode_ClampToEdge,
+        .addressModeV = WGPUAddressMode_ClampToEdge,
+        .addressModeW = WGPUAddressMode_ClampToEdge,
+        .compare = WGPUCompareFunction_Undefined,
+        .lodMinClamp = 0,
+        .lodMaxClamp = 32,
+        .maxAnisotropy = 1,
+        .magFilter = WGPUFilterMode_Nearest,
+        .minFilter = WGPUFilterMode_Nearest,
+        .mipmapFilter = WGPUMipmapFilterMode_Nearest,
+    };
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/API/GPUQueue/copyExternalImageToTexture#destination
+WGPUImageCopyTexture wgpu::makeDefaultImageCopyTexture(WGPUTexture texture) {
+    return {
+        .aspect = WGPUTextureAspect_All,
+        .origin = (WGPUOrigin3D){0},
+        .mipLevel = 0,
+        .texture = texture,
+    };
+}

@@ -2,6 +2,7 @@
 
 #include <jsi/jsi.h>
 #include "wgpu.h"
+#include "webgpu.h"
 
 using namespace facebook::jsi;
 
@@ -16,4 +17,4 @@ WGPUVertexFormat StringToWGPUVertexFormat(std::string &str);
 WGPUVertexStepMode StringToWGPUVertexStepMode(const char *str);
 WGPUCullMode StringToWGPUCullMode(const char *str);
 WGPUCompareFunction StringToWGPUCompareFunction(const char *str);
-
+WGPUFilterMode StringToWGPUFilterMode(const char *str);

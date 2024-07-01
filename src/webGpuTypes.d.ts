@@ -55,8 +55,8 @@ interface GPUExtent3DDictStrict
 //
 type GPUBindingResource =
 
-  // | GPUSampler
-  // | GPUTextureView
+  | GPUSampler
+  | GPUTextureView
   | GPUBufferBinding
   // | GPUExternalTexture;
 // type GPUBufferDynamicOffset =
@@ -77,9 +77,9 @@ type GPUColor =
 //   | GPUExtent3DDict;
 type GPUFlagsConstant =
   number;
-// type GPUImageCopyExternalImageSource =
-//
-//   | ImageBitmap
+type GPUImageCopyExternalImageSource =
+
+  | ImageBitmap
 //   | ImageData
 //   | HTMLImageElement
 //   | HTMLVideoElement
@@ -211,10 +211,10 @@ type GPUCullMode =
 //   | "rg11b10ufloat-renderable"
 //   | "bgra8unorm-storage"
 //   | "float32-filterable";
-// type GPUFilterMode =
-//
-//   | "nearest"
-//   | "linear";
+type GPUFilterMode =
+
+  | "nearest"
+  | "linear";
 // type GPUFrontFace =
 //
 //   | "ccw"
@@ -848,55 +848,55 @@ interface GPUFragmentState
 //   buffer: GPUBuffer;
 // }
 //
-// interface GPUImageCopyExternalImage {
-//   /**
-//    * The source of the image copy. The copy source data is captured at the moment that
-//    * {@link GPUQueue#copyExternalImageToTexture} is issued. Source size is defined by source
-//    * type, given by this table:
-//    * <table class=data>
-//    * <thead>
-//    * <tr>
-//    * <th>Source type
-//    * <th>Dimensions
-//    * </thead>
-//    * <tbody>
-//    * <tr>
-//    * <td>{@link ImageBitmap}
-//    * <td>{@link ImageBitmap#width|ImageBitmap.width},
-//    * {@link ImageBitmap#height|ImageBitmap.height}
-//    * <tr>
-//    * <td>{@link HTMLImageElement}
-//    * <td>{@link HTMLImageElement#naturalWidth|HTMLImageElement.naturalWidth},
-//    * {@link HTMLImageElement#naturalHeight|HTMLImageElement.naturalHeight}
-//    * <tr>
-//    * <td>{@link HTMLVideoElement}
-//    * <td>video/intrinsic width|intrinsic width of the frame,
-//    * video/intrinsic height|intrinsic height of the frame
-//    * <tr>
-//    * <td>{@link VideoFrame}
-//    * <td>{@link VideoFrame#codedWidth|VideoFrame.codedWidth},
-//    * {@link VideoFrame#codedHeight|VideoFrame.codedHeight}
-//    * <tr>
-//    * <td>{@link ImageData}
-//    * <td>{@link ImageData#width|ImageData.width},
-//    * {@link ImageData#height|ImageData.height}
-//    * <tr>
-//    * <td>{@link HTMLCanvasElement} or {@link OffscreenCanvas} with {@link CanvasRenderingContext2D} or {@link GPUCanvasContext}
-//    * <td>{@link HTMLCanvasElement#width|HTMLCanvasElement.width},
-//    * {@link HTMLCanvasElement#height|HTMLCanvasElement.height}
-//    * <tr>
-//    * <td>{@link HTMLCanvasElement} or {@link OffscreenCanvas} with {@link WebGLRenderingContextBase}
-//    * <td>{@link WebGLRenderingContextBase#drawingBufferWidth|WebGLRenderingContextBase.drawingBufferWidth},
-//    * {@link WebGLRenderingContextBase#drawingBufferHeight|WebGLRenderingContextBase.drawingBufferHeight}
-//    * <tr>
-//    * <td>{@link HTMLCanvasElement} or {@link OffscreenCanvas} with {@link ImageBitmapRenderingContext}
-//    * <td>{@link ImageBitmapRenderingContext}'s internal output bitmap
-//    * {@link ImageBitmap#width|ImageBitmap.width},
-//    * {@link ImageBitmap#height|ImageBitmap.height}
-//    * </tbody>
-//    * </table>
-//    */
-//   source: GPUImageCopyExternalImageSource;
+interface GPUImageCopyExternalImage {
+  /**
+   * The source of the image copy. The copy source data is captured at the moment that
+   * {@link GPUQueue#copyExternalImageToTexture} is issued. Source size is defined by source
+   * type, given by this table:
+   * <table class=data>
+   * <thead>
+   * <tr>
+   * <th>Source type
+   * <th>Dimensions
+   * </thead>
+   * <tbody>
+   * <tr>
+   * <td>{@link ImageBitmap}
+   * <td>{@link ImageBitmap#width|ImageBitmap.width},
+   * {@link ImageBitmap#height|ImageBitmap.height}
+   * <tr>
+   * <td>{@link HTMLImageElement}
+   * <td>{@link HTMLImageElement#naturalWidth|HTMLImageElement.naturalWidth},
+   * {@link HTMLImageElement#naturalHeight|HTMLImageElement.naturalHeight}
+   * <tr>
+   * <td>{@link HTMLVideoElement}
+   * <td>video/intrinsic width|intrinsic width of the frame,
+   * video/intrinsic height|intrinsic height of the frame
+   * <tr>
+   * <td>{@link VideoFrame}
+   * <td>{@link VideoFrame#codedWidth|VideoFrame.codedWidth},
+   * {@link VideoFrame#codedHeight|VideoFrame.codedHeight}
+   * <tr>
+   * <td>{@link ImageData}
+   * <td>{@link ImageData#width|ImageData.width},
+   * {@link ImageData#height|ImageData.height}
+   * <tr>
+   * <td>{@link HTMLCanvasElement} or {@link OffscreenCanvas} with {@link CanvasRenderingContext2D} or {@link GPUCanvasContext}
+   * <td>{@link HTMLCanvasElement#width|HTMLCanvasElement.width},
+   * {@link HTMLCanvasElement#height|HTMLCanvasElement.height}
+   * <tr>
+   * <td>{@link HTMLCanvasElement} or {@link OffscreenCanvas} with {@link WebGLRenderingContextBase}
+   * <td>{@link WebGLRenderingContextBase#drawingBufferWidth|WebGLRenderingContextBase.drawingBufferWidth},
+   * {@link WebGLRenderingContextBase#drawingBufferHeight|WebGLRenderingContextBase.drawingBufferHeight}
+   * <tr>
+   * <td>{@link HTMLCanvasElement} or {@link OffscreenCanvas} with {@link ImageBitmapRenderingContext}
+   * <td>{@link ImageBitmapRenderingContext}'s internal output bitmap
+   * {@link ImageBitmap#width|ImageBitmap.width},
+   * {@link ImageBitmap#height|ImageBitmap.height}
+   * </tbody>
+   * </table>
+   */
+  source: GPUImageCopyExternalImageSource;
 //   /**
 //    * Defines the origin of the copy - the minimum (top-left) corner of the source sub-region to copy from.
 //    * Together with `copySize`, defines the full copy sub-region.
@@ -910,13 +910,13 @@ interface GPUFragmentState
 //    * of the source image, increasing downward.
 //    */
 //   flipY?: boolean;
-// }
-//
-// interface GPUImageCopyTexture {
-//   /**
-//    * Texture to copy to/from.
-//    */
-//   texture: GPUTexture;
+}
+
+interface GPUImageCopyTexture {
+  /**
+   * Texture to copy to/from.
+   */
+  texture: GPUTexture;
 //   /**
 //    * Mip-map level of the {@link GPUImageCopyTexture#texture} to copy to/from.
 //    */
@@ -930,10 +930,10 @@ interface GPUFragmentState
 //    * Defines which aspects of the {@link GPUImageCopyTexture#texture} to copy to/from.
 //    */
 //   aspect?: GPUTextureAspect;
-// }
-//
-// interface GPUImageCopyTextureTagged
-//   extends GPUImageCopyTexture {
+}
+
+interface GPUImageCopyTextureTagged
+  extends GPUImageCopyTexture {
 //   /**
 //    * Describes the color space and encoding used to encode data into the destination texture.
 //    * This [[#color-space-conversions|may result]] in values outside of the range [0, 1]
@@ -955,7 +955,7 @@ interface GPUFragmentState
 //    * conversion may not be necessary. See [[#color-space-conversion-elision]].
 //    */
 //   premultipliedAlpha?: boolean;
-// }
+}
 //
 // interface GPUImageDataLayout {
 //   /**
@@ -1378,8 +1378,8 @@ interface GPURequestAdapterOptions {
 //   type?: GPUSamplerBindingType;
 // }
 //
-// interface GPUSamplerDescriptor
-//   extends GPUObjectDescriptorBase {
+interface GPUSamplerDescriptor
+  extends GPUObjectDescriptorBase {
 //   /**
 //    */
 //   addressModeU?: GPUAddressMode;
@@ -1391,15 +1391,15 @@ interface GPURequestAdapterOptions {
 //    * coordinates, respectively.
 //    */
 //   addressModeW?: GPUAddressMode;
-//   /**
-//    * Specifies the sampling behavior when the sample footprint is smaller than or equal to one
-//    * texel.
-//    */
-//   magFilter?: GPUFilterMode;
-//   /**
-//    * Specifies the sampling behavior when the sample footprint is larger than one texel.
-//    */
-//   minFilter?: GPUFilterMode;
+  /**
+   * Specifies the sampling behavior when the sample footprint is smaller than or equal to one
+   * texel.
+   */
+  magFilter?: GPUFilterMode;
+  /**
+   * Specifies the sampling behavior when the sample footprint is larger than one texel.
+   */
+  minFilter?: GPUFilterMode;
 //   /**
 //    * Specifies behavior for sampling between mipmap levels.
 //    */
@@ -1433,8 +1433,8 @@ interface GPURequestAdapterOptions {
 //    * </div>
 //    */
 //   maxAnisotropy?: number;
-// }
-//
+}
+
 // interface GPUShaderModuleCompilationHint {
 //   entryPoint: string;
 //   /**
@@ -1746,6 +1746,7 @@ interface GPUDebugCommandsMixin {
 }
 
 interface GPUObjectBase {
+  labelNotImplemented?: never;
   // label: string;
 }
 
@@ -2440,13 +2441,13 @@ interface GPUDevice
   createTexture(
     descriptor: GPUTextureDescriptor
   ): GPUTexture;
-//   /**
-//    * Creates a {@link GPUSampler}.
-//    * @param descriptor - Description of the {@link GPUSampler} to create.
-//    */
-//   createSampler(
-//     descriptor?: GPUSamplerDescriptor
-//   ): GPUSampler;
+  /**
+   * Creates a {@link GPUSampler}.
+   * @param descriptor - Description of the {@link GPUSampler} to create.
+   */
+  createSampler(
+    descriptor?: GPUSamplerDescriptor
+  ): GPUSampler;
 //   /**
 //    * Creates a {@link GPUExternalTexture} wrapping the provided image source.
 //    * @param descriptor - Provides the external image source object (and any creation options).
@@ -2793,25 +2794,25 @@ interface GPUQueue
 //     dataLayout: GPUImageDataLayout,
 //     size: GPUExtent3DStrict
 //   ): undefined;
-//   /**
-//    * Issues a copy operation of the contents of a platform image/canvas
-//    * into the destination texture.
-//    * This operation performs [[#color-space-conversions|color encoding]] into the destination
-//    * encoding according to the parameters of {@link GPUImageCopyTextureTagged}.
-//    * Copying into a `-srgb` texture results in the same texture bytes, not the same decoded
-//    * values, as copying into the corresponding non-`-srgb` format.
-//    * Thus, after a copy operation, sampling the destination texture has
-//    * different results depending on whether its format is `-srgb`, all else unchanged.
-//    * <!-- POSTV1(srgb-linear): If added, explain here how it interacts. -->
-//    * @param source - source image and origin to copy to `destination`.
-//    * @param destination - The texture subresource and origin to write to, and its encoding metadata.
-//    * @param copySize - Extents of the content to write from `source` to `destination`.
-//    */
-//   copyExternalImageToTexture(
-//     source: GPUImageCopyExternalImage,
-//     destination: GPUImageCopyTextureTagged,
-//     copySize: GPUExtent3DStrict
-//   ): undefined;
+  /**
+   * Issues a copy operation of the contents of a platform image/canvas
+   * into the destination texture.
+   * This operation performs [[#color-space-conversions|color encoding]] into the destination
+   * encoding according to the parameters of {@link GPUImageCopyTextureTagged}.
+   * Copying into a `-srgb` texture results in the same texture bytes, not the same decoded
+   * values, as copying into the corresponding non-`-srgb` format.
+   * Thus, after a copy operation, sampling the destination texture has
+   * different results depending on whether its format is `-srgb`, all else unchanged.
+   * <!-- POSTV1(srgb-linear): If added, explain here how it interacts. -->
+   * @param source - source image and origin to copy to `destination`.
+   * @param destination - The texture subresource and origin to write to, and its encoding metadata.
+   * @param copySize - Extents of the content to write from `source` to `destination`.
+   */
+  copyExternalImageToTexture(
+    source: GPUImageCopyExternalImage,
+    destination: GPUImageCopyTextureTagged,
+    copySize: GPUExtent3DStrict
+  ): undefined;
 }
 
 // declare var GPUQueue: {
@@ -2971,16 +2972,16 @@ interface GPURenderPipeline
 //   new (): never;
 // };
 //
-// interface GPUSampler
-//   extends GPUObjectBase {
+interface GPUSampler
+  extends GPUObjectBase {
 //   /**
 //    * Nominal type branding.
 //    * https://github.com/microsoft/TypeScript/pull/33038
 //    * @internal
 //    */
 //   readonly __brand: "GPUSampler";
-// }
-//
+}
+
 // declare var GPUSampler: {
 //   prototype: GPUSampler;
 //   new (): never;

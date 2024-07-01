@@ -324,3 +324,9 @@ WGPUCompareFunction StringToWGPUCompareFunction(const char *str) {
     if (strcmp(str, "always") == 0) { return WGPUCompareFunction_Always; }
     return WGPUCompareFunction_Undefined;
 }
+
+WGPUFilterMode StringToWGPUFilterMode(const char *str) {
+    if (strcmp(str, "nearest") == 0) { return WGPUFilterMode_Nearest; }
+    if (strcmp(str, "linear") == 0) { return WGPUFilterMode_Linear; }
+    return WGPUFilterMode_Nearest;
+}

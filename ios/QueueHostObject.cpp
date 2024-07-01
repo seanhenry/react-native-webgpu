@@ -3,6 +3,10 @@
 #include "WGPUJsiUtils.h"
 #include "WGPUContext.h"
 #include "BufferHostObject.h"
+#include "WGPUConversions.h"
+#include "TextureHostObject.h"
+#include "ImageBitmapHostObject.h"
+#include "WGPUDefaults.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
@@ -35,6 +39,41 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
                 data.data(runtime) + dataOffset,
                 size
             );
+            return Value::undefined();
+        });
+    }
+
+    if (name == "copyExternalImageToTexture") {
+        return WGPU_FUNC_FROM_HOST_FUNC(copyExternalImageToTexture, 3, [this]) {
+            auto sourceParam = arguments[0].asObject(runtime);
+            
+            auto source = sourceParam.getPropertyAsObject(runtime, "source");
+
+            WGPUTextureDataLayout dataLayout = {0};
+            void *data = NULL;
+            size_t dataSize = 0;
+            // TODO: Support other sources
+            if (sourceParam.getPropertyAsObject(runtime, "source").isHostObject<ImageBitmapHostObject>(runtime)) {
+                auto imageBitmap = WGPU_HOST_OBJ(sourceParam, source, ImageBitmapHostObject);
+                data = imageBitmap->_data;
+                dataSize = imageBitmap->_size;
+
+                auto width = imageBitmap->_width;
+                auto height = imageBitmap->_height;
+                uint32_t bytesPerPixel = dataSize / (width * height);
+                dataLayout.rowsPerImage = height;
+                dataLayout.bytesPerRow = width * bytesPerPixel;
+            } else {
+                throw JSError(runtime, "Only supports ImageBitmap");
+            }
+
+            auto destinationParam = arguments[1].asObject(runtime);
+            auto textureIn = destinationParam.getPropertyAsObject(runtime, "texture").asHostObject<TextureHostObject>(runtime);
+            WGPUImageCopyTexture copyTexture = makeDefaultImageCopyTexture(textureIn->_value);
+
+            auto copySize = makeGPUExtent3D(runtime, arguments[2].asObject(runtime));
+
+            wgpuQueueWriteTexture(_value, &copyTexture, data, dataSize, &dataLayout, &copySize);
             return Value::undefined();
         });
     }

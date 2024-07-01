@@ -9,6 +9,8 @@
 #import "WGPUJsiUtils.h"
 #import "AdapterHostObject.h"
 #import <boost/format.hpp>
+#import <UIKit/UIKit.h>
+#import "UIImage+Bitmap.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
@@ -116,6 +118,41 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
         });
     });
 
+    auto createImageBitmap = WGPU_FUNC_FROM_HOST_FUNC(_createImageBitmap, 1, []) {
+        // https://developer.mozilla.org/en-US/docs/Web/API/createImageBitmap
+        // TODO: Support blob, etc
+        // TODO: Support options
+        // TODO: Support cropping
+        auto uri = arguments[0].asObject(runtime).getProperty(runtime, "uri").asString(runtime).utf8(runtime);
+
+        return makePromise(runtime, [uri = std::move(uri)](Promise *promise){
+            // TODO: Support file urls
+            NSURL *url = [NSURL URLWithString:[NSString stringWithCString:uri.data() encoding:NSUTF8StringEncoding]];
+            NSURLSession *session = NSURLSession.sharedSession;
+            NSURLSessionTask *task = [session dataTaskWithURL:url completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                auto &runtime = promise->runtime;
+                if (error != nil) {
+                    auto message = (boost::format("%s %s")
+                        % [error.userInfo[NSLocalizedFailureReasonErrorKey] cStringUsingEncoding:NSUTF8StringEncoding]
+                        % [error.userInfo[NSLocalizedRecoverySuggestionErrorKey] cStringUsingEncoding:NSUTF8StringEncoding]).str();
+                    promise->reject->call(promise->runtime, makeJSError(runtime, message));
+                } else if (data == nil) {
+                    NSHTTPURLResponse *r = (NSHTTPURLResponse *)response;
+                    auto message = (boost::format("[%li] No response") % r.statusCode).str();
+                    promise->reject->call(promise->runtime, makeJSError(runtime, message));
+                } else {
+                    Value bitmap = [[UIImage imageWithData:data] bitmapImageWithRuntime:runtime];
+                    if (bitmap.isNull()) {
+                        promise->reject->call(promise->runtime, makeJSError(runtime, "Failed to create bitmap"));
+                    } else {
+                        promise->resolve->call(promise->runtime, std::move(bitmap));
+                    }
+                }
+            }];
+            [task resume];
+        });
+    });
+
     auto gpu = Object(runtime);
     gpu.setProperty(runtime, "requestAdapter", std::move(requestAdapter));
 
@@ -125,8 +162,9 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
     auto webgpu = Object(runtime);
     webgpu.setProperty(runtime, "navigator", std::move(navigator));
     webgpu.setProperty(runtime, "getContext", std::move(getContext));
+    webgpu.setProperty(runtime, "__createImageBitmap", std::move(createImageBitmap));
 
-    runtime.global().setProperty(runtime, "webGPU", std::move(webgpu));
+    runtime.global().setProperty(runtime, "__webGPUNative", std::move(webgpu));
 
     return @(YES);
 }

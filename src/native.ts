@@ -1,4 +1,6 @@
 import {
+  Image,
+  type ImageSourcePropType,
   NativeModules,
   Platform,
   requireNativeComponent,
@@ -36,3 +38,19 @@ if (!WGPUWebGPUView) {
 if (!webGpuJsi.install()) {
   throw new Error("Failed to install JSI");
 }
+
+const globalObj = (global as any).__webGPUNative;
+
+function createImageBitmap(source: ImageSourcePropType) {
+  const resolvedSource = Image.resolveAssetSource(source)
+  return globalObj.__createImageBitmap(resolvedSource);
+}
+
+global.webGPU = new Proxy(globalObj, {
+  get: function(target, prop, receiver) {
+    if (prop === 'createImageBitmap') {
+      return createImageBitmap;
+    }
+    return Reflect.get(target, prop, receiver);
+  }
+});

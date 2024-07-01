@@ -62,12 +62,13 @@ export function HelloTriangleMSAA() {
     const view = texture.createView();
 
     function frame() {
-      const commandEncoder = device.createCommandEncoder();
       const framebuffer = context.getCurrentTexture();
       if (!framebuffer) {
         requestAnimationFrame(frame);
-        return
+        return;
       }
+
+      const commandEncoder = device.createCommandEncoder();
 
       const renderPassDescriptor: GPURenderPassDescriptor = {
         colorAttachments: [

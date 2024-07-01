@@ -48,13 +48,14 @@ export function HelloTriangle() {
     });
 
     function frame() {
-      const commandEncoder = device.createCommandEncoder();
-      const texture = context.getCurrentTexture();
-      if (!texture) {
+      const framebuffer = context.getCurrentTexture();
+      if (!framebuffer) {
         requestAnimationFrame(frame);
         return;
       }
-      const textureView = texture.createView();
+
+      const commandEncoder = device.createCommandEncoder();
+      const textureView = framebuffer.createView();
 
       const passEncoder = commandEncoder.beginRenderPass({
         colorAttachments: [
@@ -72,7 +73,7 @@ export function HelloTriangle() {
 
       device.queue.submit([commandEncoder.finish()]);
       context.presentSurface();
-      texture.destroy();
+      framebuffer.destroy();
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);

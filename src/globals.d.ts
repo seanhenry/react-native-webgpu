@@ -1,3 +1,5 @@
+import type { ImageSourcePropType } from 'react-native';
+
 interface WGPUContext {
   configure(options: GPUCanvasConfiguration): void;
   surfaceCapabilities: SurfaceCapabilities;
@@ -12,6 +14,12 @@ interface SurfaceCapabilities {
   alphaModes: GPUCanvasAlphaMode[];
 }
 
+interface ImageBitmap {
+  width: number;
+  height: number;
+  close(): void;
+}
+
 declare global {
   var webGPU: {
     navigator: NavigatorGPU;
@@ -21,6 +29,7 @@ declare global {
      * @param props Pass `identifier` from `onInit` when using multiple instances at once.
      */
     getContext(props?: {identifier: string}): WGPUContext;
+    createImageBitmap(source: ImageSourcePropType): Promise<ImageBitmap>
   };
 }
 

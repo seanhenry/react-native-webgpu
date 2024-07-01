@@ -3,7 +3,9 @@
 #include "WGPUDefaults.h"
 #include "WGPUJsiUtils.h"
 #include "ShaderModuleHostObject.h"
+#include "SamplerHostObject.h"
 #include "BufferHostObject.h"
+#include "TextureViewHostObject.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
@@ -118,22 +120,21 @@ WGPUExtent3D wgpu::makeGPUExtent3D(Runtime &runtime, Object obj) {
     return extent;
 }
 
-void wgpu::makeWGPUBufferBinding(Runtime &runtime, Object obj, WGPUBindGroupEntry *entry) {
-    auto buffer = WGPU_HOST_OBJ(obj, buffer, BufferHostObject);
-    entry->buffer = buffer->_value;
-    entry->offset = WGPU_NUMBER_OPT(obj, offset, size_t, 0);
-    entry->size = WGPU_NUMBER_OPT(obj, size, size_t, wgpuBufferGetSize(buffer->_value));
-}
-
 void wgpu::makeWGPUBindingResource(Runtime &runtime, Value value, WGPUBindGroupEntry *entry) {
-    if (value.isObject()) { // GPUBufferBinding
-        makeWGPUBufferBinding(runtime, value.asObject(runtime), entry);
+    if (value.isObject() && value.asObject(runtime).isHostObject<SamplerHostObject>(runtime)) {
+        entry->sampler = value.asObject(runtime).asHostObject<SamplerHostObject>(runtime)->_value;
+    } else if (value.isObject() && value.asObject(runtime).isHostObject<TextureViewHostObject>(runtime)) {
+        entry->textureView = value.asObject(runtime).asHostObject<TextureViewHostObject>(runtime)->_value;
+    } else if (value.isObject() && value.asObject(runtime).hasProperty(runtime, "buffer")) {
+        auto obj = value.asObject(runtime);
+        auto buffer = WGPU_HOST_OBJ(obj, buffer, BufferHostObject);
+        entry->buffer = buffer->_value;
+        entry->offset = WGPU_NUMBER_OPT(obj, offset, size_t, 0);
+        entry->size = WGPU_NUMBER_OPT(obj, size, size_t, wgpuBufferGetSize(buffer->_value));
     } else {
-        throw JSError(runtime, "Only WGPUBufferBinding is supported");
+        // TODO: GPUExternalTexture
+        throw JSError(runtime, "GPUExternalTexture is not supported");
     }
-    // TODO: GPUSampler
-    // TODO: GPUTextureView
-    // TODO: GPUExternalTexture
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/GPUCommandEncoder/beginRenderPass#color_attachment_object_structure

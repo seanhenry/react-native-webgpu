@@ -13,6 +13,8 @@
 #include "TextureHostObject.h"
 #include "BindGroupLayoutHostObject.h"
 #include "BindGroupHostObject.h"
+#include "SamplerHostObject.h"
+#include "WGPUDefaults.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
@@ -146,6 +148,21 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
             };
             auto bindGroup = wgpuDeviceCreateBindGroup(_value, &descriptor);
             return Object::createFromHostObject(runtime, std::make_shared<BindGroupHostObject>(bindGroup, _context));
+        });
+    }
+
+    if (name == "createSampler") {
+        return WGPU_FUNC_FROM_HOST_FUNC(createSampler, 1, [this]) {
+            WGPUSamplerDescriptor descriptor = makeDefaultSamplerDescriptor();
+            if (count > 0) {
+                auto desc = arguments[0].asObject(runtime);
+                auto magFilter = WGPU_UTF8_OPT(desc, magFilter, "nearest");
+                auto minFilter = WGPU_UTF8_OPT(desc, minFilter, "nearest");
+                descriptor.magFilter = StringToWGPUFilterMode(magFilter.data());
+                descriptor.minFilter = StringToWGPUFilterMode(minFilter.data());
+            }
+            auto sampler = wgpuDeviceCreateSampler(_value, &descriptor);
+            return Object::createFromHostObject(runtime, std::make_shared<SamplerHostObject>(sampler, _context));
         });
     }
 

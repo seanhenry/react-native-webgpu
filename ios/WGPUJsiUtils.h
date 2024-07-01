@@ -1,3 +1,5 @@
+#pragma once
+
 #include <jsi/jsi.h>
 #include "AutoReleasePool.h"
 
@@ -71,13 +73,14 @@ Value makePromise(Runtime &runtime, Callback cb) {
         .callAsConstructor(runtime, promiseConstructor);
 }
 
-std::shared_ptr<std::string> getUTF8(Runtime &runtime, AutoReleasePool *pool, Value value) {
+// TODO: remove
+inline std::shared_ptr<std::string> getUTF8(Runtime &runtime, AutoReleasePool *pool, Value value) {
     auto str = std::make_shared<std::string>(value.asString(runtime).utf8(runtime));
     pool->add(str);
     return str;
 }
 
-bool isArray(Runtime &runtime, Value *value) {
+inline bool isArray(Runtime &runtime, Value *value) {
     return value->isObject() && value->asObject(runtime).isArray(runtime);
 }
 
@@ -96,9 +99,34 @@ private:
     size_t _size;
 };
 
-ArrayBuffer createSharedArrayBuffer(Runtime &runtime, void *bytes, size_t size) {
+class OwnedMutableBuffer: public MutableBuffer {
+public:
+    OwnedMutableBuffer(void *data, size_t size): _data(data), _size(size) {}
+    ~OwnedMutableBuffer() { free(_data); }
+    size_t size() const override {
+        return _size;
+    }
+    uint8_t* data() override {
+        return (uint8_t *)_data;
+    }
+private:
+    void *_data;
+    size_t _size;
+};
+
+inline ArrayBuffer createSharedArrayBuffer(Runtime &runtime, void *bytes, size_t size) {
     auto buffer = std::make_shared<SharedMutableBuffer>(bytes, size);
     return ArrayBuffer(runtime, buffer);
+}
+
+inline ArrayBuffer createOwnedArrayBuffer(Runtime &runtime, void *bytes, size_t size) {
+    auto buffer = std::make_shared<OwnedMutableBuffer>(bytes, size);
+    return ArrayBuffer(runtime, buffer);
+}
+
+inline Value makeJSError(Runtime &runtime, std::string message) {
+    auto errorConstructor = runtime.global().getPropertyAsFunction(runtime, "Error");
+    return errorConstructor.callAsConstructor(runtime, message);
 }
 
 }

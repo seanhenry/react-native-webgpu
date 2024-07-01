@@ -1,27 +1,33 @@
-// https://webgpu.github.io/webgpu-samples/?sample=rotatingCube
 import { mat4, vec3 } from 'wgpu-matrix';
 
-import { cubePositionOffset, cubeUVOffset, cubeVertexArray, cubeVertexCount, cubeVertexSize } from '../../meshes/cube';
+import {
+  cubeVertexArray,
+  cubeVertexSize,
+  cubeUVOffset,
+  cubePositionOffset,
+  cubeVertexCount,
+} from '../../meshes/cube';
 
 import basicVertWGSL from '../../shaders/basic.vert.wgsl';
-import vertexPositionColorWGSL from '../../shaders/vertexPositionColor.frag.wgsl';
+import sampleTextureMixColorWGSL from './sampleTextureMixColor.frag.wgsl';
+import { CenterSquare } from '../../../Components/CenterSquare';
 import { WebGpuView } from 'react-native-webgpu';
 import React from 'react';
-import { CenterSquare } from '../../../Components/CenterSquare';
 
-export function RotatingCube() {
+export const TexturedCube = () => {
   const onInit = async ({identifier}: {identifier: string}) => {
-    const {navigator, getContext} = global.webGPU;
-
+    const {navigator, getContext, createImageBitmap} = global.webGPU;
     const context = getContext({identifier});
     const adapter = await navigator.gpu.requestAdapter({context});
     const device = await adapter!.requestDevice();
 
-    const { formats, alphaModes} = context.surfaceCapabilities;
+    const {formats, alphaModes} = context.surfaceCapabilities;
     const {width, height} = context;
+    const presentationFormat = formats[0]!;
+
     context.configure({
       device,
-      format: formats[0]!,
+      format: presentationFormat,
       alphaMode: alphaModes[0],
     });
 
@@ -31,17 +37,16 @@ export function RotatingCube() {
       usage: GPUBufferUsage.VERTEX,
       mappedAtCreation: true,
     });
-
     new Float32Array(verticesBuffer.getMappedRange()).set(cubeVertexArray);
     verticesBuffer.unmap();
 
     const pipeline = device.createRenderPipeline({
       layout: 'auto',
       vertex: {
-        entryPoint: "main",
         module: device.createShaderModule({
           code: basicVertWGSL,
         }),
+        entryPoint: 'main',
         buffers: [
           {
             arrayStride: cubeVertexSize,
@@ -63,13 +68,13 @@ export function RotatingCube() {
         ],
       },
       fragment: {
-        entryPoint: 'main',
         module: device.createShaderModule({
-          code: vertexPositionColorWGSL,
+          code: sampleTextureMixColorWGSL,
         }),
+        entryPoint: 'main',
         targets: [
           {
-            format: formats[0]!,
+            format: presentationFormat,
           },
         ],
       },
@@ -103,6 +108,35 @@ export function RotatingCube() {
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
 
+    // Fetch the image and upload it into a GPUTexture.
+    let cubeTexture: GPUTexture;
+    {
+      const response = require('../../assets/img/Di-3d.png');
+      const imageBitmap = await createImageBitmap(response);
+
+      cubeTexture = device.createTexture({
+        size: [imageBitmap.width, imageBitmap.height, 1],
+        format: 'rgba8unorm',
+        usage:
+          GPUTextureUsage.TEXTURE_BINDING |
+          GPUTextureUsage.COPY_DST |
+          GPUTextureUsage.RENDER_ATTACHMENT,
+      });
+      device.queue.copyExternalImageToTexture(
+        { source: imageBitmap },
+        { texture: cubeTexture },
+        [imageBitmap.width, imageBitmap.height]
+      );
+
+      imageBitmap.close();
+    }
+
+    // Create a sampler with linear filtering for smooth interpolation.
+    const sampler = device.createSampler({
+      magFilter: 'linear',
+      minFilter: 'linear',
+    });
+
     const uniformBindGroup = device.createBindGroup({
       layout: pipeline.getBindGroupLayout(0),
       entries: [
@@ -111,6 +145,14 @@ export function RotatingCube() {
           resource: {
             buffer: uniformBuffer,
           },
+        },
+        {
+          binding: 1,
+          resource: sampler,
+        },
+        {
+          binding: 2,
+          resource: cubeTexture.createView(),
         },
       ],
     });
@@ -146,7 +188,7 @@ export function RotatingCube() {
         viewMatrix,
         vec3.fromValues(Math.sin(now), Math.cos(now), 0),
         1,
-        viewMatrix,
+        viewMatrix
       );
 
       mat4.multiply(projectionMatrix, viewMatrix, modelViewProjectionMatrix);
@@ -157,7 +199,7 @@ export function RotatingCube() {
     function frame() {
       const framebuffer = context.getCurrentTexture();
       if (!framebuffer) {
-        requestAnimationFrame(frame);
+        requestAnimationFrame(frame)
         return
       }
 
@@ -167,8 +209,9 @@ export function RotatingCube() {
         0,
         transformationMatrix.buffer,
         transformationMatrix.byteOffset,
-        transformationMatrix.byteLength,
+        transformationMatrix.byteLength
       );
+
       (renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[])[0]!.view = framebuffer.createView();
 
       const commandEncoder = device.createCommandEncoder();
@@ -179,16 +222,16 @@ export function RotatingCube() {
       passEncoder.draw(cubeVertexCount);
       passEncoder.end();
       device.queue.submit([commandEncoder.finish()]);
+
       context.presentSurface();
       framebuffer.destroy();
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
-  };
-
+  }
   return (
     <CenterSquare>
-      <WebGpuView identifier="RotatingCube" onInit={onInit} style={{ flex: 1, width: '100%' }} />
+      <WebGpuView identifier="TexturedCube" onInit={onInit} style={{width: '100%', height: '100%'}} />
     </CenterSquare>
   )
 }

@@ -11,5 +11,7 @@ WGPUMultisampleState makeDefaultWGPUMultisampleState();
 WGPUStencilFaceState makeDefaultWGPUStencilFaceState();
 WGPUExtent3D makeDefaultWGPUExtent3D();
 WGPUTextureDescriptor makeDefaultWGPUTextureDescriptor(WGPUTextureFormat format);
+WGPUSamplerDescriptor makeDefaultSamplerDescriptor();
+WGPUImageCopyTexture makeDefaultImageCopyTexture(WGPUTexture texture);
 
 }

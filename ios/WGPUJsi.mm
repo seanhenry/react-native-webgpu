@@ -148,6 +148,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
                         promise->resolve->call(promise->runtime, std::move(bitmap));
                     }
                 }
+                delete promise;
             }];
             [task resume];
         });

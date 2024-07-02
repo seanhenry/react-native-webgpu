@@ -49,7 +49,7 @@ Array cArrayToJsi(Runtime &runtime, T *array, size_t size, Transform transform) 
 
 class Promise {
 public:
-    Promise(Runtime &runtime): runtime(runtime) {}
+    explicit Promise(Runtime &runtime): runtime(runtime) {}
     Runtime &runtime;
     std::unique_ptr<Function> resolve;
     std::unique_ptr<Function> reject;
@@ -58,7 +58,7 @@ public:
 
 template<typename Callback>
 Value makePromise(Runtime &runtime, Callback cb) {
-    auto promiseConstructor = WGPU_FUNC_FROM_HOST_FUNC(promiseConstructor, 2, [cb]) {
+    auto promiseConstructor = WGPU_FUNC_FROM_HOST_FUNC(promiseConstructor, 2, [cb = std::move(cb)]) {
         auto promise = new Promise(runtime);
         promise->resolve = std::make_unique<Function>(arguments[0].asObject(runtime).asFunction(runtime));
         promise->reject = std::make_unique<Function>(arguments[1].asObject(runtime).asFunction(runtime));
@@ -129,4 +129,23 @@ inline Value makeJSError(Runtime &runtime, std::string message) {
     return errorConstructor.callAsConstructor(runtime, message);
 }
 
+inline Value makeJSSet(Runtime &runtime, Value *items, size_t size) {
+    auto setConstructor = runtime.global().getPropertyAsFunction(runtime, "Set");
+    auto set = setConstructor.callAsConstructor(runtime).asObject(runtime);
+    auto add = set.getPropertyAsFunction(runtime, "add");
+    for (int i = 0; i < size; i++) {
+        add.callWithThis(runtime, set, items[i]);
+    }
+    return std::move(set);
 }
+
+inline ArrayBuffer getArrayBufferFromArrayBufferLike(Runtime &runtime, Object arrayBufferLike) {
+    if (arrayBufferLike.isArrayBuffer(runtime)) {
+        return arrayBufferLike.getArrayBuffer(runtime);
+    } else if (arrayBufferLike.hasProperty(runtime, "buffer")) {
+        return arrayBufferLike.getPropertyAsObject(runtime, "buffer").getArrayBuffer(runtime);
+    }
+    throw new JSError(runtime, "Unsupported ArrayBufferLike object");
+}
+
+} // namespace

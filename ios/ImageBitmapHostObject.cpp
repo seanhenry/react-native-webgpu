@@ -26,5 +26,5 @@ Value ImageBitmapHostObject::get(Runtime &runtime, const PropNameID &propName) {
 }
 
 std::vector<PropNameID> ImageBitmapHostObject::getPropertyNames(Runtime& runtime) {
-    return PropNameID::names(runtime, "width", "height", "clear");
+    return PropNameID::names(runtime, "width", "height", "close");
 }

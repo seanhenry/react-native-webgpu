@@ -103,6 +103,15 @@ WGPUFragmentState wgpu::makeGPUFragmentState(Runtime &runtime, AutoReleasePool *
     };
 }
 
+WGPUProgrammableStageDescriptor wgpu::makeWGPUProgrammableStageDescriptor(Runtime &runtime, AutoReleasePool *autoReleasePool, Object obj) {
+    auto vertexModule = WGPU_HOST_OBJ(obj, module, ShaderModuleHostObject);
+    auto entryPoint = getUTF8(runtime, autoReleasePool, obj.getProperty(runtime, "entryPoint"));
+    return {
+        .module = vertexModule->_value,
+        .entryPoint = entryPoint->data(),
+    };
+}
+
 WGPUExtent3D wgpu::makeGPUExtent3D(Runtime &runtime, Object obj) {
     WGPUExtent3D extent = makeDefaultWGPUExtent3D();
     if (obj.isArray(runtime)) {

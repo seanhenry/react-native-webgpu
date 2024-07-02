@@ -71,5 +71,5 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
 }
 
 std::vector<PropNameID> RenderPassEncoderHostObject::getPropertyNames(Runtime& runtime) {
-    return PropNameID::names(runtime, "setPipeline", "draw", "end");
+    return PropNameID::names(runtime, "setPipeline", "draw", "end", "setBindGroup", "setVertexBuffer");
 }

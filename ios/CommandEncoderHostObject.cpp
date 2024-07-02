@@ -6,6 +6,7 @@
 #include "WGPUContext.h"
 #include "ConstantConversion.h"
 #include "WGPUConversions.h"
+#include "ComputePassEncoderHostObject.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
@@ -80,9 +81,17 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
         });
     }
 
+    if (name == "beginComputePass") {
+        return WGPU_FUNC_FROM_HOST_FUNC(beginComputePass, 1, [this]) {
+            WGPUComputePassDescriptor descriptor = {0};
+            auto encoder = wgpuCommandEncoderBeginComputePass(_value, &descriptor);
+            return Object::createFromHostObject(runtime, std::make_shared<ComputePassEncoderHostObject>(encoder, _context));
+        });
+    }
+
     return Value::undefined();
 }
 
 std::vector<PropNameID> CommandEncoderHostObject::getPropertyNames(Runtime& runtime) {
-    return PropNameID::names(runtime, "beginRenderPass", "finish");
+    return PropNameID::names(runtime, "beginRenderPass", "finish", "copyTextureToTexture", "beginComputePass");
 }

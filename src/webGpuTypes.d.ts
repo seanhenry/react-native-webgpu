@@ -198,19 +198,19 @@ type GPUCullMode =
 //   | "validation"
 //   | "out-of-memory"
 //   | "internal";
-// type GPUFeatureName =
-//
-//   | "depth-clip-control"
-//   | "depth32float-stencil8"
-//   | "texture-compression-bc"
-//   | "texture-compression-etc2"
-//   | "texture-compression-astc"
-//   | "timestamp-query"
-//   | "indirect-first-instance"
-//   | "shader-f16"
-//   | "rg11b10ufloat-renderable"
-//   | "bgra8unorm-storage"
-//   | "float32-filterable";
+type GPUFeatureName =
+
+  | "depth-clip-control"
+  | "depth32float-stencil8"
+  | "texture-compression-bc"
+  | "texture-compression-etc2"
+  | "texture-compression-astc"
+  | "timestamp-query"
+  | "indirect-first-instance"
+  | "shader-f16"
+  | "rg11b10ufloat-renderable"
+  | "bgra8unorm-storage"
+  | "float32-filterable";
 type GPUFilterMode =
 
   | "nearest"
@@ -684,14 +684,14 @@ type GPUCommandBufferDescriptor =
 type GPUCommandEncoderDescriptor =
   GPUObjectDescriptorBase;
 
-// interface GPUComputePassDescriptor
-//   extends GPUObjectDescriptorBase {
+interface GPUComputePassDescriptor
+  extends GPUObjectDescriptorBase {
 //   /**
 //    * Defines which timestamp values will be written for this pass, and where to write them to.
 //    */
 //   timestampWrites?: GPUComputePassTimestampWrites;
-// }
-//
+}
+
 // interface GPUComputePassTimestampWrites {
 //   /**
 //    * The {@link GPUQuerySet}, of type {@link GPUQueryType#"timestamp"}, that the query results will be
@@ -710,13 +710,13 @@ type GPUCommandEncoderDescriptor =
 //   endOfPassWriteIndex?: GPUSize32;
 // }
 //
-// interface GPUComputePipelineDescriptor
-//   extends GPUPipelineDescriptorBase {
-//   /**
-//    * Describes the compute shader entry point of the pipeline.
-//    */
-//   compute: GPUProgrammableStage;
-// }
+interface GPUComputePipelineDescriptor
+  extends GPUPipelineDescriptorBase {
+  /**
+   * Describes the compute shader entry point of the pipeline.
+   */
+  compute: GPUProgrammableStage;
+}
 
 interface GPUDepthStencilState {
   /**
@@ -766,15 +766,15 @@ interface GPUDepthStencilState {
 //   depthBiasClamp?: number;
 }
 
-// interface GPUDeviceDescriptor
-//   extends GPUObjectDescriptorBase {
-//   /**
-//    * Specifies the features that are required by the device request.
-//    * The request will fail if the adapter cannot provide these features.
-//    * Exactly the specified set of features, and no more or less, will be allowed in validation
-//    * of API calls on the resulting device.
-//    */
-//   requiredFeatures?: Iterable<GPUFeatureName>;
+interface GPUDeviceDescriptor
+  extends GPUObjectDescriptorBase {
+  /**
+   * Specifies the features that are required by the device request.
+   * The request will fail if the adapter cannot provide these features.
+   * Exactly the specified set of features, and no more or less, will be allowed in validation
+   * of API calls on the resulting device.
+   */
+  requiredFeatures?: Iterable<GPUFeatureName>;
 //   /**
 //    * Specifies the limits that are required by the device request.
 //    * The request will fail if the adapter cannot provide these limits.
@@ -794,7 +794,7 @@ interface GPUDepthStencilState {
 //    * The descriptor for the default {@link GPUQueue}.
 //    */
 //   defaultQueue?: GPUQueueDescriptor;
-// }
+}
 
 interface GPUExtent3DDict {
   /**
@@ -1905,10 +1905,10 @@ interface GPUAdapter {
 //    * @internal
 //    */
 //   readonly __brand: "GPUAdapter";
-//   /**
-//    * The set of values in `this`.{@link GPUAdapter#[[adapter]]}.{@link adapter#[[features]]}.
-//    */
-//   readonly features: GPUSupportedFeatures;
+  /**
+   * The set of values in `this`.{@link GPUAdapter#[[adapter]]}.{@link adapter#[[features]]}.
+   */
+  readonly features: GPUSupportedFeatures;
 //   /**
 //    * The limits in `this`.{@link GPUAdapter#[[adapter]]}.{@link adapter#[[limits]]}.
 //    */
@@ -1938,7 +1938,7 @@ interface GPUAdapter {
    * @param descriptor - Description of the {@link GPUDevice} to request.
    */
   requestDevice(
-    // descriptor?: GPUDeviceDescriptor
+    descriptor?: GPUDeviceDescriptor
   ): Promise<GPUDevice>;
 //   /** @deprecated Use `adapter.info` instead (once available in browsers). */
 //   requestAdapterInfo(): Promise<GPUAdapterInfo>;
@@ -2149,13 +2149,13 @@ interface GPUCommandEncoder
   beginRenderPass(
     descriptor: GPURenderPassDescriptor
   ): GPURenderPassEncoder;
-//   /**
-//    * Begins encoding a compute pass described by `descriptor`.
-//    * 	descriptor:
-//    */
-//   beginComputePass(
-//     descriptor?: GPUComputePassDescriptor
-//   ): GPUComputePassEncoder;
+  /**
+   * Begins encoding a compute pass described by `descriptor`.
+   * 	descriptor:
+   */
+  beginComputePass(
+    descriptor?: GPUComputePassDescriptor
+  ): GPUComputePassEncoder;
 //   /**
 //    * Encode a command into the {@link GPUCommandEncoder} that copies data from a sub-region of a
 //    * {@link GPUBuffer} to a sub-region of another {@link GPUBuffer}.
@@ -2328,37 +2328,37 @@ interface GPUCompilationMessage {
 //   prototype: GPUCompilationMessage;
 //   new (): never;
 // };
-//
-// interface GPUComputePassEncoder
-//   extends GPUObjectBase,
-//     GPUCommandsMixin,
-//     GPUDebugCommandsMixin,
-//     GPUBindingCommandsMixin {
+
+interface GPUComputePassEncoder
+  extends GPUObjectBase,
+    GPUCommandsMixin,
+    GPUDebugCommandsMixin,
+    GPUBindingCommandsMixin {
 //   /**
 //    * Nominal type branding.
 //    * https://github.com/microsoft/TypeScript/pull/33038
 //    * @internal
 //    */
 //   readonly __brand: "GPUComputePassEncoder";
-//   /**
-//    * Sets the current {@link GPUComputePipeline}.
-//    * @param pipeline - The compute pipeline to use for subsequent dispatch commands.
-//    */
-//   setPipeline(
-//     pipeline: GPUComputePipeline
-//   ): undefined;
-//   /**
-//    * Dispatch work to be performed with the current {@link GPUComputePipeline}.
-//    * See [[#computing-operations]] for the detailed specification.
-//    * @param workgroupCountX - X dimension of the grid of workgroups to dispatch.
-//    * @param workgroupCountY - Y dimension of the grid of workgroups to dispatch.
-//    * @param workgroupCountZ - Z dimension of the grid of workgroups to dispatch.
-//    */
-//   dispatchWorkgroups(
-//     workgroupCountX: GPUSize32,
-//     workgroupCountY?: GPUSize32,
-//     workgroupCountZ?: GPUSize32
-//   ): undefined;
+  /**
+   * Sets the current {@link GPUComputePipeline}.
+   * @param pipeline - The compute pipeline to use for subsequent dispatch commands.
+   */
+  setPipeline(
+    pipeline: GPUComputePipeline
+  ): undefined;
+  /**
+   * Dispatch work to be performed with the current {@link GPUComputePipeline}.
+   * See [[#computing-operations]] for the detailed specification.
+   * @param workgroupCountX - X dimension of the grid of workgroups to dispatch.
+   * @param workgroupCountY - Y dimension of the grid of workgroups to dispatch.
+   * @param workgroupCountZ - Z dimension of the grid of workgroups to dispatch.
+   */
+  dispatchWorkgroups(
+    workgroupCountX: GPUSize32,
+    workgroupCountY?: GPUSize32,
+    workgroupCountZ?: GPUSize32
+  ): undefined;
 //   /**
 //    * Dispatch work to be performed with the current {@link GPUComputePipeline} using parameters read
 //    * from a {@link GPUBuffer}.
@@ -2373,28 +2373,28 @@ interface GPUCompilationMessage {
 //     indirectBuffer: GPUBuffer,
 //     indirectOffset: GPUSize64
 //   ): undefined;
-//   /**
-//    * Completes recording of the compute pass commands sequence.
-//    */
-//   end(): undefined;
-// }
-//
+  /**
+   * Completes recording of the compute pass commands sequence.
+   */
+  end(): undefined;
+}
+
 // declare var GPUComputePassEncoder: {
 //   prototype: GPUComputePassEncoder;
 //   new (): never;
 // };
-//
-// interface GPUComputePipeline
-//   extends GPUObjectBase,
-//     GPUPipelineBase {
+
+interface GPUComputePipeline
+  extends GPUObjectBase,
+    GPUPipelineBase {
 //   /**
 //    * Nominal type branding.
 //    * https://github.com/microsoft/TypeScript/pull/33038
 //    * @internal
 //    */
 //   readonly __brand: "GPUComputePipeline";
-// }
-//
+}
+
 // declare var GPUComputePipeline: {
 //   prototype: GPUComputePipeline;
 //   new (): never;
@@ -2485,13 +2485,13 @@ interface GPUDevice
   createShaderModule(
     descriptor: GPUShaderModuleDescriptor
   ): GPUShaderModule;
-//   /**
-//    * Creates a {@link GPUComputePipeline} using immediate pipeline creation.
-//    * @param descriptor - Description of the {@link GPUComputePipeline} to create.
-//    */
-//   createComputePipeline(
-//     descriptor: GPUComputePipelineDescriptor
-//   ): GPUComputePipeline;
+  /**
+   * Creates a {@link GPUComputePipeline} using immediate pipeline creation.
+   * @param descriptor - Description of the {@link GPUComputePipeline} to create.
+   */
+  createComputePipeline(
+    descriptor: GPUComputePipelineDescriptor
+  ): GPUComputePipeline;
   /**
    * Creates a {@link GPURenderPipeline} using immediate pipeline creation.
    * @param descriptor - Description of the {@link GPURenderPipeline} to create.
@@ -2712,8 +2712,8 @@ interface GPUPipelineLayout
 //   new (): never;
 // };
 //
-// interface GPUQuerySet
-//   extends GPUObjectBase {
+interface GPUQuerySet
+  extends GPUObjectBase {
 //   /**
 //    * Nominal type branding.
 //    * https://github.com/microsoft/TypeScript/pull/33038
@@ -2732,8 +2732,8 @@ interface GPUPipelineLayout
 //    * The number of queries managed by this {@link GPUQuerySet}.
 //    */
 //   readonly count: GPUSize32Out;
-// }
-//
+}
+
 // declare var GPUQuerySet: {
 //   prototype: GPUQuerySet;
 //   new (): never;
@@ -3011,10 +3011,10 @@ interface GPUShaderModule
 //   prototype: GPUShaderModule;
 //   new (): never;
 // };
-//
-// type GPUSupportedFeatures =
-//   ReadonlySet<string>;
-//
+
+type GPUSupportedFeatures =
+  ReadonlySet<string>;
+
 // interface GPUSupportedLimits {
 //   /**
 //    * Nominal type branding.

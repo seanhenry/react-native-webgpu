@@ -97,5 +97,5 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
 }
 
 std::vector<PropNameID> ContextHostObject::getPropertyNames(Runtime& runtime) {
-    return PropNameID::names(runtime, "configure", "surfaceCapabilities", "getCurrentTexture", "width", "height");
+    return PropNameID::names(runtime, "presentSurface", "configure", "surfaceCapabilities", "getCurrentTexture", "width", "height");
 }

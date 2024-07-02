@@ -29,7 +29,7 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
         return WGPU_FUNC_FROM_HOST_FUNC(writeBuffer, 5, [this]) {
             auto buffer = arguments[0].asObject(runtime).asHostObject<BufferHostObject>(runtime)->_value;
             auto bufferOffset = (uint64_t)arguments[1].asNumber();
-            auto data = arguments[2].asObject(runtime).getArrayBuffer(runtime);
+            auto data = getArrayBufferFromArrayBufferLike(runtime, arguments[2].asObject(runtime));
             auto dataOffset = count > 3 ? (size_t)arguments[3].asNumber() : 0;
             auto size = count > 4 ? (size_t)arguments[4].asNumber() : data.size(runtime);
             wgpuQueueWriteBuffer(
@@ -81,5 +81,5 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
 }
 
 std::vector<PropNameID> QueueHostObject::getPropertyNames(Runtime& runtime) {
-    return PropNameID::names(runtime, "submit");
+    return PropNameID::names(runtime, "submit", "writeBuffer", "copyExternalImageToTexture");
 }

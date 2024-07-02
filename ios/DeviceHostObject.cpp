@@ -15,6 +15,7 @@
 #include "BindGroupHostObject.h"
 #include "SamplerHostObject.h"
 #include "WGPUDefaults.h"
+#include "ComputePipelineHostObject.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
@@ -58,6 +59,19 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
             auto pipeline = wgpuDeviceCreateRenderPipeline(_value, &descriptor);
 
             return Object::createFromHostObject(runtime, std::make_shared<RenderPipelineHostObject>(pipeline, _context));
+        });
+    }
+
+    if (name == "createComputePipeline") {
+        return WGPU_FUNC_FROM_HOST_FUNC(createComputePipeline, 1, [this]) {
+            AutoReleasePool autoReleasePool;
+            auto options = arguments[0].asObject(runtime);
+            WGPUComputePipelineDescriptor descriptor = {
+                .compute = makeWGPUProgrammableStageDescriptor(runtime, &autoReleasePool, WGPU_OBJ(options, compute)),
+                .layout = NULL,
+            };
+            auto pipeline = wgpuDeviceCreateComputePipeline(_value, &descriptor);
+            return Object::createFromHostObject(runtime, std::make_shared<ComputePipelineHostObject>(pipeline, _context));
         });
     }
 
@@ -172,5 +186,5 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
 }
 
 std::vector<PropNameID> DeviceHostObject::getPropertyNames(Runtime& runtime) {
-    return PropNameID::names(runtime, "createRenderPipeline", "createShaderModule", "createCommandEncoder", "queue");
+    return PropNameID::names(runtime, "createRenderPipeline", "createShaderModule", "createCommandEncoder", "queue", "createBuffer", "createTexture", "createBindGroup", "createSampler");
 }

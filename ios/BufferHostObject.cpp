@@ -29,6 +29,6 @@ Value BufferHostObject::get(Runtime &runtime, const PropNameID &propName) {
 }
 
 std::vector<PropNameID> BufferHostObject::getPropertyNames(Runtime& runtime) {
-    return {};
+    return PropNameID::names(runtime, "getMappedRange", "unmap");
 }
 

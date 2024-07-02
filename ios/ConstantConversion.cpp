@@ -354,3 +354,38 @@ WGPUTextureAspect StringToWGPUTextureAspect(const char *str) {
     if (strcmp(str, "stencil-only") == 0) { return WGPUTextureAspect_StencilOnly; }
     return WGPUTextureAspect_All;
 }
+
+const char* WGPUFeatureNameToString(WGPUFeatureName name) {
+    switch (name) {
+        case WGPUFeatureName_DepthClipControl: return "depth-clip-control";
+        case WGPUFeatureName_Depth32FloatStencil8: return "depth32float-stencil8";
+        case WGPUFeatureName_TextureCompressionBC: return "texture-compression-bc";
+        case WGPUFeatureName_TextureCompressionETC2: return "texture-compression-etc2";
+        case WGPUFeatureName_TextureCompressionASTC: return "texture-compression-astc";
+        case WGPUFeatureName_TimestampQuery: return "timestamp-query";
+        case WGPUFeatureName_IndirectFirstInstance: return "indirect-first-instance";
+        case WGPUFeatureName_ShaderF16: return "shader-f16";
+        case WGPUFeatureName_RG11B10UfloatRenderable: return "rg11b10ufloat-renderable";
+        case WGPUFeatureName_BGRA8UnormStorage: return "bgra8unorm-storage";
+        case WGPUFeatureName_Float32Filterable: return "float32-filterable";
+        case WGPUFeatureName_Force32:
+        case WGPUFeatureName_Undefined:
+            return NULL;
+    }
+    return NULL;
+}
+
+WGPUFeatureName StringToWGPUFeatureName(const char *name) {
+    if (strcmp(name, "depth-clip-control") == 0) { return WGPUFeatureName_DepthClipControl; }
+    if (strcmp(name, "depth32float-stencil8") == 0) { return WGPUFeatureName_Depth32FloatStencil8; }
+    if (strcmp(name, "texture-compression-bc") == 0) { return WGPUFeatureName_TextureCompressionBC; }
+    if (strcmp(name, "texture-compression-etc2") == 0) { return WGPUFeatureName_TextureCompressionETC2; }
+    if (strcmp(name, "texture-compression-astc") == 0) { return WGPUFeatureName_TextureCompressionASTC; }
+    if (strcmp(name, "timestamp-query") == 0) { return WGPUFeatureName_TimestampQuery; }
+    if (strcmp(name, "indirect-first-instance") == 0) { return WGPUFeatureName_IndirectFirstInstance; }
+    if (strcmp(name, "shader-f16") == 0) { return WGPUFeatureName_ShaderF16; }
+    if (strcmp(name, "rg11b10ufloat-renderable") == 0) { return WGPUFeatureName_RG11B10UfloatRenderable; }
+    if (strcmp(name, "bgra8unorm-storage") == 0) { return WGPUFeatureName_BGRA8UnormStorage; }
+    if (strcmp(name, "float32-filterable") == 0) { return WGPUFeatureName_Float32Filterable; }
+    return WGPUFeatureName_Undefined;
+}

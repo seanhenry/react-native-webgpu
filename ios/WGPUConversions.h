@@ -13,6 +13,7 @@ WGPUVertexAttribute makeWGPUVertexAttribute(Runtime &runtime, Value value);
 WGPUVertexBufferLayout makeWGPUVertexBufferLayout(Runtime &runtime, AutoReleasePool *pool, Value value);
 WGPUVertexState makeGPUVertexState(Runtime &runtime, AutoReleasePool *autoReleasePool, Object obj);
 WGPUFragmentState makeGPUFragmentState(Runtime &runtime, AutoReleasePool *autoReleasePool, Object obj);
+WGPUProgrammableStageDescriptor makeWGPUProgrammableStageDescriptor(Runtime &runtime, AutoReleasePool *autoReleasePool, Object obj);
 WGPUExtent3D makeGPUExtent3D(Runtime &runtime, Object obj);
 void makeWGPUBindingResource(Runtime &runtime, Value value, WGPUBindGroupEntry *entry);
 WGPUColor makeWGPUColor(Runtime &runtime, Value &value);

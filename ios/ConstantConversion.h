@@ -21,3 +21,5 @@ WGPUFilterMode StringToWGPUFilterMode(const char *str);
 WGPUTextureDimension StringToWGPUTextureDimension(const char *str);
 WGPUTextureViewDimension StringToWGPUTextureViewDimension(const char *str);
 WGPUTextureAspect StringToWGPUTextureAspect(const char *str);
+const char* WGPUFeatureNameToString(WGPUFeatureName name);
+WGPUFeatureName StringToWGPUFeatureName(const char *name);

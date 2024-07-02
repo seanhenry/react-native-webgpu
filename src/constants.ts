@@ -22,3 +22,9 @@ global.GPUTextureUsage = {
   RENDER_ATTACHMENT: 0x00000010,
   // FORCE_32:  0x7FFFFFFF
 }
+
+global.GPUShaderStage = {
+  VERTEX: 0x00000001,
+  FRAGMENT: 0x00000002,
+  COMPUTE: 0x00000004,
+}

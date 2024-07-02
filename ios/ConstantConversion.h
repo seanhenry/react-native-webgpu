@@ -23,3 +23,4 @@ WGPUTextureViewDimension StringToWGPUTextureViewDimension(const char *str);
 WGPUTextureAspect StringToWGPUTextureAspect(const char *str);
 const char* WGPUFeatureNameToString(WGPUFeatureName name);
 WGPUFeatureName StringToWGPUFeatureName(const char *name);
+WGPUBufferBindingType StringToWGPUBufferBindingType(const char *name);

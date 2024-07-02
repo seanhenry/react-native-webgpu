@@ -58,12 +58,32 @@ WGPUVertexBufferLayout wgpu::makeWGPUVertexBufferLayout(Runtime &runtime, AutoRe
     };
 }
 
+ConstantEntries wgpu::makeWGPUConstantEntries(Runtime &runtime, AutoReleasePool *autoReleasePool, Object &obj) {
+    ConstantEntries constants;
+    if (obj.hasProperty(runtime, "constants")) {
+        auto constantsIn = obj.getPropertyAsObject(runtime, "constants");
+        auto constantsOut = jsiArrayToVector<WGPUConstantEntry>(runtime, constantsIn.getPropertyNames(runtime), [constantsIn = std::move(constantsIn), autoReleasePool](Runtime &runtime, Value value) {
+            auto key = getUTF8(runtime, autoReleasePool, std::move(value));
+            return (WGPUConstantEntry){
+                .key = key->data(),
+                .value = constantsIn.getProperty(runtime, key->data()).asNumber(),
+            };
+        });
+        constants = std::make_shared<std::vector<WGPUConstantEntry>>(constantsOut);
+    }
+    autoReleasePool->add(constants);
+    return constants;
+}
+
 WGPUVertexState wgpu::makeGPUVertexState(Runtime &runtime, AutoReleasePool *autoReleasePool, Object obj) {
     auto vertexModule = WGPU_HOST_OBJ(obj, module, ShaderModuleHostObject);
     auto entryPoint = getUTF8(runtime, autoReleasePool, obj.getProperty(runtime, "entryPoint"));
+    auto constants = makeWGPUConstantEntries(runtime, autoReleasePool, obj);
     WGPUVertexState state = {
         .module = vertexModule->_value,
         .entryPoint = entryPoint->data(),
+        .constants = constants != nullptr ? constants->data() : NULL,
+        .constantCount = constants != nullptr ? constants->size() : 0,
     };
     if (obj.hasProperty(runtime, "buffers")) {
         auto buffersIn = WGPU_ARRAY(obj, buffers);
@@ -94,21 +114,27 @@ WGPUFragmentState wgpu::makeGPUFragmentState(Runtime &runtime, AutoReleasePool *
     auto sharedTargets = std::make_shared<std::vector<WGPUColorTargetState>>(targets);
     autoReleasePool->add(sharedTargets);
     auto entryPoint = getUTF8(runtime, autoReleasePool, obj.getProperty(runtime, "entryPoint"));
+    auto constants = makeWGPUConstantEntries(runtime, autoReleasePool, obj);
 
     return {
         .module = obj.getPropertyAsObject(runtime, "module").asHostObject<ShaderModuleHostObject>(runtime)->_value,
         .entryPoint = entryPoint->data(),
         .targets = sharedTargets->data(),
         .targetCount = sharedTargets->size(),
+        .constants = constants != nullptr ? constants->data() : NULL,
+        .constantCount = constants != nullptr ? constants->size() : 0,
     };
 }
 
 WGPUProgrammableStageDescriptor wgpu::makeWGPUProgrammableStageDescriptor(Runtime &runtime, AutoReleasePool *autoReleasePool, Object obj) {
     auto vertexModule = WGPU_HOST_OBJ(obj, module, ShaderModuleHostObject);
     auto entryPoint = getUTF8(runtime, autoReleasePool, obj.getProperty(runtime, "entryPoint"));
+    auto constants = makeWGPUConstantEntries(runtime, autoReleasePool, obj);
     return {
         .module = vertexModule->_value,
         .entryPoint = entryPoint->data(),
+        .constants = constants != nullptr ? constants->data() : NULL,
+        .constantCount = constants != nullptr ? constants->size() : 0,
     };
 }
 

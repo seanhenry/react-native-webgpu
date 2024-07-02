@@ -5,12 +5,15 @@
 
 using namespace facebook::jsi;
 
+typedef std::shared_ptr<std::vector<WGPUConstantEntry>> ConstantEntries;
+
 namespace wgpu {
 
 WGPUDepthStencilState makeWGPUDepthStencilState(Runtime &runtime, Object obj);
 WGPUPrimitiveState makeWGPUPrimitiveState(Runtime &runtime, Object obj);
 WGPUVertexAttribute makeWGPUVertexAttribute(Runtime &runtime, Value value);
 WGPUVertexBufferLayout makeWGPUVertexBufferLayout(Runtime &runtime, AutoReleasePool *pool, Value value);
+ConstantEntries makeWGPUConstantEntries(Runtime &runtime, AutoReleasePool *autoReleasePool, Object &obj);
 WGPUVertexState makeGPUVertexState(Runtime &runtime, AutoReleasePool *autoReleasePool, Object obj);
 WGPUFragmentState makeGPUFragmentState(Runtime &runtime, AutoReleasePool *autoReleasePool, Object obj);
 WGPUProgrammableStageDescriptor makeWGPUProgrammableStageDescriptor(Runtime &runtime, AutoReleasePool *autoReleasePool, Object obj);

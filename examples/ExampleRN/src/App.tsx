@@ -11,6 +11,7 @@ import { InstancedCube } from './WebGPUSamples/BasicGraphics/InstancedCube/Insta
 import { FractalCube } from './WebGPUSamples/BasicGraphics/FractalCube/FractalCube';
 import { CubeMap } from './WebGPUSamples/BasicGraphics/CubeMap/CubeMap';
 import { ComputeBoids } from './WebGPUSamples/GPGPU/ComputeBoids/ComputeBoids';
+import { GameOfLife } from './WebGPUSamples/GPGPU/GameOfLife/GameOfLife';
 
 type Example = 'HelloTriangle'
   // BasicGraphics
@@ -23,6 +24,7 @@ type Example = 'HelloTriangle'
   | 'CubeMap'
   // GPGPU
   | 'ComputeBoids'
+  | 'GameOfLife'
 
 // const example: string = 'HelloTriangle'
 // const example: string = 'HelloTriangleMSAA'
@@ -32,7 +34,8 @@ type Example = 'HelloTriangle'
 // const example: Example = 'InstancedCube'
 // const example: Example = 'FractalCube'
 // const example: Example = 'CubeMap'
-const example: Example = 'ComputeBoids'
+// const example: Example = 'ComputeBoids'
+const example: Example = 'GameOfLife'
 
 const examples: Record<Example, ComponentType> = {
   HelloTriangle: HelloTriangle,
@@ -44,6 +47,7 @@ const examples: Record<Example, ComponentType> = {
   FractalCube: FractalCube,
   CubeMap: CubeMap,
   ComputeBoids: ComputeBoids,
+  GameOfLife: GameOfLife,
 }
 
 export default function App() {

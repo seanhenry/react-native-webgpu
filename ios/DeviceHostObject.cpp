@@ -16,6 +16,7 @@
 #include "SamplerHostObject.h"
 #include "WGPUDefaults.h"
 #include "ComputePipelineHostObject.h"
+#include "PipelineLayoutHostObject.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
@@ -31,7 +32,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
             auto vertex = makeGPUVertexState(runtime, &autoReleasePool, WGPU_OBJ(options, vertex));
 
             WGPURenderPipelineDescriptor descriptor = {
-                .layout = NULL, // TODO: GPUPipelineLayout
+                .layout = WGPU_HOST_OBJ_VALUE_OPT(options, layout, PipelineLayoutHostObject, NULL),
                 .vertex = vertex,
             };
             if (options.hasProperty(runtime, "primitive")) {
@@ -68,7 +69,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
             auto options = arguments[0].asObject(runtime);
             WGPUComputePipelineDescriptor descriptor = {
                 .compute = makeWGPUProgrammableStageDescriptor(runtime, &autoReleasePool, WGPU_OBJ(options, compute)),
-                .layout = NULL,
+                .layout = WGPU_HOST_OBJ_VALUE_OPT(options, layout, PipelineLayoutHostObject, NULL),
             };
             auto pipeline = wgpuDeviceCreateComputePipeline(_value, &descriptor);
             return Object::createFromHostObject(runtime, std::make_shared<ComputePipelineHostObject>(pipeline, _context));
@@ -182,9 +183,54 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         });
     }
 
+    if (name == "createBindGroupLayout") {
+        return WGPU_FUNC_FROM_HOST_FUNC(createBindGroupLayout, 1, [this]) {
+            auto desc = arguments[0].asObject(runtime);
+            auto entries = jsiArrayToVector<WGPUBindGroupLayoutEntry>(runtime, WGPU_ARRAY(desc, entries), [](Runtime &runtime, Value value) {
+                auto obj = value.asObject(runtime);
+                WGPUBindGroupLayoutEntry entry = {
+                    .binding = WGPU_NUMBER(obj, binding, uint32_t),
+                    .visibility = WGPU_NUMBER(obj, visibility, WGPUShaderStageFlags),
+                };
+                if (obj.hasProperty(runtime, "buffer")) {
+                    auto buffer = obj.getPropertyAsObject(runtime, "buffer");
+                    auto type = WGPU_UTF8_OPT(buffer, type, "uniform");
+                    entry.buffer = {
+                        .hasDynamicOffset = false,
+                        .minBindingSize = 0,
+                        .type = StringToWGPUBufferBindingType(type.data()),
+                    };
+                }
+                return entry;
+            });
+
+            WGPUBindGroupLayoutDescriptor descriptor = {
+                .entries = entries.data(),
+                .entryCount = entries.size(),
+            };
+            auto layout = wgpuDeviceCreateBindGroupLayout(_value, &descriptor);
+            return Object::createFromHostObject(runtime, std::make_shared<BindGroupLayoutHostObject>(layout, _context));
+        });
+    }
+
+    if (name == "createPipelineLayout") {
+        return WGPU_FUNC_FROM_HOST_FUNC(createPipelineLayout, 1, [this]) {
+            auto desc = arguments[0].asObject(runtime);
+            auto layouts = jsiArrayToVector<WGPUBindGroupLayout>(runtime, WGPU_ARRAY(desc, bindGroupLayouts), [](Runtime &runtime, Value value) {
+                return value.asObject(runtime).asHostObject<BindGroupLayoutHostObject>(runtime)->_value;
+            });
+            WGPUPipelineLayoutDescriptor descriptor = {
+                .bindGroupLayouts = layouts.data(),
+                .bindGroupLayoutCount = layouts.size(),
+            };
+            auto layout = wgpuDeviceCreatePipelineLayout(_value, &descriptor);
+            return Object::createFromHostObject(runtime, std::make_shared<PipelineLayoutHostObject>(layout, _context));
+        });
+    }
+
     return Value::undefined();
 }
 
 std::vector<PropNameID> DeviceHostObject::getPropertyNames(Runtime& runtime) {
-    return PropNameID::names(runtime, "createRenderPipeline", "createShaderModule", "createCommandEncoder", "queue", "createBuffer", "createTexture", "createBindGroup", "createSampler");
+    return PropNameID::names(runtime, "createRenderPipeline", "createShaderModule", "createCommandEncoder", "queue", "createBuffer", "createTexture", "createBindGroup", "createSampler", "createBindGroupLayout", "createPipelineLayout");
 }

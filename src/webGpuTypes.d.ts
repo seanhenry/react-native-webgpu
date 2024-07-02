@@ -151,11 +151,11 @@ type GPUAutoLayoutMode =
 //   | "reverse-subtract"
 //   | "min"
 //   | "max";
-// type GPUBufferBindingType =
-//
-//   | "uniform"
-//   | "storage"
-//   | "read-only-storage";
+type GPUBufferBindingType =
+
+  | "uniform"
+  | "storage"
+  | "read-only-storage";
 // type GPUBufferMapState =
 //
 //   | "unmapped"
@@ -461,33 +461,32 @@ interface GPUBindGroupEntry {
   resource: GPUBindingResource;
 }
 
-// interface GPUBindGroupLayoutDescriptor
-//   extends GPUObjectDescriptorBase {
-//   /**
-//    * A list of entries describing the shader resource bindings for a bind group.
-//    */
-//   entries: Iterable<GPUBindGroupLayoutEntry>;
-// }
+interface GPUBindGroupLayoutDescriptor
+  extends GPUObjectDescriptorBase {
+  /**
+   * A list of entries describing the shader resource bindings for a bind group.
+   */
+  entries: Iterable<GPUBindGroupLayoutEntry>;
+}
 
 interface GPUBindGroupLayoutEntry {
-  notImplemented?: never;
-//   /**
-//    * A unique identifier for a resource binding within the {@link GPUBindGroupLayout}, corresponding
-//    * to a {@link GPUBindGroupEntry#binding|GPUBindGroupEntry.binding} and a @binding
-//    * attribute in the {@link GPUShaderModule}.
-//    */
-//   binding: GPUIndex32;
-//   /**
-//    * A bitset of the members of {@link GPUShaderStage}.
-//    * Each set bit indicates that a {@link GPUBindGroupLayoutEntry}'s resource
-//    * will be accessible from the associated shader stage.
-//    */
-//   visibility: GPUShaderStageFlags;
-//   /**
-//    * When map/exist|provided, indicates the binding resource type for this {@link GPUBindGroupLayoutEntry}
-//    * is {@link GPUBufferBinding}.
-//    */
-//   buffer?: GPUBufferBindingLayout;
+  /**
+   * A unique identifier for a resource binding within the {@link GPUBindGroupLayout}, corresponding
+   * to a {@link GPUBindGroupEntry#binding|GPUBindGroupEntry.binding} and a @binding
+   * attribute in the {@link GPUShaderModule}.
+   */
+  binding: GPUIndex32;
+  /**
+   * A bitset of the members of {@link GPUShaderStage}.
+   * Each set bit indicates that a {@link GPUBindGroupLayoutEntry}'s resource
+   * will be accessible from the associated shader stage.
+   */
+  visibility: GPUShaderStageFlags;
+  /**
+   * When map/exist|provided, indicates the binding resource type for this {@link GPUBindGroupLayoutEntry}
+   * is {@link GPUBufferBinding}.
+   */
+  buffer?: GPUBufferBindingLayout;
 //   /**
 //    * When map/exist|provided, indicates the binding resource type for this {@link GPUBindGroupLayoutEntry}
 //    * is {@link GPUSampler}.
@@ -555,11 +554,11 @@ interface GPUBufferBinding {
   size?: GPUSize64;
 }
 
-// interface GPUBufferBindingLayout {
-//   /**
-//    * Indicates the type required for buffers bound to this bindings.
-//    */
-//   type?: GPUBufferBindingType;
+interface GPUBufferBindingLayout {
+  /**
+   * Indicates the type required for buffers bound to this bindings.
+   */
+  type?: GPUBufferBindingType;
 //   /**
 //    * Indicates whether this binding requires a dynamic offset.
 //    */
@@ -582,8 +581,8 @@ interface GPUBufferBinding {
 //    * most ergonomic impact.
 //    */
 //   minBindingSize?: GPUSize64;
-// }
-//
+}
+
 interface GPUBufferDescriptor
   extends GPUObjectDescriptorBase {
   /**
@@ -1026,23 +1025,23 @@ interface GPUPipelineDescriptorBase
    * with any other pipelines.
    */
   layout:
-    // | GPUPipelineLayout
+    | GPUPipelineLayout
     | GPUAutoLayoutMode;
 }
 
 // interface GPUPipelineErrorInit {
 //   reason: GPUPipelineErrorReason;
 // }
-//
-// interface GPUPipelineLayoutDescriptor
-//   extends GPUObjectDescriptorBase {
-//   /**
-//    * A list of {@link GPUBindGroupLayout}s the pipeline will use. Each element corresponds to a
-//    * @group attribute in the {@link GPUShaderModule}, with the `N`th element corresponding with
-//    * `@group(N)`.
-//    */
-//   bindGroupLayouts: Iterable<GPUBindGroupLayout>;
-// }
+
+interface GPUPipelineLayoutDescriptor
+  extends GPUObjectDescriptorBase {
+  /**
+   * A list of {@link GPUBindGroupLayout}s the pipeline will use. Each element corresponds to a
+   * @group attribute in the {@link GPUShaderModule}, with the `N`th element corresponding with
+   * `@group(N)`.
+   */
+  bindGroupLayouts: Iterable<GPUBindGroupLayout>;
+}
 
 interface GPUPrimitiveState {
   /**
@@ -1094,26 +1093,26 @@ interface GPUProgrammableStage {
    */
   // entryPoint?: string;
   entryPoint: string; // Empty not compatible without function lookup
-//   /**
-//    * Specifies the values of pipeline-overridable constants in the shader module
-//    * {@link GPUProgrammableStage#module}.
-//    * Each such pipeline-overridable constant is uniquely identified by a single
-//    * pipeline-overridable constant identifier string, representing the pipeline
-//    * constant ID of the constant if its declaration specifies one, and otherwise the
-//    * constant's identifier name.
-//    * The key of each key-value pair must equal the
-//    * pipeline-overridable constant identifier string|identifier string
-//    * of one such constant, with the comparison performed
-//    * according to the rules for WGSL identifier comparison.
-//    * When the pipeline is executed, that constant will have the specified value.
-//    * Values are specified as <dfn typedef for="">GPUPipelineConstantValue</dfn>, which is a {@link double}.
-//    * They are converted [$to WGSL type$] of the pipeline-overridable constant (`bool`/`i32`/`u32`/`f32`/`f16`).
-//    * If conversion fails, a validation error is generated.
-//    */
-//   constants?: Record<
-//     string,
-//     GPUPipelineConstantValue
-//   >;
+  /**
+   * Specifies the values of pipeline-overridable constants in the shader module
+   * {@link GPUProgrammableStage#module}.
+   * Each such pipeline-overridable constant is uniquely identified by a single
+   * pipeline-overridable constant identifier string, representing the pipeline
+   * constant ID of the constant if its declaration specifies one, and otherwise the
+   * constant's identifier name.
+   * The key of each key-value pair must equal the
+   * pipeline-overridable constant identifier string|identifier string
+   * of one such constant, with the comparison performed
+   * according to the rules for WGSL identifier comparison.
+   * When the pipeline is executed, that constant will have the specified value.
+   * Values are specified as <dfn typedef for="">GPUPipelineConstantValue</dfn>, which is a {@link double}.
+   * They are converted [$to WGSL type$] of the pipeline-overridable constant (`bool`/`i32`/`u32`/`f32`/`f16`).
+   * If conversion fails, a validation error is generated.
+   */
+  constants?: Record<
+    string,
+    GPUPipelineConstantValue
+  >;
 }
 
 // interface GPUQuerySetDescriptor
@@ -2457,20 +2456,20 @@ interface GPUDevice
 //   importExternalTexture(
 //     descriptor: GPUExternalTextureDescriptor
 //   ): GPUExternalTexture;
-//   /**
-//    * Creates a {@link GPUBindGroupLayout}.
-//    * @param descriptor - Description of the {@link GPUBindGroupLayout} to create.
-//    */
-//   createBindGroupLayout(
-//     descriptor: GPUBindGroupLayoutDescriptor
-//   ): GPUBindGroupLayout;
-//   /**
-//    * Creates a {@link GPUPipelineLayout}.
-//    * @param descriptor - Description of the {@link GPUPipelineLayout} to create.
-//    */
-//   createPipelineLayout(
-//     descriptor: GPUPipelineLayoutDescriptor
-//   ): GPUPipelineLayout;
+  /**
+   * Creates a {@link GPUBindGroupLayout}.
+   * @param descriptor - Description of the {@link GPUBindGroupLayout} to create.
+   */
+  createBindGroupLayout(
+    descriptor: GPUBindGroupLayoutDescriptor
+  ): GPUBindGroupLayout;
+  /**
+   * Creates a {@link GPUPipelineLayout}.
+   * @param descriptor - Description of the {@link GPUPipelineLayout} to create.
+   */
+  createPipelineLayout(
+    descriptor: GPUPipelineLayoutDescriptor
+  ): GPUPipelineLayout;
   /**
    * Creates a {@link GPUBindGroup}.
    * @param descriptor - Description of the {@link GPUBindGroup} to create.
@@ -3207,12 +3206,12 @@ declare var GPUBufferUsage: {
 //   readonly READ: GPUFlagsConstant;
 //   readonly WRITE: GPUFlagsConstant;
 // };
-//
-// declare var GPUShaderStage: {
-//   readonly VERTEX: GPUFlagsConstant;
-//   readonly FRAGMENT: GPUFlagsConstant;
-//   readonly COMPUTE: GPUFlagsConstant;
-// };
+
+declare var GPUShaderStage: {
+  readonly VERTEX: GPUFlagsConstant;
+  readonly FRAGMENT: GPUFlagsConstant;
+  readonly COMPUTE: GPUFlagsConstant;
+};
 
 declare var GPUTextureUsage: {
   readonly COPY_SRC: GPUFlagsConstant;

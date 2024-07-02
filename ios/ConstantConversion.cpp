@@ -389,3 +389,10 @@ WGPUFeatureName StringToWGPUFeatureName(const char *name) {
     if (strcmp(name, "float32-filterable") == 0) { return WGPUFeatureName_Float32Filterable; }
     return WGPUFeatureName_Undefined;
 }
+
+WGPUBufferBindingType StringToWGPUBufferBindingType(const char *name) {
+    if (strcmp(name, "uniform") == 0) { return WGPUBufferBindingType_Uniform; }
+    if (strcmp(name, "storage") == 0) { return WGPUBufferBindingType_Storage; }
+    if (strcmp(name, "read-only-storage") == 0) { return WGPUBufferBindingType_ReadOnlyStorage; }
+    return WGPUBufferBindingType_Undefined;
+}

@@ -5,9 +5,12 @@
 
 using namespace facebook::jsi;
 
-typedef std::shared_ptr<std::vector<WGPUConstantEntry>> ConstantEntries;
 
 namespace wgpu {
+
+const size_t NUM_FEATURES = 13;
+
+typedef std::shared_ptr<std::vector<WGPUConstantEntry>> ConstantEntries;
 
 WGPUDepthStencilState makeWGPUDepthStencilState(Runtime &runtime, Object obj);
 WGPUPrimitiveState makeWGPUPrimitiveState(Runtime &runtime, Object obj);
@@ -23,5 +26,7 @@ WGPUColor makeWGPUColor(Runtime &runtime, Value &value);
 WGPUColor makeWGPUColorFromProp(Runtime &runtime, Object &obj, const char *propName);
 WGPUImageCopyTexture makeWGPUImageCopyTexture(Runtime &runtime, Object obj);
 WGPUOrigin3D makeWGPUOrigin3D(Runtime &runtime, Object obj);
+Value makeJsiLimits(Runtime &runtime, WGPULimits *limits);
+Value makeJsiFeatures(Runtime &runtime, WGPUFeatureName *features);
 
 }

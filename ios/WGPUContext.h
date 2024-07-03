@@ -12,10 +12,12 @@ public:
         wgpuInstanceRelease(_instance);
         wgpuSurfaceRelease(_surface);
         // Adapter lifetime managed by AdapterHostObject
+        // Device lifetime managed by DeviceHostObject
     }
     WGPUInstance _instance;
     WGPUSurface _surface;
     WGPUAdapter _adapter;
+    WGPUDevice _device;
     std::function<uint32_t()> _getWidth;
     std::function<uint32_t()> _getHeight;
 };

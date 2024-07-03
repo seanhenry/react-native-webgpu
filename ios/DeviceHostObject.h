@@ -11,7 +11,9 @@ namespace wgpu {
 
 class DeviceHostObject : public HostObject {
 public:
-    explicit DeviceHostObject(WGPUDevice value, WGPUContext *context): _value(value), _context(context) { }
+    explicit DeviceHostObject(WGPUDevice value, WGPUContext *context): _value(value), _context(context) { 
+        context->_device = value;
+    }
     ~DeviceHostObject() { wgpuDeviceRelease(_value); }
     std::vector<PropNameID> getPropertyNames(Runtime& runtime) override;
     Value get(Runtime &runtime, const PropNameID &name) override;

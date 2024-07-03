@@ -7,6 +7,7 @@
 #include "ConstantConversion.h"
 #include "WGPUConversions.h"
 #include "ComputePassEncoderHostObject.h"
+#include "BufferHostObject.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
@@ -89,9 +90,21 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
         });
     }
 
+    if (name == "copyBufferToBuffer") {
+        return WGPU_FUNC_FROM_HOST_FUNC(copyBufferToBuffer, 5, [this]) {
+            auto source = arguments[0].asObject(runtime).asHostObject<BufferHostObject>(runtime)->_value;
+            auto sourceOffset = (uint64_t)arguments[1].asNumber();
+            auto destination = arguments[2].asObject(runtime).asHostObject<BufferHostObject>(runtime)->_value;
+            auto destinationOffset = (uint64_t)arguments[3].asNumber();
+            auto size = (uint64_t)arguments[4].asNumber();
+            wgpuCommandEncoderCopyBufferToBuffer(_value, source, sourceOffset, destination, destinationOffset, size);
+            return Value::undefined();
+        });
+    }
+
     return Value::undefined();
 }
 
 std::vector<PropNameID> CommandEncoderHostObject::getPropertyNames(Runtime& runtime) {
-    return PropNameID::names(runtime, "beginRenderPass", "finish", "copyTextureToTexture", "beginComputePass");
+    return PropNameID::names(runtime, "beginRenderPass", "finish", "copyTextureToTexture", "beginComputePass", "copyBufferToBuffer");
 }

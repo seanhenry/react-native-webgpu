@@ -17,6 +17,7 @@
 #include "WGPUDefaults.h"
 #include "ComputePipelineHostObject.h"
 #include "PipelineLayoutHostObject.h"
+#include "WGPUConversions.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
@@ -228,9 +229,21 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         });
     }
 
+    if (name == "features") {
+        WGPUFeatureName features[NUM_FEATURES];
+        wgpuDeviceEnumerateFeatures(_value, features);
+        return makeJsiFeatures(runtime, features);
+    }
+
+    if (name == "limits") {
+        WGPUSupportedLimits limits = {0};
+        wgpuDeviceGetLimits(_value, &limits);
+        return makeJsiLimits(runtime, &limits.limits);
+    }
+
     return Value::undefined();
 }
 
 std::vector<PropNameID> DeviceHostObject::getPropertyNames(Runtime& runtime) {
-    return PropNameID::names(runtime, "createRenderPipeline", "createShaderModule", "createCommandEncoder", "queue", "createBuffer", "createTexture", "createBindGroup", "createSampler", "createBindGroupLayout", "createPipelineLayout");
+    return PropNameID::names(runtime, "createRenderPipeline", "createShaderModule", "createCommandEncoder", "queue", "createBuffer", "createTexture", "createBindGroup", "createSampler", "createBindGroupLayout", "createPipelineLayout", "features", "limits");
 }

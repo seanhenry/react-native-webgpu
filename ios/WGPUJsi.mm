@@ -21,23 +21,7 @@ RCT_EXPORT_MODULE(WGPUJsi)
 
 @synthesize bridge;
 
-static void handle_request_adapter(WGPURequestAdapterStatus status,
-                                   WGPUAdapter adapter,
-                                   char const *message,
-                                   void *userdata) {
-    Promise *promise = (Promise *)userdata;
-    Runtime &runtime = promise->runtime;
-    auto sharedContext = (WGPUContext *)promise->userData;
-
-    if (status == WGPURequestAdapterStatus_Success) {
-        auto adapterHostObject = Object::createFromHostObject(runtime, std::make_shared<AdapterHostObject>(adapter, sharedContext));
-        promise->resolve->call(runtime, std::move(adapterHostObject));
-    } else {
-        auto error = boost::format("[%s] %#.8x %s") % __FILE_NAME__ % status % message;
-        promise->reject->call(runtime, String::createFromUtf8(runtime, error.str()));
-    }
-    delete promise;
-}
+static void handle_request_adapter(WGPURequestAdapterStatus status, WGPUAdapter adapter, char const *message, void *userdata);
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
     RCTCxxBridge *cxxBridge = (RCTCxxBridge*)self.bridge;
@@ -172,5 +156,17 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
 
 @end
 
+static void handle_request_adapter(WGPURequestAdapterStatus status, WGPUAdapter adapter, char const *message, void *userdata) {
+    Promise *promise = (Promise *)userdata;
+    Runtime &runtime = promise->runtime;
+    auto sharedContext = (WGPUContext *)promise->userData;
 
-
+    if (status == WGPURequestAdapterStatus_Success) {
+        auto adapterHostObject = Object::createFromHostObject(runtime, std::make_shared<AdapterHostObject>(adapter, sharedContext));
+        promise->resolve->call(runtime, std::move(adapterHostObject));
+    } else {
+        auto error = boost::format("[%s] %#.8x %s") % __FILE_NAME__ % status % message;
+        promise->reject->call(runtime, String::createFromUtf8(runtime, error.str()));
+    }
+    delete promise;
+}

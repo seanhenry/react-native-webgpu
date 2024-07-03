@@ -1908,10 +1908,10 @@ interface GPUAdapter {
    * The set of values in `this`.{@link GPUAdapter#[[adapter]]}.{@link adapter#[[features]]}.
    */
   readonly features: GPUSupportedFeatures;
-//   /**
-//    * The limits in `this`.{@link GPUAdapter#[[adapter]]}.{@link adapter#[[limits]]}.
-//    */
-//   readonly limits: GPUSupportedLimits;
+  /**
+   * The limits in `this`.{@link GPUAdapter#[[adapter]]}.{@link adapter#[[limits]]}.
+   */
+  readonly limits: GPUSupportedLimits;
 //   /**
 //    * Information about the physical adapter underlying this {@link GPUAdapter}.
 //    * For a given {@link GPUAdapter}, the {@link GPUAdapterInfo} values exposed are constant over time.
@@ -2028,27 +2028,27 @@ interface GPUBuffer
 //   readonly size: GPUSize64Out;
 //   readonly usage: GPUFlagsConstant;
 //   readonly mapState: GPUBufferMapState;
-//   /**
-//    * Maps the given range of the {@link GPUBuffer} and resolves the returned {@link Promise} when the
-//    * {@link GPUBuffer}'s content is ready to be accessed with {@link GPUBuffer#getMappedRange}.
-//    * The resolution of the returned {@link Promise} **only** indicates that the buffer has been mapped.
-//    * It does not guarantee the completion of any other operations visible to the content timeline,
-//    * and in particular does not imply that any other {@link Promise} returned from
-//    * {@link GPUQueue#onSubmittedWorkDone()} or {@link GPUBuffer#mapAsync} on other {@link GPUBuffer}s
-//    * have resolved.
-//    * The resolution of the {@link Promise} returned from {@link GPUQueue#onSubmittedWorkDone}
-//    * **does** imply the completion of
-//    * {@link GPUBuffer#mapAsync} calls made prior to that call,
-//    * on {@link GPUBuffer}s last used exclusively on that queue.
-//    * @param mode - Whether the buffer should be mapped for reading or writing.
-//    * @param offset - Offset in bytes into the buffer to the start of the range to map.
-//    * @param size - Size in bytes of the range to map.
-//    */
-//   mapAsync(
-//     mode: GPUMapModeFlags,
-//     offset?: GPUSize64,
-//     size?: GPUSize64
-//   ): Promise<undefined>;
+  /**
+   * Maps the given range of the {@link GPUBuffer} and resolves the returned {@link Promise} when the
+   * {@link GPUBuffer}'s content is ready to be accessed with {@link GPUBuffer#getMappedRange}.
+   * The resolution of the returned {@link Promise} **only** indicates that the buffer has been mapped.
+   * It does not guarantee the completion of any other operations visible to the content timeline,
+   * and in particular does not imply that any other {@link Promise} returned from
+   * {@link GPUQueue#onSubmittedWorkDone()} or {@link GPUBuffer#mapAsync} on other {@link GPUBuffer}s
+   * have resolved.
+   * The resolution of the {@link Promise} returned from {@link GPUQueue#onSubmittedWorkDone}
+   * **does** imply the completion of
+   * {@link GPUBuffer#mapAsync} calls made prior to that call,
+   * on {@link GPUBuffer}s last used exclusively on that queue.
+   * @param mode - Whether the buffer should be mapped for reading or writing.
+   * @param offset - Offset in bytes into the buffer to the start of the range to map.
+   * @param size - Size in bytes of the range to map.
+   */
+  mapAsync(
+    mode: GPUMapModeFlags,
+    offset?: GPUSize64,
+    size?: GPUSize64
+  ): Promise<undefined>;
   /**
    * Returns an {@link ArrayBuffer} with the contents of the {@link GPUBuffer} in the given mapped range.
    * @param offset - Offset in bytes into the buffer to return buffer contents from.
@@ -2155,22 +2155,22 @@ interface GPUCommandEncoder
   beginComputePass(
     descriptor?: GPUComputePassDescriptor
   ): GPUComputePassEncoder;
-//   /**
-//    * Encode a command into the {@link GPUCommandEncoder} that copies data from a sub-region of a
-//    * {@link GPUBuffer} to a sub-region of another {@link GPUBuffer}.
-//    * @param source - The {@link GPUBuffer} to copy from.
-//    * @param sourceOffset - Offset in bytes into `source` to begin copying from.
-//    * @param destination - The {@link GPUBuffer} to copy to.
-//    * @param destinationOffset - Offset in bytes into `destination` to place the copied data.
-//    * @param size - Bytes to copy.
-//    */
-//   copyBufferToBuffer(
-//     source: GPUBuffer,
-//     sourceOffset: GPUSize64,
-//     destination: GPUBuffer,
-//     destinationOffset: GPUSize64,
-//     size: GPUSize64
-//   ): undefined;
+  /**
+   * Encode a command into the {@link GPUCommandEncoder} that copies data from a sub-region of a
+   * {@link GPUBuffer} to a sub-region of another {@link GPUBuffer}.
+   * @param source - The {@link GPUBuffer} to copy from.
+   * @param sourceOffset - Offset in bytes into `source` to begin copying from.
+   * @param destination - The {@link GPUBuffer} to copy to.
+   * @param destinationOffset - Offset in bytes into `destination` to place the copied data.
+   * @param size - Bytes to copy.
+   */
+  copyBufferToBuffer(
+    source: GPUBuffer,
+    sourceOffset: GPUSize64,
+    destination: GPUBuffer,
+    destinationOffset: GPUSize64,
+    size: GPUSize64
+  ): undefined;
 //   /**
 //    * Encode a command into the {@link GPUCommandEncoder} that copies data from a sub-region of a
 //    * {@link GPUBuffer} to a sub-region of one or multiple continuous texture subresources.
@@ -2408,16 +2408,16 @@ interface GPUDevice
 //    * @internal
 //    */
 //   readonly __brand: "GPUDevice";
-//   /**
-//    * A set containing the {@link GPUFeatureName} values of the features
-//    * supported by the device (i.e. the ones with which it was created).
-//    */
-//   readonly features: GPUSupportedFeatures;
-//   /**
-//    * Exposes the limits supported by the device
-//    * (which are exactly the ones with which it was created).
-//    */
-//   readonly limits: GPUSupportedLimits;
+  /**
+   * A set containing the {@link GPUFeatureName} values of the features
+   * supported by the device (i.e. the ones with which it was created).
+   */
+  readonly features: GPUSupportedFeatures;
+  /**
+   * Exposes the limits supported by the device
+   * (which are exactly the ones with which it was created).
+   */
+  readonly limits: GPUSupportedLimits;
   /**
    * The primary {@link GPUQueue} for this device.
    */
@@ -3014,47 +3014,47 @@ interface GPUShaderModule
 type GPUSupportedFeatures =
   ReadonlySet<string>;
 
-// interface GPUSupportedLimits {
-//   /**
-//    * Nominal type branding.
-//    * https://github.com/microsoft/TypeScript/pull/33038
-//    * @internal
-//    */
-//   readonly __brand: "GPUSupportedLimits";
-//   readonly maxTextureDimension1D: number;
-//   readonly maxTextureDimension2D: number;
-//   readonly maxTextureDimension3D: number;
-//   readonly maxTextureArrayLayers: number;
-//   readonly maxBindGroups: number;
-//   readonly maxBindGroupsPlusVertexBuffers: number;
-//   readonly maxBindingsPerBindGroup: number;
-//   readonly maxDynamicUniformBuffersPerPipelineLayout: number;
-//   readonly maxDynamicStorageBuffersPerPipelineLayout: number;
-//   readonly maxSampledTexturesPerShaderStage: number;
-//   readonly maxSamplersPerShaderStage: number;
-//   readonly maxStorageBuffersPerShaderStage: number;
-//   readonly maxStorageTexturesPerShaderStage: number;
-//   readonly maxUniformBuffersPerShaderStage: number;
-//   readonly maxUniformBufferBindingSize: number;
-//   readonly maxStorageBufferBindingSize: number;
-//   readonly minUniformBufferOffsetAlignment: number;
-//   readonly minStorageBufferOffsetAlignment: number;
-//   readonly maxVertexBuffers: number;
-//   readonly maxBufferSize: number;
-//   readonly maxVertexAttributes: number;
-//   readonly maxVertexBufferArrayStride: number;
-//   readonly maxInterStageShaderComponents: number;
-//   readonly maxInterStageShaderVariables: number;
-//   readonly maxColorAttachments: number;
-//   readonly maxColorAttachmentBytesPerSample: number;
-//   readonly maxComputeWorkgroupStorageSize: number;
-//   readonly maxComputeInvocationsPerWorkgroup: number;
-//   readonly maxComputeWorkgroupSizeX: number;
-//   readonly maxComputeWorkgroupSizeY: number;
-//   readonly maxComputeWorkgroupSizeZ: number;
-//   readonly maxComputeWorkgroupsPerDimension: number;
-// }
-//
+interface GPUSupportedLimits {
+  /**
+   * Nominal type branding.
+   * https://github.com/microsoft/TypeScript/pull/33038
+   * @internal
+   */
+  readonly __brand: "GPUSupportedLimits";
+  readonly maxTextureDimension1D: number;
+  readonly maxTextureDimension2D: number;
+  readonly maxTextureDimension3D: number;
+  readonly maxTextureArrayLayers: number;
+  readonly maxBindGroups: number;
+  readonly maxBindGroupsPlusVertexBuffers: number;
+  readonly maxBindingsPerBindGroup: number;
+  readonly maxDynamicUniformBuffersPerPipelineLayout: number;
+  readonly maxDynamicStorageBuffersPerPipelineLayout: number;
+  readonly maxSampledTexturesPerShaderStage: number;
+  readonly maxSamplersPerShaderStage: number;
+  readonly maxStorageBuffersPerShaderStage: number;
+  readonly maxStorageTexturesPerShaderStage: number;
+  readonly maxUniformBuffersPerShaderStage: number;
+  readonly maxUniformBufferBindingSize: number;
+  readonly maxStorageBufferBindingSize: number;
+  readonly minUniformBufferOffsetAlignment: number;
+  readonly minStorageBufferOffsetAlignment: number;
+  readonly maxVertexBuffers: number;
+  readonly maxBufferSize: number;
+  readonly maxVertexAttributes: number;
+  readonly maxVertexBufferArrayStride: number;
+  readonly maxInterStageShaderComponents: number;
+  readonly maxInterStageShaderVariables: number;
+  readonly maxColorAttachments: number;
+  readonly maxColorAttachmentBytesPerSample: number;
+  readonly maxComputeWorkgroupStorageSize: number;
+  readonly maxComputeInvocationsPerWorkgroup: number;
+  readonly maxComputeWorkgroupSizeX: number;
+  readonly maxComputeWorkgroupSizeY: number;
+  readonly maxComputeWorkgroupSizeZ: number;
+  readonly maxComputeWorkgroupsPerDimension: number;
+}
+
 // declare var GPUSupportedLimits: {
 //   prototype: GPUSupportedLimits;
 // };
@@ -3201,11 +3201,11 @@ declare var GPUBufferUsage: {
 //   readonly ALPHA: GPUFlagsConstant;
 //   readonly ALL: GPUFlagsConstant;
 // };
-//
-// declare var GPUMapMode: {
-//   readonly READ: GPUFlagsConstant;
-//   readonly WRITE: GPUFlagsConstant;
-// };
+
+declare var GPUMapMode: {
+  readonly READ: GPUFlagsConstant;
+  readonly WRITE: GPUFlagsConstant;
+};
 
 declare var GPUShaderStage: {
   readonly VERTEX: GPUFlagsConstant;

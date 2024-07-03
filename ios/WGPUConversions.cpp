@@ -225,3 +225,53 @@ WGPUOrigin3D wgpu::makeWGPUOrigin3D(Runtime &runtime, Object obj) {
     }
     return origin;
 }
+
+Value wgpu::makeJsiLimits(Runtime &runtime, WGPULimits *limits) {
+    Object obj(runtime);
+    obj.setProperty(runtime, "maxTextureDimension1D", Value((int)limits->maxTextureDimension1D));
+    obj.setProperty(runtime, "maxTextureDimension2D", Value((int)limits->maxTextureDimension2D));
+    obj.setProperty(runtime, "maxTextureDimension3D", Value((int)limits->maxTextureDimension3D));
+    obj.setProperty(runtime, "maxTextureArrayLayers", Value((int)limits->maxTextureArrayLayers));
+    obj.setProperty(runtime, "maxBindGroups", Value((int)limits->maxBindGroups));
+    obj.setProperty(runtime, "maxBindGroupsPlusVertexBuffers", Value((int)limits->maxBindGroupsPlusVertexBuffers));
+    obj.setProperty(runtime, "maxBindingsPerBindGroup", Value((int)limits->maxBindingsPerBindGroup));
+    obj.setProperty(runtime, "maxDynamicUniformBuffersPerPipelineLayout", Value((int)limits->maxDynamicUniformBuffersPerPipelineLayout));
+    obj.setProperty(runtime, "maxDynamicStorageBuffersPerPipelineLayout", Value((int)limits->maxDynamicStorageBuffersPerPipelineLayout));
+    obj.setProperty(runtime, "maxSampledTexturesPerShaderStage", Value((int)limits->maxSampledTexturesPerShaderStage));
+    obj.setProperty(runtime, "maxSamplersPerShaderStage", Value((int)limits->maxSamplersPerShaderStage));
+    obj.setProperty(runtime, "maxStorageBuffersPerShaderStage", Value((int)limits->maxStorageBuffersPerShaderStage));
+    obj.setProperty(runtime, "maxStorageTexturesPerShaderStage", Value((int)limits->maxStorageTexturesPerShaderStage));
+    obj.setProperty(runtime, "maxUniformBuffersPerShaderStage", Value((int)limits->maxUniformBuffersPerShaderStage));
+    obj.setProperty(runtime, "maxUniformBufferBindingSize", Value((int)limits->maxUniformBufferBindingSize));
+    obj.setProperty(runtime, "maxStorageBufferBindingSize", Value((int)limits->maxStorageBufferBindingSize));
+    obj.setProperty(runtime, "minUniformBufferOffsetAlignment", Value((int)limits->minUniformBufferOffsetAlignment));
+    obj.setProperty(runtime, "minStorageBufferOffsetAlignment", Value((int)limits->minStorageBufferOffsetAlignment));
+    obj.setProperty(runtime, "maxVertexBuffers", Value((int)limits->maxVertexBuffers));
+    obj.setProperty(runtime, "maxBufferSize", Value((int)limits->maxBufferSize));
+    obj.setProperty(runtime, "maxVertexAttributes", Value((int)limits->maxVertexAttributes));
+    obj.setProperty(runtime, "maxVertexBufferArrayStride", Value((int)limits->maxVertexBufferArrayStride));
+    obj.setProperty(runtime, "maxInterStageShaderComponents", Value((int)limits->maxInterStageShaderComponents));
+    obj.setProperty(runtime, "maxInterStageShaderVariables", Value((int)limits->maxInterStageShaderVariables));
+    obj.setProperty(runtime, "maxColorAttachments", Value((int)limits->maxColorAttachments));
+    obj.setProperty(runtime, "maxColorAttachmentBytesPerSample", Value((int)limits->maxColorAttachmentBytesPerSample));
+    obj.setProperty(runtime, "maxComputeWorkgroupStorageSize", Value((int)limits->maxComputeWorkgroupStorageSize));
+    obj.setProperty(runtime, "maxComputeInvocationsPerWorkgroup", Value((int)limits->maxComputeInvocationsPerWorkgroup));
+    obj.setProperty(runtime, "maxComputeWorkgroupSizeX", Value((int)limits->maxComputeWorkgroupSizeX));
+    obj.setProperty(runtime, "maxComputeWorkgroupSizeY", Value((int)limits->maxComputeWorkgroupSizeY));
+    obj.setProperty(runtime, "maxComputeWorkgroupSizeZ", Value((int)limits->maxComputeWorkgroupSizeZ));
+    obj.setProperty(runtime, "maxComputeWorkgroupsPerDimension", Value((int)limits->maxComputeWorkgroupsPerDimension));
+    return std::move(obj);
+}
+
+Value wgpu::makeJsiFeatures(Runtime &runtime, WGPUFeatureName *features) {
+    Value values[NUM_FEATURES];
+    size_t count = 0;
+    for (int i = 0; i < NUM_FEATURES; i++) {
+        auto name = WGPUFeatureNameToString(features[i]);
+        if (name != NULL) {
+            count++;
+            values[i] = String::createFromUtf8(runtime, name);
+        }
+    }
+    return makeJSSet(runtime, values, count);
+}

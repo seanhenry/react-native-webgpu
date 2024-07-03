@@ -3,27 +3,14 @@
 #include "WGPUJsiUtils.h"
 #include "WGPUContext.h"
 #include "ConstantConversion.h"
+#include "WGPUConversions.h"
 #include <stdio.h>
 #include <boost/format.hpp>
 
 using namespace facebook::jsi;
 using namespace wgpu;
 
-static void handle_request_device(WGPURequestDeviceStatus status,
-                                  WGPUDevice device, char const *message,
-                                  void *userdata) {
-    auto promise = (Promise *)userdata;
-    auto context = (WGPUContext *)promise->userData;
-    Runtime &runtime = promise->runtime;
-    if (status == WGPURequestDeviceStatus_Success) {
-        auto deviceHostObject = Object::createFromHostObject(runtime, std::make_shared<DeviceHostObject>(device, context));
-        promise->resolve->call(runtime, std::move(deviceHostObject));
-    } else {
-        auto error = boost::format("[%s] %#.8x %s") % __FILE_NAME__ % status % message;
-        promise->reject->call(runtime, String::createFromUtf8(runtime, error.str()));
-    }
-    delete promise;
-}
+static void handle_request_device(WGPURequestDeviceStatus status, WGPUDevice device, char const *message, void *userdata);
 
 Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
     auto name = propName.utf8(runtime);
@@ -63,24 +50,34 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
     }
 
     if (name == "features") {
-        const size_t NUM_FEATURES = 13;
         WGPUFeatureName features[NUM_FEATURES];
-        Value values[NUM_FEATURES];
-        size_t count = 0;
         wgpuAdapterEnumerateFeatures(_value, features);
-        for (int i = 0; i < NUM_FEATURES; i++) {
-            auto name = WGPUFeatureNameToString(features[i]);
-            if (name != NULL) {
-                count++;
-                values[i] = String::createFromUtf8(runtime, name);
-            }
-        }
-        return makeJSSet(runtime, values, count);
+        return makeJsiFeatures(runtime, features);
+    }
+
+    if (name == "limits") {
+        WGPUSupportedLimits limits = {0};
+        wgpuAdapterGetLimits(_value, &limits);
+        return makeJsiLimits(runtime, &limits.limits);
     }
 
     return Value::undefined();
 }
 
 std::vector<PropNameID> AdapterHostObject::getPropertyNames(Runtime& runtime) {
-    return PropNameID::names(runtime, "requestDevice", "features");
+    return PropNameID::names(runtime, "requestDevice", "features", "limits");
+}
+
+static void handle_request_device(WGPURequestDeviceStatus status, WGPUDevice device, char const *message, void *userdata) {
+    auto promise = (Promise *)userdata;
+    auto context = (WGPUContext *)promise->userData;
+    Runtime &runtime = promise->runtime;
+    if (status == WGPURequestDeviceStatus_Success) {
+        auto deviceHostObject = Object::createFromHostObject(runtime, std::make_shared<DeviceHostObject>(device, context));
+        promise->resolve->call(runtime, std::move(deviceHostObject));
+    } else {
+        auto error = boost::format("[%s] %#.8x %s") % __FILE_NAME__ % status % message;
+        promise->reject->call(runtime, String::createFromUtf8(runtime, error.str()));
+    }
+    delete promise;
 }

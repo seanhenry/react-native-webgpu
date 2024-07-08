@@ -7,11 +7,13 @@ Interested in this project? Star it in GitHub to show your support.
 Dependent projects:
 - [react-native-webgpu-three](https://github.com/seanhenry/react-native-webgpu-three)
 
+## Examples
+
+If you want to check the progress of this project, or play around with what's been implemented so far, you can check out [the examples](examples/ExampleRN)
+
 ## Installation
 
-```sh
-npm install react-native-webgpu
-```
+*Coming soon*
 
 ## Contributing
 

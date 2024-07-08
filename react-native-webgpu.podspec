@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.platforms    = { :ios => min_ios_version_supported }
   s.source       = { :git => "https://github.com/seanhenry/react-native-webgpu.git", :tag => "#{s.version}" }
 
-  s.source_files = ["ios/**/*.{hpp,h,m,mm,cpp,c}", "submodules/wgpu-native/ffi/**/*.h"]
+  s.source_files = ["ios/**/*.{hpp,h,m,mm,cpp,c}", "submodules/wgpu-native/ffi/webgpu-headers/webgpu.h", "submodules/wgpu-native/ffi/wgpu.h"]
 
   pods_root = ENV['PWD']
   relative_path_to_libs = Pathname.new("#{__dir__}/bin").relative_path_from(Pathname.new(pods_root)).to_s

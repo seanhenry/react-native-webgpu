@@ -9,23 +9,40 @@ Dependent projects:
 
 ## Examples
 
-If you want to check the progress of this project, or play around with what's been implemented so far, you can check out [the examples](examples/ExampleRN)
+If you want to check the progress of this project, or play around with what's been implemented so far, you can check out the examples.
 
-## Installation
+1. Install library dependencies
 
-*Coming soon*
+```bash
+git submodule update --init --recursive
+yarn
+```
 
-## Contributing
+2. Download the libraries from the [release page](https://github.com/seanhenry/react-native-webgpu/releases/tag/v0.0.0).
+3. Create a `/bin` folder at the root of this project and move the libraries there
+4. Install examples dependencies
 
-See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
+```bash
+cd examples/ExampleRN
+yarn
+
+# iOS
+cd ios
+pod install
+cd ..
+
+# Android coming soon
+```
+
+5. Build and run
+
+```bash
+yarn ios
+```
 
 ## License
 
 MIT
-
----
-
-Made with [create-react-native-library](https://github.com/callstack/react-native-builder-bob)
 
 ## Build locally
 

@@ -166,7 +166,7 @@ void wgpu::makeWGPUBindingResource(Runtime &runtime, Value value, WGPUBindGroupE
         auto buffer = WGPU_HOST_OBJ(obj, buffer, BufferHostObject);
         entry->buffer = buffer->_value;
         entry->offset = WGPU_NUMBER_OPT(obj, offset, size_t, 0);
-        entry->size = WGPU_NUMBER_OPT(obj, size, size_t, wgpuBufferGetSize(buffer->_value));
+        entry->size = WGPU_NUMBER_OPT(obj, size, size_t, wgpuBufferGetSize(buffer->_value) - entry->offset);
     } else {
         // TODO: GPUExternalTexture
         throw JSError(runtime, "GPUExternalTexture is not supported");
@@ -263,15 +263,15 @@ Value wgpu::makeJsiLimits(Runtime &runtime, WGPULimits *limits) {
     return std::move(obj);
 }
 
-Value wgpu::makeJsiFeatures(Runtime &runtime, WGPUFeatureName *features) {
-    Value values[NUM_FEATURES];
-    size_t count = 0;
-    for (int i = 0; i < NUM_FEATURES; i++) {
-        auto name = WGPUFeatureNameToString(features[i]);
+// wgpu returns undefined data along with supported features so we need to filter those out
+Value wgpu::makeJsiFeatures(Runtime &runtime, std::vector<WGPUFeatureName> *features) {
+    std::vector<Value> values;
+    values.reserve(features->size());
+    for (WGPUFeatureName featureName : *features) {
+        auto name = WGPUFeatureNameToString(featureName);
         if (name != NULL) {
-            count++;
-            values[i] = String::createFromUtf8(runtime, name);
+            values.emplace_back(String::createFromUtf8(runtime, name));
         }
     }
-    return makeJSSet(runtime, values, count);
+    return makeJSSet(runtime, values.data(), values.size());
 }

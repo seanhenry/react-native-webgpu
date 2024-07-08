@@ -84,10 +84,10 @@ inline bool isArray(Runtime &runtime, Value *value) {
     return value->isObject() && value->asObject(runtime).isArray(runtime);
 }
 
-class SharedMutableBuffer: public MutableBuffer {
+class UnownedMutableBuffer: public MutableBuffer {
 public:
-    SharedMutableBuffer(void *data, size_t size): _data(data), _size(size) {}
-    ~SharedMutableBuffer() {}
+    UnownedMutableBuffer(void *data, size_t size): _data(data), _size(size) {}
+    ~UnownedMutableBuffer() {}
     size_t size() const override {
         return _size;
     }
@@ -114,8 +114,8 @@ private:
     size_t _size;
 };
 
-inline ArrayBuffer createSharedArrayBuffer(Runtime &runtime, void *bytes, size_t size) {
-    auto buffer = std::make_shared<SharedMutableBuffer>(bytes, size);
+inline ArrayBuffer createUnownedArrayBuffer(Runtime &runtime, void *bytes, size_t size) {
+    auto buffer = std::make_shared<UnownedMutableBuffer>(bytes, size);
     return ArrayBuffer(runtime, buffer);
 }
 

@@ -12,14 +12,14 @@ import {
 import basicVertWGSL from '../../shaders/basic.vert.wgsl';
 import sampleTextureMixColorWGSL from './sampleTextureMixColor.frag.wgsl';
 import { CenterSquare } from '../../../Components/CenterSquare';
-import { WebGpuView } from 'react-native-webgpu';
+import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
 import React from 'react';
 import { globalStyles } from '../../../Components/globalStyles';
 
 export const TexturedCube = () => {
-  const onInit = async ({identifier}: {identifier: string}) => {
-    const {navigator, getContext, createImageBitmap} = global.webGPU;
-    const context = getContext({identifier});
+  const onInit: WebGpuViewProps['onInit'] = async ({ context, timer }) => {
+    const {requestAnimationFrame} = timer;
+    const {navigator, createImageBitmap} = global.webGPU;
     const adapter = await navigator.gpu.requestAdapter({context});
     const device = await adapter!.requestDevice();
 

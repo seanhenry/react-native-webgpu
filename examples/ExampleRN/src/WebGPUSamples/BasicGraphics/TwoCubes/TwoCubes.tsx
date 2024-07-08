@@ -1,6 +1,6 @@
 // https://webgpu.github.io/webgpu-samples/?sample=twoCubes
 import { CenterSquare } from '../../../Components/CenterSquare';
-import { WebGpuView } from 'react-native-webgpu';
+import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
 import React from 'react';
 
 import { mat4, vec3 } from 'wgpu-matrix';
@@ -12,9 +12,9 @@ import vertexPositionColorWGSL from '../../shaders/vertexPositionColor.frag.wgsl
 import { globalStyles } from '../../../Components/globalStyles';
 
 export const TwoCubes = () => {
-  const onInit = async ({identifier}: {identifier: string}) => {
-    const {navigator, getContext} = global.webGPU;
-    const context = getContext({identifier})
+  const onInit: WebGpuViewProps['onInit'] = async ({ context, timer }) => {
+    const {requestAnimationFrame} = timer;
+    const {navigator} = global.webGPU;
     const adapter = await navigator.gpu.requestAdapter({context});
     const device = await adapter!.requestDevice();
 

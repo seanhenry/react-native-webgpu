@@ -69,7 +69,7 @@ WGPUImageCopyTexture wgpu::makeDefaultImageCopyTexture(WGPUTexture texture) {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/GPUTexture/createView#descriptor
-WGPUTextureViewDescriptor wgpu::makeDefaultWGPUTextureViewDescriptor(Runtime &runtime, Object desc, WGPUTexture texture) {
+WGPUTextureViewDescriptor wgpu::makeDefaultWGPUTextureViewDescriptor(Runtime &runtime, Object &desc, WGPUTexture texture) {
     auto arrayLayerCount = WGPU_NUMBER_OPT(desc, arrayLayerCount, uint32_t, 0);
     auto aspectStr = WGPU_UTF8_OPT(desc, aspect, "all");
     auto aspect = StringToWGPUTextureAspect(aspectStr.data());
@@ -130,6 +130,8 @@ WGPUTextureViewDescriptor wgpu::makeDefaultWGPUTextureViewDescriptor(Runtime &ru
         .baseMipLevel = baseMipLevel,
         .dimension = dimension,
         .format = format,
-        .mipLevelCount = wgpuTextureGetMipLevelCount(texture) - baseMipLevel,
+        .label = NULL,
+        .mipLevelCount = mipLevelCount,
+        .nextInChain = NULL,
     };
 }

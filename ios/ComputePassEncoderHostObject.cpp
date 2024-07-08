@@ -49,9 +49,13 @@ Value ComputePassEncoderHostObject::get(Runtime &runtime, const PropNameID &prop
         });
     }
 
+    if (name == "label") {
+        return String::createFromUtf8(runtime, _label);
+    }
+
     return Value::undefined();
 }
 
 std::vector<PropNameID> ComputePassEncoderHostObject::getPropertyNames(Runtime& runtime) {
-    return PropNameID::names(runtime, "setPipeline", "setBindGroup", "dispatchWorkgroups", "end");
+    return PropNameID::names(runtime, "setPipeline", "setBindGroup", "dispatchWorkgroups", "end", "label");
 }

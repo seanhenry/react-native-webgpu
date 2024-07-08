@@ -10,12 +10,13 @@ namespace wgpu {
 
 class BindGroupHostObject : public HostObject {
 public:
-    explicit BindGroupHostObject(WGPUBindGroup value, WGPUContext *context): _value(value), _context(context) {}
+    explicit BindGroupHostObject(WGPUBindGroup value, WGPUContext *context, std::string label): _value(value), _context(context), _label(label) {}
     ~BindGroupHostObject() { wgpuBindGroupRelease(_value); }
     std::vector<PropNameID> getPropertyNames(Runtime& runtime) override;
     Value get(Runtime &runtime, const PropNameID &name) override;
     WGPUBindGroup _value;
     WGPUContext *_context;
+    std::string _label;
 };
 
 }

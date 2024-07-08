@@ -1,5 +1,5 @@
 import { CenterSquare } from '../../../Components/CenterSquare';
-import { WebGpuView } from 'react-native-webgpu';
+import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
 import { globalStyles } from '../../../Components/globalStyles';
 import React from 'react';
 
@@ -8,10 +8,11 @@ import React from 'react';
 import { createBindGroupCluster, SampleInitFactoryWebGPU } from './utils';
 import BitonicDisplayRenderer from './bitonicDisplay';
 import { NaiveBitonicCompute } from './bitonicCompute';
-import atomicToZero from './atomicToZero.wgsl';
+// import atomicToZero from './atomicToZero.wgsl';
 
 export const BitonicSort = () => {
-  const onInit = async ({ identifier }: { identifier: string }) => {
+  const onInit: WebGpuViewProps['onInit'] = async ({ context, timer }) => {
+    const {requestAnimationFrame} = timer;
     // Type of step that will be executed in our shader
     enum StepEnum {
       NONE,
@@ -307,17 +308,17 @@ export const BitonicSort = () => {
         });
 
         // Simple pipeline that zeros out an atomic value at group 0 binding 3
-        const atomicToZeroComputePipeline = device.createComputePipeline({
-          layout: device.createPipelineLayout({
-            bindGroupLayouts: [computeBGCluster.bindGroupLayout],
-          }),
-          compute: {
-            module: device.createShaderModule({
-              code: atomicToZero,
-            }),
-            entryPoint: 'atomicToZero',
-          },
-        });
+        // const atomicToZeroComputePipeline = device.createComputePipeline({
+        //   layout: device.createPipelineLayout({
+        //     bindGroupLayouts: [computeBGCluster.bindGroupLayout],
+        //   }),
+        //   compute: {
+        //     module: device.createShaderModule({
+        //       code: atomicToZero,
+        //     }),
+        //     entryPoint: 'atomicToZero',
+        //   },
+        // });
 
         // Create bitonic debug renderer
         const renderPassDescriptor: GPURenderPassDescriptor = {
@@ -340,79 +341,79 @@ export const BitonicSort = () => {
           'BitonicDisplay',
         );
 
-        const resetTimeInfo = () => {
-          settings.stepTime = 0;
-          settings.sortTime = 0;
-          // stepTimeController.setValue('0ms');
-          settings['Step Time'] = '0ms';
-          // sortTimeController.setValue(`0ms`);
-          settings['Sort Time'] = '0ms';
-          const nanCheck =
-            settings.configToCompleteSwapsMap[settings.configKey]!.time /
-            settings.configToCompleteSwapsMap[settings.configKey]!.sorts;
-          const ast = nanCheck ? nanCheck : 0;
-          // averageSortTimeController.setValue(`${ast.toFixed(5)}ms`);
-          settings['Average Sort Time'] = `${ast.toFixed(5)}ms`;
-        };
-
-        const resetExecutionInformation = () => {
-          // // The workgroup size is either elements / 2 or Size Limit
-          // workgroupSizeController.setValue(
-          //   Math.min(settings['Total Elements'] / 2, settings['Size Limit']),
-          // );
-          settings['Workgroup Size'] = Math.min(settings['Total Elements'] / 2, settings['Size Limit'])
-          //
-          // // Dispatch a workgroup for every (Size Limit * 2) elements
-          // const workgroupsPerStep =
-          //   (settings['Total Elements'] - 1) / (settings['Size Limit'] * 2);
-          //
-          // workgroupsPerStepController.setValue(Math.ceil(workgroupsPerStep));
-          settings['Workgroups Per Step'] = (settings['Total Elements'] - 1) / (settings['Size Limit'] * 2);
-
-          // Reset step Index and number of steps based on elements size
-          settings['Step Index'] = 0;
-          settings['Total Steps'] = getNumSteps(settings['Total Elements']);
-          // currentStepController.setValue(
-          //   `${settings['Step Index']} of ${settings['Total Steps']}`,
-          // );
-          settings['Current Step'] = `${settings['Step Index']} of ${settings['Total Steps']}`;
-
-          // Get new width and height of screen display in cells
-          const newCellWidth =
-            Math.sqrt(settings['Total Elements']) % 2 === 0
-              ? Math.floor(Math.sqrt(settings['Total Elements']))
-              : Math.floor(Math.sqrt(settings['Total Elements'] / 2));
-          const newCellHeight = settings['Total Elements'] / newCellWidth;
-          settings['Grid Width'] = newCellWidth;
-          settings['Grid Height'] = newCellHeight;
-          // gridDimensionsController.setValue(`${newCellWidth}x${newCellHeight}`);
-          settings['Grid Dimensions'] = `${newCellWidth}x${newCellHeight}`;
-          //
-          // // Set prevStep to None (restart) and next step to FLIP
-          // prevStepController.setValue('NONE');
-          settings['Prev Step'] = 'NONE';
-          // nextStepController.setValue('FLIP_LOCAL');
-          settings['Next Step'] = 'FLIP_LOCAL';
-          //
-          // // Reset block heights
-          // prevBlockHeightController.setValue(0);
-          settings['Prev Swap Span'] = 0;
-          // nextBlockHeightController.setValue(2);
-          settings['Next Swap Span'] = 2;
-
-          // Reset Total Swaps by setting atomic value to 0
-          const commandEncoder = device.createCommandEncoder();
-          const computePassEncoder = commandEncoder.beginComputePass();
-          computePassEncoder.setPipeline(atomicToZeroComputePipeline);
-          computePassEncoder.setBindGroup(0, computeBGCluster.bindGroups[0]!);
-          computePassEncoder.dispatchWorkgroups(1);
-          computePassEncoder.end();
-          device.queue.submit([commandEncoder.finish()]);
-          // totalSwapsController.setValue(0);
-          settings['Total Swaps'] = 0;
-
-          highestBlockHeight = 2;
-        };
+        // const resetTimeInfo = () => {
+        //   settings.stepTime = 0;
+        //   settings.sortTime = 0;
+        //   // stepTimeController.setValue('0ms');
+        //   settings['Step Time'] = '0ms';
+        //   // sortTimeController.setValue(`0ms`);
+        //   settings['Sort Time'] = '0ms';
+        //   const nanCheck =
+        //     settings.configToCompleteSwapsMap[settings.configKey]!.time /
+        //     settings.configToCompleteSwapsMap[settings.configKey]!.sorts;
+        //   const ast = nanCheck ? nanCheck : 0;
+        //   // averageSortTimeController.setValue(`${ast.toFixed(5)}ms`);
+        //   settings['Average Sort Time'] = `${ast.toFixed(5)}ms`;
+        // };
+        //
+        // const resetExecutionInformation = () => {
+        //   // // The workgroup size is either elements / 2 or Size Limit
+        //   // workgroupSizeController.setValue(
+        //   //   Math.min(settings['Total Elements'] / 2, settings['Size Limit']),
+        //   // );
+        //   settings['Workgroup Size'] = Math.min(settings['Total Elements'] / 2, settings['Size Limit'])
+        //   //
+        //   // // Dispatch a workgroup for every (Size Limit * 2) elements
+        //   // const workgroupsPerStep =
+        //   //   (settings['Total Elements'] - 1) / (settings['Size Limit'] * 2);
+        //   //
+        //   // workgroupsPerStepController.setValue(Math.ceil(workgroupsPerStep));
+        //   settings['Workgroups Per Step'] = (settings['Total Elements'] - 1) / (settings['Size Limit'] * 2);
+        //
+        //   // Reset step Index and number of steps based on elements size
+        //   settings['Step Index'] = 0;
+        //   settings['Total Steps'] = getNumSteps(settings['Total Elements']);
+        //   // currentStepController.setValue(
+        //   //   `${settings['Step Index']} of ${settings['Total Steps']}`,
+        //   // );
+        //   settings['Current Step'] = `${settings['Step Index']} of ${settings['Total Steps']}`;
+        //
+        //   // Get new width and height of screen display in cells
+        //   const newCellWidth =
+        //     Math.sqrt(settings['Total Elements']) % 2 === 0
+        //       ? Math.floor(Math.sqrt(settings['Total Elements']))
+        //       : Math.floor(Math.sqrt(settings['Total Elements'] / 2));
+        //   const newCellHeight = settings['Total Elements'] / newCellWidth;
+        //   settings['Grid Width'] = newCellWidth;
+        //   settings['Grid Height'] = newCellHeight;
+        //   // gridDimensionsController.setValue(`${newCellWidth}x${newCellHeight}`);
+        //   settings['Grid Dimensions'] = `${newCellWidth}x${newCellHeight}`;
+        //   //
+        //   // // Set prevStep to None (restart) and next step to FLIP
+        //   // prevStepController.setValue('NONE');
+        //   settings['Prev Step'] = 'NONE';
+        //   // nextStepController.setValue('FLIP_LOCAL');
+        //   settings['Next Step'] = 'FLIP_LOCAL';
+        //   //
+        //   // // Reset block heights
+        //   // prevBlockHeightController.setValue(0);
+        //   settings['Prev Swap Span'] = 0;
+        //   // nextBlockHeightController.setValue(2);
+        //   settings['Next Swap Span'] = 2;
+        //
+        //   // Reset Total Swaps by setting atomic value to 0
+        //   const commandEncoder = device.createCommandEncoder();
+        //   const computePassEncoder = commandEncoder.beginComputePass();
+        //   computePassEncoder.setPipeline(atomicToZeroComputePipeline);
+        //   computePassEncoder.setBindGroup(0, computeBGCluster.bindGroups[0]!);
+        //   computePassEncoder.dispatchWorkgroups(1);
+        //   computePassEncoder.end();
+        //   device.queue.submit([commandEncoder.finish()]);
+        //   // totalSwapsController.setValue(0);
+        //   settings['Total Swaps'] = 0;
+        //
+        //   highestBlockHeight = 2;
+        // };
 
         const randomizeElementArray = () => {
           let currentIndex = elements.length;
@@ -428,32 +429,32 @@ export const BitonicSort = () => {
           }
         };
 
-        const resizeElementArray = () => {
-          // Recreate elements array with new length
-          elements = new Uint32Array(
-            Array.from({ length: settings['Total Elements'] }, (_, i) => i),
-          );
-
-          resetExecutionInformation();
-
-          // Create new shader invocation with workgroupSize that reflects number of invocations
-          computePipeline = device.createComputePipeline({
-            layout: device.createPipelineLayout({
-              bindGroupLayouts: [computeBGCluster.bindGroupLayout],
-            }),
-            compute: {
-              module: device.createShaderModule({
-                code: NaiveBitonicCompute(
-                  Math.min(settings['Total Elements'] / 2, settings['Size Limit']),
-                ),
-              }),
-              entryPoint: 'computeMain',
-            },
-          });
-          // Randomize array elements
-          randomizeElementArray();
-          highestBlockHeight = 2;
-        };
+        // const resizeElementArray = () => {
+        //   // Recreate elements array with new length
+        //   elements = new Uint32Array(
+        //     Array.from({ length: settings['Total Elements'] }, (_, i) => i),
+        //   );
+        //
+        //   resetExecutionInformation();
+        //
+        //   // Create new shader invocation with workgroupSize that reflects number of invocations
+        //   computePipeline = device.createComputePipeline({
+        //     layout: device.createPipelineLayout({
+        //       bindGroupLayouts: [computeBGCluster.bindGroupLayout],
+        //     }),
+        //     compute: {
+        //       module: device.createShaderModule({
+        //         code: NaiveBitonicCompute(
+        //           Math.min(settings['Total Elements'] / 2, settings['Size Limit']),
+        //         ),
+        //       }),
+        //       entryPoint: 'computeMain',
+        //     },
+        //   });
+        //   // Randomize array elements
+        //   randomizeElementArray();
+        //   highestBlockHeight = 2;
+        // };
 
         randomizeElementArray();
 
@@ -497,12 +498,12 @@ export const BitonicSort = () => {
         };
 
         let autoSortIntervalID: ReturnType<typeof setInterval> | null = null;
-        const endSortInterval = () => {
-          if (autoSortIntervalID !== null) {
-            clearInterval(autoSortIntervalID);
-            autoSortIntervalID = null;
-          }
-        };
+        // const endSortInterval = () => {
+        //   if (autoSortIntervalID !== null) {
+        //     clearInterval(autoSortIntervalID);
+        //     autoSortIntervalID = null;
+        //   }
+        // };
         const startSortInterval = () => {
           const currentIntervalSpeed = settings['Auto Sort Speed'];
           autoSortIntervalID = setInterval(() => {
@@ -527,65 +528,61 @@ export const BitonicSort = () => {
         // computeResourcesFolder
         //   .add(settings, 'Total Elements', totalElementOptions)
         //   .onChange(() => {
-        const onComputeResourceChange = () => {
-          endSortInterval();
-          resizeElementArray();
-          // sizeLimitController.domElement.style.pointerEvents = 'auto';
-          // Create new config key for current element + size limit configuration
-          const currConfigKey = `${settings['Total Elements']} ${settings['Size Limit']}`;
-          // If configKey doesn't exist in the map, create it.
-          if (!settings.configToCompleteSwapsMap[currConfigKey]) {
-            settings.configToCompleteSwapsMap[currConfigKey] = {
-              sorts: 0,
-              time: 0,
-            };
-          }
-          settings.configKey = currConfigKey;
-          resetTimeInfo();
-        }
+        //   endSortInterval();
+        //   resizeElementArray();
+        //   // sizeLimitController.domElement.style.pointerEvents = 'auto';
+        //   // Create new config key for current element + size limit configuration
+        //   const currConfigKey = `${settings['Total Elements']} ${settings['Size Limit']}`;
+        //   // If configKey doesn't exist in the map, create it.
+        //   if (!settings.configToCompleteSwapsMap[currConfigKey]) {
+        //     settings.configToCompleteSwapsMap[currConfigKey] = {
+        //       sorts: 0,
+        //       time: 0,
+        //     };
+        //   }
+        //   settings.configKey = currConfigKey;
+        //   resetTimeInfo();
         //   });
         // const sizeLimitController = computeResourcesFolder
         //   .add(settings, 'Size Limit', sizeLimitOptions)
         //   .onChange(() => {
-        const onSizeLimitChange = () => {
-            // Change total workgroups per step and size of a workgroup based on arbitrary constraint
-            // imposed by size limit.
-            const constraint = Math.min(
-              settings['Total Elements'] / 2,
-              settings['Size Limit'],
-            );
-            const workgroupsPerStep =
-              (settings['Total Elements'] - 1) / (settings['Size Limit'] * 2);
-            // workgroupSizeController.setValue(constraint);
-            settings['Workgroup Size'] = constraint;
-            // workgroupsPerStepController.setValue(Math.ceil(workgroupsPerStep));
-            settings['Workgroups Per Step'] = Math.ceil(workgroupsPerStep);
-            // Apply new compute resources values to the sort's compute pipeline
-            computePipeline = computePipeline = device.createComputePipeline({
-              layout: device.createPipelineLayout({
-                bindGroupLayouts: [computeBGCluster.bindGroupLayout],
-              }),
-              compute: {
-                module: device.createShaderModule({
-                  code: NaiveBitonicCompute(
-                    Math.min(settings['Total Elements'] / 2, settings['Size Limit']),
-                  ),
-                }),
-                entryPoint: 'computeMain',
-              },
-            });
-            // Create new config key for current element + size limit configuration
-            const currConfigKey = `${settings['Total Elements']} ${settings['Size Limit']}`;
-            // If configKey doesn't exist in the map, create it.
-            if (!settings.configToCompleteSwapsMap[currConfigKey]) {
-              settings.configToCompleteSwapsMap[currConfigKey] = {
-                sorts: 0,
-                time: 0,
-              };
-            }
-            settings.configKey = currConfigKey;
-            resetTimeInfo();
-        }
+        //     // Change total workgroups per step and size of a workgroup based on arbitrary constraint
+        //     // imposed by size limit.
+        //     const constraint = Math.min(
+        //       settings['Total Elements'] / 2,
+        //       settings['Size Limit'],
+        //     );
+        //     const workgroupsPerStep =
+        //       (settings['Total Elements'] - 1) / (settings['Size Limit'] * 2);
+        //     // workgroupSizeController.setValue(constraint);
+        //     settings['Workgroup Size'] = constraint;
+        //     // workgroupsPerStepController.setValue(Math.ceil(workgroupsPerStep));
+        //     settings['Workgroups Per Step'] = Math.ceil(workgroupsPerStep);
+        //     // Apply new compute resources values to the sort's compute pipeline
+        //     computePipeline = computePipeline = device.createComputePipeline({
+        //       layout: device.createPipelineLayout({
+        //         bindGroupLayouts: [computeBGCluster.bindGroupLayout],
+        //       }),
+        //       compute: {
+        //         module: device.createShaderModule({
+        //           code: NaiveBitonicCompute(
+        //             Math.min(settings['Total Elements'] / 2, settings['Size Limit']),
+        //           ),
+        //         }),
+        //         entryPoint: 'computeMain',
+        //       },
+        //     });
+        //     // Create new config key for current element + size limit configuration
+        //     const currConfigKey = `${settings['Total Elements']} ${settings['Size Limit']}`;
+        //     // If configKey doesn't exist in the map, create it.
+        //     if (!settings.configToCompleteSwapsMap[currConfigKey]) {
+        //       settings.configToCompleteSwapsMap[currConfigKey] = {
+        //         sorts: 0,
+        //         time: 0,
+        //       };
+        //     }
+        //     settings.configKey = currConfigKey;
+        //     resetTimeInfo();
         //   });
         // const workgroupSizeController = computeResourcesFolder.add(
         //   settings,
@@ -601,32 +598,26 @@ export const BitonicSort = () => {
         // // Folder with functions that control the execution of the sort
         // const controlFolder = gui.addFolder('Sort Controls');
         // controlFolder.add(settings, 'Execute Sort Step').onChange(() => {
-        const onExecuteSortStepChange = () => {
-          // Size Limit locked upon sort
-          // sizeLimitController.domElement.style.pointerEvents = 'none';
-          endSortInterval();
-          settings.executeStep = true;
-        }
+        //   // Size Limit locked upon sort
+        //   // sizeLimitController.domElement.style.pointerEvents = 'none';
+        //   endSortInterval();
+        //   settings.executeStep = true;
         // });
         // controlFolder.add(settings, 'Randomize Values').onChange(() => {
-        const onRandomizeValuesChange = () => {
-          endSortInterval();
-          randomizeElementArray();
-          resetExecutionInformation();
-          resetTimeInfo();
+        //   endSortInterval();
+        //   randomizeElementArray();
+        //   resetExecutionInformation();
+        //   resetTimeInfo();
           // Unlock workgroup size limit controller since sort has stopped
           // sizeLimitController.domElement.style.pointerEvents = 'auto';
-        }
         // });
         // controlFolder
         //   .add(settings, 'Log Elements')
         //   .onChange(() => console.log(elements));
         // controlFolder.add(settings, 'Auto Sort').onChange(() => {
-        const onAutoSortChange = () => {
           // Invocation Limit locked upon sort
           // sizeLimitController.domElement.style.pointerEvents = 'none';
-          startSortInterval();
-        }
+          // startSortInterval();
         // });
         // controlFolder.add(settings, 'Auto Sort Speed', 50, 1000).step(50);
         // controlFolder.open();
@@ -965,9 +956,6 @@ export const BitonicSort = () => {
       // document.body.appendChild(stats.dom);
 
       // init({ canvas, stats, gui });
-
-      const { getContext } = webGPU;
-      const context = getContext({ identifier });
 
       init({ context });
     });

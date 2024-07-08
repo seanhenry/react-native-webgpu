@@ -1,4 +1,4 @@
-global.GPUBufferUsage = {
+globalThis.GPUBufferUsage = {
   MAP_READ: 0x00000001,
   MAP_WRITE: 0x00000002,
   COPY_SRC: 0x00000004,
@@ -11,7 +11,7 @@ global.GPUBufferUsage = {
   QUERY_RESOLVE: 0x00000200,
 }
 
-global.GPUTextureUsage = {
+globalThis.GPUTextureUsage = {
   COPY_SRC: 0x00000001,
   COPY_DST: 0x00000002,
   TEXTURE_BINDING: 0x00000004,
@@ -19,13 +19,13 @@ global.GPUTextureUsage = {
   RENDER_ATTACHMENT: 0x00000010,
 }
 
-global.GPUShaderStage = {
+globalThis.GPUShaderStage = {
   VERTEX: 0x00000001,
   FRAGMENT: 0x00000002,
   COMPUTE: 0x00000004,
 }
 
-global.GPUMapMode = {
+globalThis.GPUMapMode = {
   READ: 0x00000001,
   WRITE: 0x00000002,
 };

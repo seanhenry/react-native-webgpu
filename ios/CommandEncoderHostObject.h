@@ -10,12 +10,13 @@ namespace wgpu {
 
 class CommandEncoderHostObject : public HostObject {
 public:
-    explicit CommandEncoderHostObject(WGPUCommandEncoder value, WGPUContext *context): _value(value), _context(context) {}
+    explicit CommandEncoderHostObject(WGPUCommandEncoder value, WGPUContext *context, std::string label): _value(value), _context(context), _label(label) {}
     ~CommandEncoderHostObject() { wgpuCommandEncoderRelease(_value); }
     std::vector<PropNameID> getPropertyNames(Runtime& runtime) override;
     Value get(Runtime &runtime, const PropNameID &name) override;
     WGPUCommandEncoder _value;
     WGPUContext *_context;
+    std::string _label;
 };
 
 }

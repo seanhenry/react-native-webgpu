@@ -11,6 +11,7 @@ interface BitonicDisplayRenderArgs {
 }
 
 export default class BitonicDisplayRenderer extends Base2DRendererClass {
+  // @ts-expect-error
   switchBindGroup: (name: string) => void;
   setArguments: (args: BitonicDisplayRenderArgs) => void;
   computeBGDescript: BindGroupCluster;

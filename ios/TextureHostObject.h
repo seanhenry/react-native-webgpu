@@ -10,7 +10,7 @@ namespace wgpu {
 
 class TextureHostObject : public HostObject {
 public:
-    explicit TextureHostObject(WGPUTexture value, WGPUContext *context): _value(value), _context(context) {}
+    explicit TextureHostObject(WGPUTexture value, WGPUContext *context, std::string label): _value(value), _context(context), _label(label) {}
     ~TextureHostObject() {
         // Note, must call delete() after each frame as JS garbage collection is too slow
         // Clean up anyway in case.
@@ -26,6 +26,7 @@ public:
     }
     WGPUTexture _value;
     WGPUContext *_context;
+    std::string _label;
 };
 
 }

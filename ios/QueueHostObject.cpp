@@ -31,7 +31,7 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
             auto bufferOffset = (uint64_t)arguments[1].asNumber();
             auto data = getArrayBufferFromArrayBufferLike(runtime, arguments[2].asObject(runtime));
             auto dataOffset = count > 3 ? (size_t)arguments[3].asNumber() : 0;
-            auto size = count > 4 ? (size_t)arguments[4].asNumber() : data.size(runtime);
+            auto size = count > 4 ? (size_t)arguments[4].asNumber() : (data.size(runtime) - dataOffset);
             wgpuQueueWriteBuffer(
                 _value,
                 buffer,

@@ -2,6 +2,7 @@ import {
   Image,
   type ImageSourcePropType,
   NativeModules,
+  type NativeSyntheticEvent,
   Platform,
   requireNativeComponent,
   type ViewProps,
@@ -17,11 +18,11 @@ export type WGPUWebGPUViewProps = ViewProps & {
   /**
    * Called on the native UI thread to configure the device and pipeline
    */
-  onInit: (props: {identifier: string}) => void,
+  onInit(props: NativeSyntheticEvent<{identifier: string}>): void,
   /**
-   * Used to identify the view with the graphics context. `main` will be used by default
+   * Used to identify the view with the graphics context.
    */
-  identifier?: string
+  identifier: string
 }
 
 export const WGPUWebGPUView = requireNativeComponent<WGPUWebGPUViewProps>('WGPUWebGPUView')
@@ -39,14 +40,14 @@ if (!webGpuJsi.install()) {
   throw new Error("Failed to install JSI");
 }
 
-const globalObj = (global as any).__webGPUNative;
+const globalObj = (globalThis as any).__webGPUNative;
 
 function createImageBitmap(source: ImageSourcePropType) {
   const resolvedSource = Image.resolveAssetSource(source)
   return globalObj.__createImageBitmap(resolvedSource);
 }
 
-global.webGPU = new Proxy(globalObj, {
+globalThis.webGPU = new Proxy(globalObj, {
   get: function(target, prop, receiver) {
     if (prop === 'createImageBitmap') {
       return createImageBitmap;

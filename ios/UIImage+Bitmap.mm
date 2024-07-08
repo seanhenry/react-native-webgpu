@@ -1,9 +1,10 @@
 #import "UIImage+Bitmap.h"
 #import "ImageBitmapHostObject.h"
+#import <tuple>
 
 @implementation UIImage (Bitmap)
 
-- (Value)bitmapImageWithRuntime:(Runtime&)runtime {
+- (BOOL)createBitmapImage:(BitmapImage *)bitmapImage runtime:(Runtime&)runtime {
     CGImageRef imageRef = [self CGImage];
     NSUInteger width = CGImageGetWidth(imageRef);
     NSUInteger height = CGImageGetHeight(imageRef);
@@ -14,7 +15,7 @@
     size_t size = height * width * bytesPerPixel;
     unsigned char *rawData = (unsigned char*) calloc(size, sizeof(unsigned char));
     if (!rawData) {
-        return Value::null();
+        return NO;
     }
 
     CGContextRef context = CGBitmapContextCreate(
@@ -28,13 +29,18 @@
     );
     if (!context) {
         free(rawData);
-        return Value::null();
+        return NO;
     }
 
     CGContextDrawImage(context, CGRectMake(0, 0, width, height), imageRef);
     CGContextRelease(context);
 
-    return Object::createFromHostObject(runtime, std::make_shared<wgpu::ImageBitmapHostObject>(rawData, size, width, height));
+    bitmapImage->data = rawData;
+    bitmapImage->size = size;
+    bitmapImage->width = width;
+    bitmapImage->height = height;
+
+    return YES;
 }
 
 @end

@@ -1,4 +1,4 @@
-import { WebGpuView } from 'react-native-webgpu';
+import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
 import { globalStyles } from '../../../Components/globalStyles';
 import React from 'react';
 import { CenterSquare } from '../../../Components/CenterSquare';
@@ -11,10 +11,10 @@ import basicVertWGSL from '../../shaders/basic.vert.wgsl';
 import sampleCubemapWGSL from './sampleCubemap.frag.wgsl';
 
 export const CubeMap = () => {
-  const onInit = async ({ identifier }: { identifier: string }) => {
-    const { navigator, getContext, createImageBitmap } = global.webGPU;
+  const onInit: WebGpuViewProps['onInit'] = async ({ context, timer }) => {
+    const {requestAnimationFrame} = timer;
+    const { navigator, createImageBitmap } = global.webGPU;
 
-    const context = getContext({ identifier });
     const adapter = await navigator.gpu.requestAdapter({ context });
     const device = await adapter!.requestDevice();
 

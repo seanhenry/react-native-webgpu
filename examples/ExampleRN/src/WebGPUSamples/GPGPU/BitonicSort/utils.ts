@@ -1,5 +1,6 @@
 // import type { GUI } from 'dat.gui';
 import fullscreenTexturedQuad from '../../shaders/fullscreenTexturedQuad.wgsl';
+import type {WGPUContext} from 'react-native-webgpu'
 
 type BindGroupBindingLayout =
   | GPUBufferBindingLayout
@@ -150,10 +151,15 @@ export abstract class Base2DRendererClass {
     commandEncoder: GPUCommandEncoder,
     ...args: unknown[]
   ): void;
+  // @ts-expect-error
   renderPassDescriptor: GPURenderPassDescriptor;
+  // @ts-expect-error
   pipeline: GPURenderPipeline;
+  // @ts-expect-error
   bindGroupMap: Record<string, GPUBindGroup>;
+  // @ts-expect-error
   currentBindGroup: GPUBindGroup;
+  // @ts-expect-error
   currentBindGroupName: string;
 
   executeRun(

@@ -10,12 +10,13 @@ namespace wgpu {
 
 class RenderPassEncoderHostObject : public HostObject {
 public:
-    explicit RenderPassEncoderHostObject(WGPURenderPassEncoder value, WGPUContext *context): _value(value), _context(context) { }
+    explicit RenderPassEncoderHostObject(WGPURenderPassEncoder value, WGPUContext *context, std::string label): _value(value), _context(context), _label(label) { }
     ~RenderPassEncoderHostObject() { wgpuRenderPassEncoderRelease(_value); }
     std::vector<PropNameID> getPropertyNames(Runtime& runtime) override;
     Value get(Runtime &runtime, const PropNameID &name) override;
     WGPURenderPassEncoder _value;
     WGPUContext *_context;
+    std::string _label;
 };
 
 }

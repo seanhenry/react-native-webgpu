@@ -11,7 +11,10 @@ class ContextHostObject : public HostObject {
 public:
     explicit ContextHostObject(WGPUContext *context): _context(context) {}
     ~ContextHostObject() {
-        if (_context) {
+        destroy();
+    }
+    void destroy() {
+        if (_context != nullptr) {
             delete _context;
             _context = nullptr;
         }

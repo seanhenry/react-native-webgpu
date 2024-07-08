@@ -50,9 +50,11 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
     }
 
     if (name == "features") {
-        WGPUFeatureName features[NUM_FEATURES];
-        wgpuAdapterEnumerateFeatures(_value, features);
-        return makeJsiFeatures(runtime, features);
+        auto size = wgpuAdapterEnumerateFeatures(_value, NULL);
+        std::vector<WGPUFeatureName> features;
+        features.resize(size);
+        wgpuAdapterEnumerateFeatures(_value, features.data());
+        return makeJsiFeatures(runtime, &features);
     }
 
     if (name == "limits") {

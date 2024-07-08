@@ -40,9 +40,13 @@ Value ShaderModuleHostObject::get(Runtime &runtime, const PropNameID &propName) 
         });
     }
 
+    if (name == "label") {
+        return String::createFromUtf8(runtime, _label);
+    }
+
     return Value::undefined();
 }
 
 std::vector<PropNameID> ShaderModuleHostObject::getPropertyNames(Runtime& runtime) {
-    return PropNameID::names(runtime, "getCompilationInfo");
+    return PropNameID::names(runtime, "getCompilationInfo", "label");
 }

@@ -61,15 +61,19 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
             }
             auto offset = count > 2 ? (size_t)arguments[2].asNumber() : 0;
             auto size = count > 3 ? (size_t)arguments[3].asNumber() :
-                buffer != NULL ? wgpuBufferGetSize(buffer) : 0;
+                buffer != NULL ? wgpuBufferGetSize(buffer) - offset : 0;
             wgpuRenderPassEncoderSetVertexBuffer(_value, slot, buffer, offset, size);
             return Value::undefined();
         });
+    }
+
+    if (name == "label") {
+        return String::createFromUtf8(runtime, _label);
     }
 
     return Value::undefined();
 }
 
 std::vector<PropNameID> RenderPassEncoderHostObject::getPropertyNames(Runtime& runtime) {
-    return PropNameID::names(runtime, "setPipeline", "draw", "end", "setBindGroup", "setVertexBuffer");
+    return PropNameID::names(runtime, "setPipeline", "draw", "end", "setBindGroup", "setVertexBuffer", "label");
 }

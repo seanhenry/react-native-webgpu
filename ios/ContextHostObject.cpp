@@ -68,6 +68,8 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
         auto result = Object(runtime);
         result.setProperty(runtime, PropNameID::forAscii(runtime, "formats"), std::move(formats));
         result.setProperty(runtime, PropNameID::forAscii(runtime, "alphaModes"), std::move(alphaModes));
+
+        wgpuSurfaceCapabilitiesFreeMembers(capabilities);
         return std::move(result);
     }
 
@@ -76,7 +78,7 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
             WGPUSurfaceTexture texture;
             wgpuSurfaceGetCurrentTexture(_context->_surface, &texture);
             if (texture.status == WGPUSurfaceGetCurrentTextureStatus_Success) {
-                return Object::createFromHostObject(runtime, std::make_shared<TextureHostObject>(texture.texture, _context));
+                return Object::createFromHostObject(runtime, std::make_shared<TextureHostObject>(texture.texture, _context, ""));
             } else if (texture.texture) {
                 // TODO: check this
                 wgpuTextureRelease(texture.texture);
@@ -93,9 +95,16 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
         return Value((int)_context->_getHeight());
     }
 
+    if (name == "destroy") {
+        return WGPU_FUNC_FROM_HOST_FUNC(destroy, 0, [this]) {
+            destroy();
+            return Value::undefined();
+        });
+    }
+
     return Value::undefined();
 }
 
 std::vector<PropNameID> ContextHostObject::getPropertyNames(Runtime& runtime) {
-    return PropNameID::names(runtime, "presentSurface", "configure", "surfaceCapabilities", "getCurrentTexture", "width", "height");
+    return PropNameID::names(runtime, "presentSurface", "configure", "surfaceCapabilities", "getCurrentTexture", "width", "height", "destroy");
 }

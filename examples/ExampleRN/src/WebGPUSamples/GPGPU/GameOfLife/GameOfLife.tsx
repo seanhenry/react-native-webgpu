@@ -1,5 +1,5 @@
 import { CenterSquare } from '../../../Components/CenterSquare';
-import { WebGpuView } from 'react-native-webgpu';
+import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
 import { globalStyles } from '../../../Components/globalStyles';
 import React from 'react';
 
@@ -9,10 +9,10 @@ import vertWGSL from './vert.wgsl';
 import fragWGSL from './frag.wgsl';
 
 export const GameOfLife = () => {
-  const onInit = async ({ identifier }: { identifier: string }) => {
-    const {navigator, getContext} = global.webGPU;
+  const onInit: WebGpuViewProps['onInit'] = async ({ context, timer }) => {
+    const {requestAnimationFrame} = timer;
+    const {navigator} = global.webGPU;
 
-    const context = getContext({identifier});
     const adapter = await navigator.gpu.requestAdapter({context});
     const device = await adapter!.requestDevice();
 

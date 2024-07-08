@@ -998,11 +998,10 @@ interface GPUMultisampleState {
 }
 
 interface GPUObjectDescriptorBase {
-  notImplemented?: never;
-  // /**
-  //  * The initial value of {@link GPUObjectBase#label|GPUObjectBase.label}.
-  //  */
-  // label?: string;
+  /**
+   * The initial value of {@link GPUObjectBase#label|GPUObjectBase.label}.
+   */
+  label?: string;
 }
 
 // interface GPUOrigin2DDict {
@@ -1747,8 +1746,7 @@ interface GPUDebugCommandsMixin {
 }
 
 interface GPUObjectBase {
-  labelNotImplemented?: never;
-  // label: string;
+  label: string;
 }
 
 interface GPUPipelineBase {
@@ -2240,7 +2238,7 @@ interface GPUCommandEncoder
    * 	descriptor:
    */
   finish(
-    // descriptor?: GPUCommandBufferDescriptor
+    descriptor?: GPUCommandBufferDescriptor
   ): GPUCommandBuffer;
 }
 

@@ -14,14 +14,18 @@ Value TextureHostObject::get(Runtime &runtime, const PropNameID &propName) {
     if (name == "createView") {
         return WGPU_FUNC_FROM_HOST_FUNC(createView, 1, [this]) {
             WGPUTextureView view = NULL;
+            std::string label;
             if (count > 0) {
-                auto descriptor = makeDefaultWGPUTextureViewDescriptor(runtime, arguments[0].asObject(runtime), _value);
+                auto desc = arguments[0].asObject(runtime);
+                label = WGPU_UTF8_OPT(desc, label, "");
+                auto descriptor = makeDefaultWGPUTextureViewDescriptor(runtime, desc, _value);
+                descriptor.label = label.data();
                 view = wgpuTextureCreateView(_value, &descriptor);
             } else {
                 view = wgpuTextureCreateView(_value, NULL);
             }
 
-            return Object::createFromHostObject(runtime, std::make_shared<TextureViewHostObject>(view, _context));
+            return Object::createFromHostObject(runtime, std::make_shared<TextureViewHostObject>(view, _context, label));
         });
     }
 
@@ -40,9 +44,13 @@ Value TextureHostObject::get(Runtime &runtime, const PropNameID &propName) {
         return Value((int)wgpuTextureGetHeight(_value));
     }
 
+    if (name == "label") {
+        return String::createFromUtf8(runtime, _label);
+    }
+
     return Value::undefined();
 }
 
 std::vector<PropNameID> TextureHostObject::getPropertyNames(Runtime& runtime) {
-    return PropNameID::names(runtime, "createView", "destroy", "width", "height");
+    return PropNameID::names(runtime, "createView", "destroy", "width", "height", "label");
 }

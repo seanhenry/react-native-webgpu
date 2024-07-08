@@ -1,5 +1,5 @@
 import { CenterSquare } from '../../../Components/CenterSquare';
-import { WebGpuView } from 'react-native-webgpu';
+import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
 import { globalStyles } from '../../../Components/globalStyles';
 import React from 'react'
 
@@ -8,9 +8,9 @@ import updateSpritesWGSL from './updateSprites.wgsl';
 // import { GUI } from 'dat.gui';
 
 export const ComputeBoids = () => {
-  const onInit = async ({identifier}: {identifier: string}) => {
-    const {navigator, getContext} = global.webGPU;
-    const context = getContext({identifier})
+  const onInit: WebGpuViewProps['onInit'] = async ({ context, timer }) => {
+    const {requestAnimationFrame} = timer;
+    const {navigator} = global.webGPU;
 
     const adapter = await navigator.gpu.requestAdapter({context});
 
@@ -36,7 +36,6 @@ export const ComputeBoids = () => {
     //   console.error('canvas.parentNode is null');
     // }
 
-    const {width, height} = context;
     const {formats, alphaModes} = context.surfaceCapabilities;
     const presentationFormat = formats[0]!;
 
@@ -124,14 +123,14 @@ export const ComputeBoids = () => {
 
     const computePassDescriptor: GPUComputePassDescriptor = {};
 
-    /** Storage for timestamp query results */
-    let querySet: GPUQuerySet | undefined = undefined;
-    /** Timestamps are resolved into this buffer */
-    let resolveBuffer: GPUBuffer | undefined = undefined;
-    /** Pool of spare buffers for MAP_READing the timestamps back to CPU. A buffer
-     * is taken from the pool (if available) when a readback is needed, and placed
-     * back into the pool once the readback is done and it's unmapped. */
-    const spareResultBuffers = [];
+    // /** Storage for timestamp query results */
+    // let querySet: GPUQuerySet | undefined = undefined;
+    // /** Timestamps are resolved into this buffer */
+    // let resolveBuffer: GPUBuffer | undefined = undefined;
+    // /** Pool of spare buffers for MAP_READing the timestamps back to CPU. A buffer
+    //  * is taken from the pool (if available) when a readback is needed, and placed
+    //  * back into the pool once the readback is done and it's unmapped. */
+    // const spareResultBuffers = [];
 
     if (hasTimestampQuery) {
 //       querySet = device.createQuerySet({
@@ -261,9 +260,9 @@ export const ComputeBoids = () => {
     }
 
     let t = 0;
-    let computePassDurationSum = 0;
-    let renderPassDurationSum = 0;
-    let timerSamples = 0;
+    // let computePassDurationSum = 0;
+    // let renderPassDurationSum = 0;
+    // let timerSamples = 0;
     function frame() {
       const framebuffer = context.getCurrentTexture();
       if (!framebuffer) {
@@ -289,7 +288,7 @@ export const ComputeBoids = () => {
         passEncoder.end();
       }
 
-      let resultBuffer: GPUBuffer | undefined = undefined;
+      // let resultBuffer: GPUBuffer | undefined = undefined;
       if (hasTimestampQuery) {
 //         resultBuffer =
 //           spareResultBuffers.pop() ||

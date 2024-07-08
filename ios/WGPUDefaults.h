@@ -16,6 +16,6 @@ WGPUExtent3D makeDefaultWGPUExtent3D();
 WGPUTextureDescriptor makeDefaultWGPUTextureDescriptor(WGPUTextureFormat format);
 WGPUSamplerDescriptor makeDefaultSamplerDescriptor();
 WGPUImageCopyTexture makeDefaultImageCopyTexture(WGPUTexture texture);
-WGPUTextureViewDescriptor makeDefaultWGPUTextureViewDescriptor(Runtime &runtime, Object desc, WGPUTexture texture);
+WGPUTextureViewDescriptor makeDefaultWGPUTextureViewDescriptor(Runtime &runtime, Object &desc, WGPUTexture texture);
 
 }

@@ -1,5 +1,5 @@
 // https://webgpu.github.io/webgpu-samples/?sample=helloTriangle
-import { WebGpuView } from 'react-native-webgpu';
+import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
 import triangleVertWGSL from '../../shaders/triangle.vert.wgsl';
 import redFragWGSL from '../../shaders/red.frag.wgsl';
 import React from 'react';
@@ -8,10 +8,10 @@ import { globalStyles } from '../../../Components/globalStyles';
 
 export function HelloTriangle() {
 
-  const onInit = async ({identifier}: {identifier: string}) => {
-    const { navigator, getContext } = global.webGPU;
+  const onInit: WebGpuViewProps['onInit'] = async ({context, timer}) => {
+    const { requestAnimationFrame } = timer;
+    const { navigator } = global.webGPU;
 
-    const context = getContext({identifier});
     const adapter = await navigator.gpu.requestAdapter({ context });
     const device = await adapter!.requestDevice();
 

@@ -29,7 +29,7 @@
     "src/types.d.ts",
     "src/App.tsx",
     "../../src/index.tsx",
-    "../../src/globals.d.ts",
-    "../../src/webGpuTypes.d.ts"
+    "../../types/globals.d.ts",
+    "../../types/webGpuTypes.d.ts"
   ]
 }

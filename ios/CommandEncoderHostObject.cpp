@@ -36,9 +36,16 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
                 };
             });
 
+            auto label = WGPU_UTF8_OPT(desc, label, "");
+
             WGPURenderPassDescriptor descriptor = {
+                .label = label.data(),
                 .colorAttachmentCount = colorAttachments.size(),
                 .colorAttachments = colorAttachments.data(),
+                .depthStencilAttachment = NULL,
+                .nextInChain = NULL,
+                .occlusionQuerySet = NULL,
+                .timestampWrites = NULL,
             };
 
             WGPURenderPassDepthStencilAttachment depthStencilAttachment = {0};
@@ -58,14 +65,22 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
             }
 
             auto encoder = wgpuCommandEncoderBeginRenderPass(_value, &descriptor);
-            return Object::createFromHostObject(runtime, std::make_shared<RenderPassEncoderHostObject>(encoder, _context));
+            return Object::createFromHostObject(runtime, std::make_shared<RenderPassEncoderHostObject>(encoder, _context, label));
         });
     }
 
     if (name == "finish") {
-        return WGPU_FUNC_FROM_HOST_FUNC(finish, 0, [this]) {
-            WGPUCommandBuffer buffer = wgpuCommandEncoderFinish(_value, NULL);
-            return Object::createFromHostObject(runtime, std::make_shared<CommandBufferHostObject>(buffer, _context));
+        return WGPU_FUNC_FROM_HOST_FUNC(finish, 1, [this]) {
+            std::string label;
+            if (count > 0) {
+                label = WGPU_UTF8_OPT(arguments[0].asObject(runtime), label, "");
+            }
+            WGPUCommandBufferDescriptor descriptor = {
+                .label = label.data(),
+                .nextInChain = NULL,
+            };
+            WGPUCommandBuffer buffer = wgpuCommandEncoderFinish(_value, &descriptor);
+            return Object::createFromHostObject(runtime, std::make_shared<CommandBufferHostObject>(buffer, _context, label));
         });
     }
 
@@ -84,9 +99,17 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
 
     if (name == "beginComputePass") {
         return WGPU_FUNC_FROM_HOST_FUNC(beginComputePass, 1, [this]) {
-            WGPUComputePassDescriptor descriptor = {0};
+            std::string label;
+            if (count > 0) {
+                label = WGPU_UTF8_OPT(arguments[0].asObject(runtime), label, "");
+            }
+            WGPUComputePassDescriptor descriptor = {
+                .label = label.data(),
+                .nextInChain = NULL,
+                .timestampWrites = NULL,
+            };
             auto encoder = wgpuCommandEncoderBeginComputePass(_value, &descriptor);
-            return Object::createFromHostObject(runtime, std::make_shared<ComputePassEncoderHostObject>(encoder, _context));
+            return Object::createFromHostObject(runtime, std::make_shared<ComputePassEncoderHostObject>(encoder, _context, label));
         });
     }
 
@@ -102,9 +125,13 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
         });
     }
 
+    if (name == "label") {
+        return String::createFromUtf8(runtime, _label);
+    }
+
     return Value::undefined();
 }
 
 std::vector<PropNameID> CommandEncoderHostObject::getPropertyNames(Runtime& runtime) {
-    return PropNameID::names(runtime, "beginRenderPass", "finish", "copyTextureToTexture", "beginComputePass", "copyBufferToBuffer");
+    return PropNameID::names(runtime, "beginRenderPass", "finish", "copyTextureToTexture", "beginComputePass", "copyBufferToBuffer", "label");
 }

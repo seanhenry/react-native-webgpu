@@ -165,3 +165,4 @@ vendor/
 /.yarn
 /.idea
 /ios/Pods
+/ios/build

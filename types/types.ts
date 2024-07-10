@@ -4,7 +4,7 @@ export interface WGPUContext {
   configure(options: GPUCanvasConfiguration): void;
   surfaceCapabilities: WGPUSurfaceCapabilities;
   getCurrentTexture(): GPUTexture | null;
-  presentSurface(): void;
+  presentSurface(texture: GPUTexture): void;
   destroy(): void;
   width: number;
   height: number;

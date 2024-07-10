@@ -941,8 +941,7 @@ export const BitonicSort = () => {
             }
           }
           settings.executeStep = false;
-          context.presentSurface();
-          framebuffer.destroy();
+          context.presentSurface(framebuffer);
           requestAnimationFrame(frame);
         }
 

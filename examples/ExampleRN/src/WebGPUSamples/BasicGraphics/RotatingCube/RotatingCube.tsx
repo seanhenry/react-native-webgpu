@@ -180,8 +180,7 @@ export function RotatingCube() {
       passEncoder.draw(cubeVertexCount);
       passEncoder.end();
       device.queue.submit([commandEncoder.finish()]);
-      context.presentSurface();
-      framebuffer.destroy();
+      context.presentSurface(framebuffer);
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);

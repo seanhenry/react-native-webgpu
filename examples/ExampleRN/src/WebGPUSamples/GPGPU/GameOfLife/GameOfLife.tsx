@@ -264,8 +264,7 @@ export const GameOfLife = () => {
 
         device.queue.submit([commandEncoder.finish()]);
 
-        context.presentSurface();
-        framebuffer.destroy();
+        context.presentSurface(framebuffer);
       };
     }
 

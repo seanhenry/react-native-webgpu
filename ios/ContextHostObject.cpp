@@ -13,8 +13,11 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
     auto name = propName.utf8(runtime);
 
     if (name == "presentSurface") {
-        return WGPU_FUNC_FROM_HOST_FUNC(present, 0, [this]) {
+        return WGPU_FUNC_FROM_HOST_FUNC(present, 1, [this]) {
+            auto texture = arguments[0].asObject(runtime).asHostObject<TextureHostObject>(runtime);
             wgpuSurfacePresent(_context->_surface);
+            // We must release the texture before the next pass so that the surface can provide the next texture.
+            texture->release();
             return Value::undefined();
         });
     }

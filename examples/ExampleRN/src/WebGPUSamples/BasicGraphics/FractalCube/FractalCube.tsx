@@ -227,8 +227,7 @@ export const FractalCube = () => {
 
       device.queue.submit([commandEncoder.finish()]);
 
-      context.presentSurface();
-      swapChainTexture.destroy();
+      context.presentSurface(swapChainTexture);
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);

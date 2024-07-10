@@ -198,6 +198,12 @@ export const TwoCubes = () => {
     }
 
     function frame() {
+      const framebuffer = context.getCurrentTexture();
+      if (!framebuffer) {
+        requestAnimationFrame(frame);
+        return
+      }
+
       updateTransformationMatrix();
       device.queue.writeBuffer(
         uniformBuffer,
@@ -214,13 +220,7 @@ export const TwoCubes = () => {
         modelViewProjectionMatrix2.byteLength
       );
 
-      const texture = context.getCurrentTexture();
-      if (!texture) {
-        requestAnimationFrame(frame);
-        return
-      }
-
-      (renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[])[0]!.view = texture.createView();
+      (renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[])[0]!.view = framebuffer.createView();
 
       const commandEncoder = device.createCommandEncoder();
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
@@ -237,8 +237,7 @@ export const TwoCubes = () => {
 
       passEncoder.end();
       device.queue.submit([commandEncoder.finish()]);
-      context.presentSurface();
-      texture.destroy();
+      context.presentSurface(framebuffer);
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);

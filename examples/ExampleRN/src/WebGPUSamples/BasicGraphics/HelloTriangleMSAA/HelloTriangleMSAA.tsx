@@ -88,9 +88,8 @@ export function HelloTriangleMSAA() {
       passEncoder.end();
 
       device.queue.submit([commandEncoder.finish()]);
-      context.presentSurface();
+      context.presentSurface(framebuffer);
 
-      framebuffer.destroy();
       requestAnimationFrame(frame);
     }
 

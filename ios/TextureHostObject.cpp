@@ -31,7 +31,7 @@ Value TextureHostObject::get(Runtime &runtime, const PropNameID &propName) {
 
     if (name == "destroy") {
         return WGPU_FUNC_FROM_HOST_FUNC(destroy, 0, [this]) {
-            this->destroy();
+            wgpuTextureDestroy(_value);
             return Value::undefined();
         });
     }

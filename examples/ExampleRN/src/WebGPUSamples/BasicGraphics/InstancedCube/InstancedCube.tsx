@@ -233,8 +233,7 @@ export const InstancedCube = () => {
       passEncoder.end();
       device.queue.submit([commandEncoder.finish()]);
 
-      context.presentSurface();
-      framebuffer.destroy();
+      context.presentSurface(framebuffer);
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);

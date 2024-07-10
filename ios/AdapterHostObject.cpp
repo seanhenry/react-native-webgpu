@@ -21,9 +21,7 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
             if (count > 0 && arguments[0].isObject()) {
                 sharedObj = std::make_shared<Object>(arguments[0].asObject(runtime));
             }
-            return makePromise(runtime, [this, sharedObj](Promise *promise) {
-                promise->userData = (void *)_context;
-
+            return makePromise(runtime, _context, [this, sharedObj](Promise *promise) {
                 if (sharedObj != nullptr) {
                     auto &runtime = promise->runtime;
                     auto obj = std::move(*sharedObj.get());
@@ -72,7 +70,7 @@ std::vector<PropNameID> AdapterHostObject::getPropertyNames(Runtime& runtime) {
 
 static void handle_request_device(WGPURequestDeviceStatus status, WGPUDevice device, char const *message, void *userdata) {
     auto promise = (Promise *)userdata;
-    auto context = (WGPUContext *)promise->userData;
+    auto context = promise->context;
     Runtime &runtime = promise->runtime;
     if (status == WGPURequestDeviceStatus_Success) {
         auto deviceHostObject = Object::createFromHostObject(runtime, std::make_shared<DeviceHostObject>(device, context));

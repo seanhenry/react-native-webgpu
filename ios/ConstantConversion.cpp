@@ -396,3 +396,17 @@ WGPUBufferBindingType StringToWGPUBufferBindingType(const char *name) {
     if (strcmp(name, "read-only-storage") == 0) { return WGPUBufferBindingType_ReadOnlyStorage; }
     return WGPUBufferBindingType_Undefined;
 }
+
+WGPUQueryType StringToWGPUQueryType(const char *name) {
+    if (strcmp(name, "occlusion") == 0) { return WGPUQueryType_Occlusion; }
+    if (strcmp(name, "timestamp") == 0) { return WGPUQueryType_Timestamp; }
+    return WGPUQueryType_Occlusion;
+}
+
+const char* WGPUQuerySetToString(WGPUQueryType type) {
+    switch (type) {
+        case WGPUQueryType_Occlusion: return "occlusion";
+        case WGPUQueryType_Timestamp: return "timestamp";
+        default: return NULL;
+    }
+}

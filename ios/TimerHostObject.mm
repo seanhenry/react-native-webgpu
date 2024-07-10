@@ -45,7 +45,9 @@ using namespace wgpu;
     auto now = performance.getPropertyAsFunction(runtime, "now").callWithThis(runtime, performance, nullptr, 0).asNumber();
 
     for (auto &callback : _animationCallbacksForProcessing) {
-        callback.call(runtime, now, 1);
+        @autoreleasepool {
+            callback.call(runtime, now, 1);
+        }
     }
 
     _animationCallbacksForProcessing.clear();

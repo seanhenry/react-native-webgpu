@@ -7,6 +7,7 @@
 #include "BufferHostObject.h"
 #include "TextureViewHostObject.h"
 #include "TextureHostObject.h"
+#include "QuerySetHostObject.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
@@ -274,4 +275,22 @@ Value wgpu::makeJsiFeatures(Runtime &runtime, std::vector<WGPUFeatureName> *feat
         }
     }
     return makeJSSet(runtime, values.data(), values.size());
+}
+
+// TODO: figure out defaults https://www.w3.org/TR/webgpu/#timestamp
+WGPUComputePassTimestampWrites wgpu::makeWGPUComputePassTimestampWrites(Runtime &runtime, Object obj) {
+    return {
+        .querySet = WGPU_HOST_OBJ(obj, querySet, QuerySetHostObject)->_value,
+        .beginningOfPassWriteIndex = WGPU_NUMBER(obj, beginningOfPassWriteIndex, uint32_t),
+        .endOfPassWriteIndex = WGPU_NUMBER(obj, endOfPassWriteIndex, uint32_t),
+    };
+}
+
+// TODO: figure out defaults https://www.w3.org/TR/webgpu/#timestamp
+WGPURenderPassTimestampWrites wgpu::makeWGPURenderPassTimestampWrites(Runtime &runtime, Object obj) {
+    return {
+        .querySet = WGPU_HOST_OBJ(obj, querySet, QuerySetHostObject)->_value,
+        .beginningOfPassWriteIndex = WGPU_NUMBER(obj, beginningOfPassWriteIndex, uint32_t),
+        .endOfPassWriteIndex = WGPU_NUMBER(obj, endOfPassWriteIndex, uint32_t),
+    };
 }

@@ -2,6 +2,7 @@
 
 #include <jsi/jsi.h>
 #include "AutoReleasePool.h"
+#include "WGPUContext.h"
 
 #define WGPU_FUNC_FROM_HOST_FUNC(__name, __argCount, ...) Function::createFromHostFunction(runtime, PropNameID::forAscii(runtime, #__name), __argCount, __VA_ARGS__(Runtime &runtime, const Value &thisValue, const Value *arguments, size_t count) -> Value
 
@@ -53,13 +54,15 @@ public:
     Runtime &runtime;
     std::unique_ptr<Function> resolve;
     std::unique_ptr<Function> reject;
+    WGPUContext *context;
     void * userData;
 };
 
 template<typename Callback>
-Value makePromise(Runtime &runtime, Callback cb) {
-    auto promiseConstructor = WGPU_FUNC_FROM_HOST_FUNC(promiseConstructor, 2, [cb = std::move(cb)]) {
+Value makePromise(Runtime &runtime, WGPUContext *context, Callback cb) {
+    auto promiseConstructor = WGPU_FUNC_FROM_HOST_FUNC(promiseConstructor, 2, [cb = std::move(cb), context]) {
         auto promise = new Promise(runtime);
+        promise->context = context;
         promise->resolve = std::make_unique<Function>(arguments[0].asObject(runtime).asFunction(runtime));
         promise->reject = std::make_unique<Function>(arguments[1].asObject(runtime).asFunction(runtime));
         cb(promise);

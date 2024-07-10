@@ -246,10 +246,10 @@ type GPUPrimitiveTopology =
   | "line-strip"
   | "triangle-list"
   | "triangle-strip";
-// type GPUQueryType =
-//
-//   | "occlusion"
-//   | "timestamp";
+type GPUQueryType =
+
+  | "occlusion"
+  | "timestamp";
 // type GPUSamplerBindingType =
 //
 //   | "filtering"
@@ -688,27 +688,29 @@ interface GPUComputePassDescriptor
 //   /**
 //    * Defines which timestamp values will be written for this pass, and where to write them to.
 //    */
-//   timestampWrites?: GPUComputePassTimestampWrites;
+  timestampWrites?: GPUComputePassTimestampWrites;
 }
 
-// interface GPUComputePassTimestampWrites {
-//   /**
-//    * The {@link GPUQuerySet}, of type {@link GPUQueryType#"timestamp"}, that the query results will be
-//    * written to.
-//    */
-//   querySet: GPUQuerySet;
-//   /**
-//    * If defined, indicates the query index in {@link GPURenderPassTimestampWrites#querySet} into
-//    * which the timestamp at the beginning of the compute pass will be written.
-//    */
-//   beginningOfPassWriteIndex?: GPUSize32;
-//   /**
-//    * If defined, indicates the query index in {@link GPURenderPassTimestampWrites#querySet} into
-//    * which the timestamp at the end of the compute pass will be written.
-//    */
-//   endOfPassWriteIndex?: GPUSize32;
-// }
-//
+interface GPUComputePassTimestampWrites {
+  /**
+   * The {@link GPUQuerySet}, of type {@link GPUQueryType#"timestamp"}, that the query results will be
+   * written to.
+   */
+  querySet: GPUQuerySet;
+  /**
+   * If defined, indicates the query index in {@link GPURenderPassTimestampWrites#querySet} into
+   * which the timestamp at the beginning of the compute pass will be written.
+   */
+  beginningOfPassWriteIndex: GPUSize32;
+  // beginningOfPassWriteIndex?: GPUSize32;
+  /**
+   * If defined, indicates the query index in {@link GPURenderPassTimestampWrites#querySet} into
+   * which the timestamp at the end of the compute pass will be written.
+   */
+  endOfPassWriteIndex: GPUSize32;
+  // endOfPassWriteIndex?: GPUSize32;
+}
+
 interface GPUComputePipelineDescriptor
   extends GPUPipelineDescriptorBase {
   /**
@@ -1114,18 +1116,18 @@ interface GPUProgrammableStage {
   >;
 }
 
-// interface GPUQuerySetDescriptor
-//   extends GPUObjectDescriptorBase {
-//   /**
-//    * The type of queries managed by {@link GPUQuerySet}.
-//    */
-//   type: GPUQueryType;
-//   /**
-//    * The number of queries managed by {@link GPUQuerySet}.
-//    */
-//   count: GPUSize32;
-// }
-//
+interface GPUQuerySetDescriptor
+  extends GPUObjectDescriptorBase {
+  /**
+   * The type of queries managed by {@link GPUQuerySet}.
+   */
+  type: GPUQueryType;
+  /**
+   * The number of queries managed by {@link GPUQuerySet}.
+   */
+  count: GPUSize32;
+}
+
 // type GPUQueueDescriptor =
 //   GPUObjectDescriptorBase;
 // type GPURenderBundleDescriptor =
@@ -1261,10 +1263,10 @@ interface GPURenderPassDescriptor
 //    * The {@link GPUQuerySet} value defines where the occlusion query results will be stored for this pass.
 //    */
 //   occlusionQuerySet?: GPUQuerySet;
-//   /**
-//    * Defines which timestamp values will be written for this pass, and where to write them to.
-//    */
-//   timestampWrites?: GPURenderPassTimestampWrites;
+  /**
+   * Defines which timestamp values will be written for this pass, and where to write them to.
+   */
+  timestampWrites?: GPURenderPassTimestampWrites;
 //   /**
 //    * The maximum number of draw calls that will be done in the render pass. Used by some
 //    * implementations to size work injected before the render pass. Keeping the default value
@@ -1288,24 +1290,26 @@ interface GPURenderPassDescriptor
 //    */
 //   sampleCount?: GPUSize32;
 // }
-//
-// interface GPURenderPassTimestampWrites {
-//   /**
-//    * The {@link GPUQuerySet}, of type {@link GPUQueryType#"timestamp"}, that the query results will be
-//    * written to.
-//    */
-//   querySet: GPUQuerySet;
-//   /**
-//    * If defined, indicates the query index in {@link GPURenderPassTimestampWrites#querySet} into
-//    * which the timestamp at the beginning of the render pass will be written.
-//    */
-//   beginningOfPassWriteIndex?: GPUSize32;
-//   /**
-//    * If defined, indicates the query index in {@link GPURenderPassTimestampWrites#querySet} into
-//    * which the timestamp at the end of the render pass will be written.
-//    */
-//   endOfPassWriteIndex?: GPUSize32;
-// }
+
+interface GPURenderPassTimestampWrites {
+  /**
+   * The {@link GPUQuerySet}, of type {@link GPUQueryType#"timestamp"}, that the query results will be
+   * written to.
+   */
+  querySet: GPUQuerySet;
+  /**
+   * If defined, indicates the query index in {@link GPURenderPassTimestampWrites#querySet} into
+   * which the timestamp at the beginning of the render pass will be written.
+   */
+  beginningOfPassWriteIndex: GPUSize32;
+  // beginningOfPassWriteIndex?: GPUSize32;
+  /**
+   * If defined, indicates the query index in {@link GPURenderPassTimestampWrites#querySet} into
+   * which the timestamp at the end of the render pass will be written.
+   */
+  endOfPassWriteIndex: GPUSize32;
+  // endOfPassWriteIndex?: GPUSize32;
+}
 
 interface GPURenderPipelineDescriptor
   extends GPUPipelineDescriptorBase {
@@ -2023,9 +2027,9 @@ interface GPUBuffer
 //    * @internal
 //    */
 //   readonly __brand: "GPUBuffer";
-//   readonly size: GPUSize64Out;
-//   readonly usage: GPUFlagsConstant;
-//   readonly mapState: GPUBufferMapState;
+  readonly size: GPUSize64Out;
+  readonly usage: GPUFlagsConstant;
+  // readonly mapState: GPUBufferMapState;
   /**
    * Maps the given range of the {@link GPUBuffer} and resolves the returned {@link Promise} when the
    * {@link GPUBuffer}'s content is ready to be accessed with {@link GPUBuffer#getMappedRange}.
@@ -2218,21 +2222,21 @@ interface GPUCommandEncoder
 //     offset?: GPUSize64,
 //     size?: GPUSize64
 //   ): undefined;
-//   /**
-//    * Resolves query results from a {@link GPUQuerySet} out into a range of a {@link GPUBuffer}.
-//    * 	querySet:
-//    * 	firstQuery:
-//    * 	queryCount:
-//    * 	destination:
-//    * 	destinationOffset:
-//    */
-//   resolveQuerySet(
-//     querySet: GPUQuerySet,
-//     firstQuery: GPUSize32,
-//     queryCount: GPUSize32,
-//     destination: GPUBuffer,
-//     destinationOffset: GPUSize64
-//   ): undefined;
+  /**
+   * Resolves query results from a {@link GPUQuerySet} out into a range of a {@link GPUBuffer}.
+   * 	querySet:
+   * 	firstQuery:
+   * 	queryCount:
+   * 	destination:
+   * 	destinationOffset:
+   */
+  resolveQuerySet(
+    querySet: GPUQuerySet,
+    firstQuery: GPUSize32,
+    queryCount: GPUSize32,
+    destination: GPUBuffer,
+    destinationOffset: GPUSize64
+  ): undefined;
   /**
    * Completes recording of the commands sequence and returns a corresponding {@link GPUCommandBuffer}.
    * 	descriptor:
@@ -2534,13 +2538,13 @@ interface GPUDevice
 //   createRenderBundleEncoder(
 //     descriptor: GPURenderBundleEncoderDescriptor
 //   ): GPURenderBundleEncoder;
-//   /**
-//    * Creates a {@link GPUQuerySet}.
-//    * @param descriptor - Description of the {@link GPUQuerySet} to create.
-//    */
-//   createQuerySet(
-//     descriptor: GPUQuerySetDescriptor
-//   ): GPUQuerySet;
+  /**
+   * Creates a {@link GPUQuerySet}.
+   * @param descriptor - Description of the {@link GPUQuerySet} to create.
+   */
+  createQuerySet(
+    descriptor: GPUQuerySetDescriptor
+  ): GPUQuerySet;
 //   /**
 //    * A slot-backed attribute holding a promise which is created with the device, remains
 //    * pending for the lifetime of the device, then resolves when the device is lost.
@@ -2717,18 +2721,18 @@ interface GPUQuerySet
 //    * @internal
 //    */
 //   readonly __brand: "GPUQuerySet";
-//   /**
-//    * Destroys the {@link GPUQuerySet}.
-//    */
-//   destroy(): undefined;
-//   /**
-//    * The type of the queries managed by this {@link GPUQuerySet}.
-//    */
-//   readonly type: GPUQueryType;
-//   /**
-//    * The number of queries managed by this {@link GPUQuerySet}.
-//    */
-//   readonly count: GPUSize32Out;
+  /**
+   * Destroys the {@link GPUQuerySet}.
+   */
+  destroy(): undefined;
+  /**
+   * The type of the queries managed by this {@link GPUQuerySet}.
+   */
+  readonly type: GPUQueryType;
+  /**
+   * The number of queries managed by this {@link GPUQuerySet}.
+   */
+  readonly count: GPUSize32Out;
 }
 
 // declare var GPUQuerySet: {

@@ -18,6 +18,8 @@
 #include "ComputePipelineHostObject.h"
 #include "PipelineLayoutHostObject.h"
 #include "WGPUConversions.h"
+#include "ConstantConversion.h"
+#include "QuerySetHostObject.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
@@ -274,9 +276,25 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         return makeJsiLimits(runtime, &limits.limits);
     }
 
+    if (name == "createQuerySet") {
+        return WGPU_FUNC_FROM_HOST_FUNC(createQuerySet, 1, [this]) {
+            auto desc = arguments[0].asObject(runtime);
+            auto type = WGPU_UTF8(desc, type);
+            auto label = WGPU_UTF8_OPT(desc, label, "");
+            WGPUQuerySetDescriptor descriptor = {
+                .label = label.data(),
+                .type = StringToWGPUQueryType(type.data()),
+                .count = WGPU_NUMBER(desc, count, uint32_t),
+                .nextInChain = NULL,
+            };
+            auto querySet = wgpuDeviceCreateQuerySet(_value, &descriptor);
+            return Object::createFromHostObject(runtime, std::make_shared<QuerySetHostObject>(querySet, _context, std::move(label)));
+        });
+    }
+
     return Value::undefined();
 }
 
 std::vector<PropNameID> DeviceHostObject::getPropertyNames(Runtime& runtime) {
-    return PropNameID::names(runtime, "createRenderPipeline", "createShaderModule", "createCommandEncoder", "queue", "createBuffer", "createTexture", "createBindGroup", "createSampler", "createBindGroupLayout", "createPipelineLayout", "features", "limits");
+    return PropNameID::names(runtime, "createRenderPipeline", "createShaderModule", "createCommandEncoder", "queue", "createBuffer", "createTexture", "createBindGroup", "createSampler", "createBindGroupLayout", "createPipelineLayout", "features", "limits", "createQuerySet");
 }

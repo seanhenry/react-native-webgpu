@@ -40,7 +40,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
     });
 
     auto &runtime = *(Runtime *)cxxBridge.runtime;
-    auto getContext = WGPU_FUNC_FROM_HOST_FUNC("getContext", 1, []) {
+    auto getContext = WGPU_FUNC_FROM_HOST_FUNC("getContext", 1, [jsMessageThread]) {
         NSString *identifier = @"main";
         if (count > 0) {
             auto obj = arguments[0].asObject(runtime);
@@ -89,7 +89,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
                 return (uint32_t)layer.frame.size.height;
             }
             return (uint32_t)0;
-        });
+        }, jsMessageThread);
 
         return Object::createFromHostObject(runtime, std::make_shared<ContextHostObject>(context));
     });
@@ -97,16 +97,14 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
     auto requestAdapter = WGPU_FUNC_FROM_HOST_FUNC(requestAdapter, 1, []) {
         auto descriptor = arguments[0].asObject(runtime);
         auto context = WGPU_HOST_OBJ(descriptor, context, ContextHostObject);
-        auto sharedContext = context->_context;
-        return makePromise(runtime, [sharedContext](Promise *promise) {
-            auto surface = sharedContext->_surface;
-            auto instance = sharedContext->_instance;
+        return makePromise(runtime, context->_context, [](Promise *promise) {
+            auto surface = promise->context->_surface;
+            auto instance = promise->context->_instance;
 
             const WGPURequestAdapterOptions adapterOptions = {
                 .compatibleSurface = surface,
             };
 
-            promise->userData = (void *)sharedContext;
             wgpuInstanceRequestAdapter(instance, &adapterOptions, handle_request_adapter, promise);
         });
     });
@@ -118,7 +116,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
         // TODO: Support cropping
         auto uri = arguments[0].asObject(runtime).getProperty(runtime, "uri").asString(runtime).utf8(runtime);
 
-        return makePromise(runtime, [uri = std::move(uri), jsMessageThread](Promise *promise){
+        return makePromise(runtime, nullptr, [uri = std::move(uri), jsMessageThread](Promise *promise) {
             // TODO: Support file urls
             NSURL *url = [NSURL URLWithString:[NSString stringWithCString:uri.data() encoding:NSUTF8StringEncoding]];
             NSURLSession *session = NSURLSession.sharedSession;
@@ -188,7 +186,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
 static void handle_request_adapter(WGPURequestAdapterStatus status, WGPUAdapter adapter, char const *message, void *userdata) {
     Promise *promise = (Promise *)userdata;
     Runtime &runtime = promise->runtime;
-    auto sharedContext = (WGPUContext *)promise->userData;
+    auto sharedContext = promise->context;
 
     if (status == WGPURequestAdapterStatus_Success) {
         auto adapterHostObject = Object::createFromHostObject(runtime, std::make_shared<AdapterHostObject>(adapter, sharedContext));

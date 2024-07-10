@@ -34,7 +34,7 @@ Value ShaderModuleHostObject::get(Runtime &runtime, const PropNameID &propName) 
     // Not supported on iOS
     if (name == "getCompilationInfo") {
         return WGPU_FUNC_FROM_HOST_FUNC(getCompilationInfo, 0, [this]) {
-            return makePromise(runtime, [this](Promise *promise) {
+            return makePromise(runtime, _context, [this](Promise *promise) {
                 wgpuShaderModuleGetCompilationInfo(_value, wgpuShaderModuleGetCompilationInfoCallback, &promise);
             });
         });

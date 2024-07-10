@@ -1,14 +1,17 @@
 import { CenterSquare } from '../../../Components/CenterSquare';
 import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
 import { globalStyles } from '../../../Components/globalStyles';
-import React from 'react'
+import React, { useRef } from 'react';
 
 import spriteWGSL from './sprite.wgsl';
 import updateSpritesWGSL from './updateSprites.wgsl';
+import { StyleSheet, TextInput, View } from 'react-native';
 // import { GUI } from 'dat.gui';
 
 export const ComputeBoids = () => {
+  const perfDisplayRef = useRef<TextInput | null>(null)
   const onInit: WebGpuViewProps['onInit'] = async ({ context, timer }) => {
+    const perfDisplay = perfDisplayRef.current!;
     const {requestAnimationFrame} = timer;
     const {navigator} = global.webGPU;
 
@@ -18,23 +21,6 @@ export const ComputeBoids = () => {
     const device = await adapter!.requestDevice({
       requiredFeatures: hasTimestampQuery ? ['timestamp-query'] : [],
     });
-
-    // const perfDisplayContainer = document.createElement('div');
-    // perfDisplayContainer.style.color = 'white';
-    // perfDisplayContainer.style.backdropFilter = 'blur(10px)';
-    // perfDisplayContainer.style.position = 'absolute';
-    // perfDisplayContainer.style.bottom = '10px';
-    // perfDisplayContainer.style.left = '10px';
-    // perfDisplayContainer.style.textAlign = 'left';
-    //
-    // const perfDisplay = document.createElement('pre');
-    // perfDisplay.style.margin = '.5em';
-    // perfDisplayContainer.appendChild(perfDisplay);
-    // if (canvas.parentNode) {
-    //   canvas.parentNode.appendChild(perfDisplayContainer);
-    // } else {
-    //   console.error('canvas.parentNode is null');
-    // }
 
     const {formats, alphaModes} = context.surfaceCapabilities;
     const presentationFormat = formats[0]!;
@@ -123,34 +109,34 @@ export const ComputeBoids = () => {
 
     const computePassDescriptor: GPUComputePassDescriptor = {};
 
-    // /** Storage for timestamp query results */
-    // let querySet: GPUQuerySet | undefined = undefined;
-    // /** Timestamps are resolved into this buffer */
-    // let resolveBuffer: GPUBuffer | undefined = undefined;
-    // /** Pool of spare buffers for MAP_READing the timestamps back to CPU. A buffer
-    //  * is taken from the pool (if available) when a readback is needed, and placed
-    //  * back into the pool once the readback is done and it's unmapped. */
-    // const spareResultBuffers = [];
+    /** Storage for timestamp query results */
+    let querySet: GPUQuerySet | undefined = undefined;
+    /** Timestamps are resolved into this buffer */
+    let resolveBuffer: GPUBuffer | undefined = undefined;
+    /** Pool of spare buffers for MAP_READing the timestamps back to CPU. A buffer
+     * is taken from the pool (if available) when a readback is needed, and placed
+     * back into the pool once the readback is done and it's unmapped. */
+    const spareResultBuffers: GPUBuffer[] = [];
 
     if (hasTimestampQuery) {
-//       querySet = device.createQuerySet({
-//         type: 'timestamp',
-//         count: 4,
-//       });
-//       resolveBuffer = device.createBuffer({
-//         size: 4 * BigInt64Array.BYTES_PER_ELEMENT,
-//         usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC,
-//       });
-//       computePassDescriptor.timestampWrites = {
-//         querySet,
-//         beginningOfPassWriteIndex: 0,
-//         endOfPassWriteIndex: 1,
-//       };
-//       renderPassDescriptor.timestampWrites = {
-//         querySet,
-//         beginningOfPassWriteIndex: 2,
-//         endOfPassWriteIndex: 3,
-//       };
+      querySet = device.createQuerySet({
+        type: 'timestamp',
+        count: 4,
+      });
+      resolveBuffer = device.createBuffer({
+        size: 4 * BigInt64Array.BYTES_PER_ELEMENT,
+        usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC,
+      });
+      computePassDescriptor.timestampWrites = {
+        querySet,
+        beginningOfPassWriteIndex: 0,
+        endOfPassWriteIndex: 1,
+      };
+      renderPassDescriptor.timestampWrites = {
+        querySet,
+        beginningOfPassWriteIndex: 2,
+        endOfPassWriteIndex: 3,
+      };
     }
 
     // prettier-ignore
@@ -260,9 +246,9 @@ export const ComputeBoids = () => {
     }
 
     let t = 0;
-    // let computePassDurationSum = 0;
-    // let renderPassDurationSum = 0;
-    // let timerSamples = 0;
+    let computePassDurationSum = 0;
+    let renderPassDurationSum = 0;
+    let timerSamples = 0;
     function frame() {
       const framebuffer = context.getCurrentTexture();
       if (!framebuffer) {
@@ -288,22 +274,22 @@ export const ComputeBoids = () => {
         passEncoder.end();
       }
 
-      // let resultBuffer: GPUBuffer | undefined = undefined;
+      let resultBuffer: GPUBuffer | undefined = undefined;
       if (hasTimestampQuery) {
-//         resultBuffer =
-//           spareResultBuffers.pop() ||
-//           device.createBuffer({
-//             size: 4 * BigInt64Array.BYTES_PER_ELEMENT,
-//             usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
-//           });
-//         commandEncoder.resolveQuerySet(querySet, 0, 4, resolveBuffer, 0);
-//         commandEncoder.copyBufferToBuffer(
-//           resolveBuffer,
-//           0,
-//           resultBuffer,
-//           0,
-//           resultBuffer.size
-//         );
+        resultBuffer =
+          spareResultBuffers.pop() ||
+          device.createBuffer({
+            size: 4 * BigInt64Array.BYTES_PER_ELEMENT,
+            usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+          });
+        commandEncoder.resolveQuerySet(querySet!, 0, 4, resolveBuffer!, 0);
+        commandEncoder.copyBufferToBuffer(
+          resolveBuffer!,
+          0,
+          resultBuffer,
+          0,
+          resultBuffer.size
+        );
       }
 
       device.queue.submit([commandEncoder.finish()]);
@@ -311,50 +297,68 @@ export const ComputeBoids = () => {
       context.presentSurface(framebuffer);
 
       if (hasTimestampQuery) {
-//         resultBuffer.mapAsync(GPUMapMode.READ).then(() => {
-//           const times = new BigInt64Array(resultBuffer.getMappedRange());
-//           const computePassDuration = Number(times[1] - times[0]);
-//           const renderPassDuration = Number(times[3] - times[2]);
-//
-//           // In some cases the timestamps may wrap around and produce a negative
-//           // number as the GPU resets it's timings. These can safely be ignored.
-//           if (computePassDuration > 0 && renderPassDuration > 0) {
-//             computePassDurationSum += computePassDuration;
-//             renderPassDurationSum += renderPassDuration;
-//             timerSamples++;
-//           }
-//           resultBuffer.unmap();
-//
-//           // Periodically update the text for the timer stats
-//           const kNumTimerSamplesPerUpdate = 100;
-//           if (timerSamples >= kNumTimerSamplesPerUpdate) {
-//             const avgComputeMicroseconds = Math.round(
-//               computePassDurationSum / timerSamples / 1000
-//             );
-//             const avgRenderMicroseconds = Math.round(
-//               renderPassDurationSum / timerSamples / 1000
-//             );
-//             perfDisplay.textContent = `\
-// avg compute pass duration: ${avgComputeMicroseconds}µs
-// avg render pass duration:  ${avgRenderMicroseconds}µs
-// spare readback buffers:    ${spareResultBuffers.length}`;
-//             computePassDurationSum = 0;
-//             renderPassDurationSum = 0;
-//             timerSamples = 0;
-//           }
-//           spareResultBuffers.push(resultBuffer);
-//         });
+        resultBuffer!.mapAsync(GPUMapMode.READ).then(() => {
+          const times = new BigInt64Array(resultBuffer!.getMappedRange());
+          const computePassDuration = Number(times[1]! - times[0]!);
+          const renderPassDuration = Number(times[3]! - times[2]!);
+
+          // In some cases the timestamps may wrap around and produce a negative
+          // number as the GPU resets it's timings. These can safely be ignored.
+          if (computePassDuration > 0 && renderPassDuration > 0) {
+            computePassDurationSum += computePassDuration;
+            renderPassDurationSum += renderPassDuration;
+            timerSamples++;
+          }
+          resultBuffer!.unmap();
+
+          // Periodically update the text for the timer stats
+          const kNumTimerSamplesPerUpdate = 10;
+          if (timerSamples >= kNumTimerSamplesPerUpdate) {
+            const avgComputeMicroseconds = Math.round(
+              computePassDurationSum / timerSamples / 1000
+            );
+            const avgRenderMicroseconds = Math.round(
+              renderPassDurationSum / timerSamples / 1000
+            );
+            perfDisplay.setNativeProps({text: `\
+avg compute pass duration: ${avgComputeMicroseconds}µs
+avg render pass duration:  ${avgRenderMicroseconds}µs
+spare readback buffers:    ${spareResultBuffers.length}`});
+            computePassDurationSum = 0;
+            renderPassDurationSum = 0;
+            timerSamples = 0;
+          }
+          spareResultBuffers.push(resultBuffer!);
+        });
       }
 
       ++t;
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
-
   }
+
   return (
-    <CenterSquare>
-      <WebGpuView identifier="ComputeBoids" onInit={onInit} style={globalStyles.fill} />
-    </CenterSquare>
+    <>
+      <View style={styles.perfDisplayContainer}>
+        <TextInput ref={perfDisplayRef} editable={false} style={styles.perfDisplay} multiline />
+      </View>
+      <CenterSquare>
+        <WebGpuView identifier="ComputeBoids" onInit={onInit} style={globalStyles.fill} />
+      </CenterSquare>
+    </>
   )
 }
+
+const styles = StyleSheet.create({
+  perfDisplayContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+  },
+  perfDisplay: {
+    paddingTop: 8,
+    paddingLeft: 8,
+  }
+})

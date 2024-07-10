@@ -26,5 +26,7 @@ WGPUImageCopyTexture makeWGPUImageCopyTexture(Runtime &runtime, Object obj);
 WGPUOrigin3D makeWGPUOrigin3D(Runtime &runtime, Object obj);
 Value makeJsiLimits(Runtime &runtime, WGPULimits *limits);
 Value makeJsiFeatures(Runtime &runtime, std::vector<WGPUFeatureName> *features);
+WGPUComputePassTimestampWrites makeWGPUComputePassTimestampWrites(Runtime &runtime, Object obj);
+WGPURenderPassTimestampWrites makeWGPURenderPassTimestampWrites(Runtime &runtime, Object obj);
 
 }

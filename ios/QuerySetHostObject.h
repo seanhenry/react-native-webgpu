@@ -1,13 +1,22 @@
-//
-//  QuerySetHostObject.hpp
-//  react-native-webgpu
-//
-//  Created by Sean Henry on 10/07/2024.
-//
+#pragma once
 
-#ifndef QuerySetHostObject_hpp
-#define QuerySetHostObject_hpp
+#include <jsi/jsi.h>
+#include "WGPUContext.h"
+#include "wgpu.h"
 
-#include <stdio.h>
+using namespace facebook::jsi;
 
-#endif /* QuerySetHostObject_hpp */
+namespace wgpu {
+
+class QuerySetHostObject : public HostObject {
+public:
+    explicit QuerySetHostObject(WGPUQuerySet value, WGPUContext *context, std::string label): _value(value), _context(context), _label(label) {}
+    ~QuerySetHostObject() { wgpuQuerySetRelease(_value); }
+    std::vector<PropNameID> getPropertyNames(Runtime& runtime) override;
+    Value get(Runtime &runtime, const PropNameID &name) override;
+    WGPUQuerySet _value;
+    WGPUContext *_context;
+    std::string _label;
+};
+
+}

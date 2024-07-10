@@ -1,6 +1,6 @@
 import './constants';
 import { WGPUWebGPUView } from './native';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type { NativeSyntheticEvent, ViewProps } from 'react-native';
 import type { WGPUContext, WGPUTimer } from '../types/types';
 export * from '../types/types'
@@ -51,6 +51,22 @@ export const WebGpuView = ({ identifier, onInit, onError, ...props }: WebGpuView
   }, [tearDown]);
 
   return (
-    <WGPUWebGPUView {...props} identifier={identifier} onInit={onInitInternal} />
+    <>
+      <WGPUWebGPUView {...props} identifier={identifier} onInit={onInitInternal} />
+      <Workaround />
+    </>
   );
 };
+
+// A temporary workaround for development purposes (not planning to release this!).
+// Promises are not fired unless the app is interacted with.
+const Workaround = () => {
+  const [_, inc] = useState(0)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      inc(a => a + 1)
+    }, 0)
+    return () => clearInterval(interval);
+  }, []);
+  return null;
+}

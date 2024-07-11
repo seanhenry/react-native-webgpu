@@ -1,18 +1,6 @@
-import type { ComponentType } from 'react';
 import * as React from 'react';
 
 import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
-import { HelloTriangle } from '../WebGPUSamples/BasicGraphics/HelloTriangle/HelloTriangle';
-import { HelloTriangleMSAA } from '../WebGPUSamples/BasicGraphics/HelloTriangleMSAA/HelloTriangleMSAA';
-import { RotatingCube } from '../WebGPUSamples/BasicGraphics/RotatingCube/RotatingCube';
-import { TwoCubes } from '../WebGPUSamples/BasicGraphics/TwoCubes/TwoCubes';
-import { TexturedCube } from '../WebGPUSamples/BasicGraphics/TexturedCube/TexturedCube';
-import { InstancedCube } from '../WebGPUSamples/BasicGraphics/InstancedCube/InstancedCube';
-import { FractalCube } from '../WebGPUSamples/BasicGraphics/FractalCube/FractalCube';
-import { CubeMap } from '../WebGPUSamples/BasicGraphics/CubeMap/CubeMap';
-import { ComputeBoids } from '../WebGPUSamples/GPGPU/ComputeBoids/ComputeBoids';
-import { GameOfLife } from '../WebGPUSamples/GPGPU/GameOfLife/GameOfLife';
-import { BitonicSort } from '../WebGPUSamples/GPGPU/BitonicSort/BitonicSort';
 import type { SectionListData, SectionListRenderItem } from 'react-native/Libraries/Lists/SectionList';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Example } from './ExampleScreen';
@@ -25,7 +13,6 @@ type HeaderItem = {
 
 type ListItem = {
   title: Example;
-  Component: ComponentType;
 }
 
 export function Examples() {
@@ -55,22 +42,28 @@ export function Examples() {
           {
             title: 'Basic Graphics',
             data: [
-              { title: 'HelloTriangle', Component: HelloTriangle },
-              { title: 'HelloTriangleMSAA', Component: HelloTriangleMSAA },
-              { title: 'RotatingCube', Component: RotatingCube },
-              { title: 'TwoCubes', Component: TwoCubes },
-              { title: 'TexturedCube', Component: TexturedCube },
-              { title: 'InstancedCube', Component: InstancedCube },
-              { title: 'FractalCube', Component: FractalCube },
-              { title: 'CubeMap', Component: CubeMap },
+              { title: 'HelloTriangle' },
+              { title: 'HelloTriangleMSAA' },
+              { title: 'RotatingCube' },
+              { title: 'TwoCubes' },
+              { title: 'TexturedCube' },
+              { title: 'InstancedCube' },
+              { title: 'FractalCube' },
+              { title: 'CubeMap' },
             ],
           },
           {
             title: 'GPGPU',
             data: [
-              { title: 'ComputeBoids', Component: ComputeBoids },
-              { title: 'GameOfLife', Component: GameOfLife },
-              { title: 'BitonicSort', Component: BitonicSort },
+              { title: 'ComputeBoids' },
+              { title: 'GameOfLife' },
+              { title: 'BitonicSort' },
+            ],
+          },
+          {
+            title: 'Graphics Techniques',
+            data: [
+              { title: 'Cameras' },
             ],
           },
         ]}

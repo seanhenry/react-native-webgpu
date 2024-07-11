@@ -12,6 +12,7 @@ import { ComputeBoids } from '../WebGPUSamples/GPGPU/ComputeBoids/ComputeBoids';
 import { GameOfLife } from '../WebGPUSamples/GPGPU/GameOfLife/GameOfLife';
 import { type RouteProp, useRoute } from '@react-navigation/native';
 import type { Routes } from '../types/navigationTypes';
+import { Cameras } from '../WebGPUSamples/GraphicsTechniques/Cameras/Cameras';
 
 export type Example = 'HelloTriangle'
   // BasicGraphics
@@ -26,6 +27,8 @@ export type Example = 'HelloTriangle'
   | 'ComputeBoids'
   | 'GameOfLife'
   | 'BitonicSort'
+  // GraphicsTechniques
+  | 'Cameras'
 
 const examples: Record<Example, ComponentType> = {
   // BasicGraphics
@@ -41,6 +44,8 @@ const examples: Record<Example, ComponentType> = {
   ComputeBoids: ComputeBoids,
   GameOfLife: GameOfLife,
   BitonicSort: BitonicSort,
+  // GraphicsTechniques
+  Cameras: Cameras,
 }
 
 export function ExampleScreen() {

@@ -22,8 +22,8 @@ export const ComputeBoids = () => {
       requiredFeatures: hasTimestampQuery ? ['timestamp-query'] : [],
     });
 
-    const {formats, alphaModes} = context.surfaceCapabilities;
-    const presentationFormat = formats[0]!;
+    const {alphaModes} = context.surfaceCapabilities;
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(adapter!);
 
     context.configure({
       device,

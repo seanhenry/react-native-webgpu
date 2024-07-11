@@ -15,9 +15,9 @@ export function HelloTriangle() {
     const adapter = await navigator.gpu.requestAdapter({ context });
     const device = await adapter!.requestDevice();
 
-    const { formats, alphaModes } = context.surfaceCapabilities;
+    const { alphaModes } = context.surfaceCapabilities;
 
-    const presentationFormat = formats[0]!;
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(adapter!);
     context.configure({
       device,
       format: presentationFormat,

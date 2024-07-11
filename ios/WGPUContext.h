@@ -17,7 +17,10 @@ namespace wgpu {
 
 class WGPUContext {
 public:
-    WGPUContext(WGPUInstance instance, WGPUSurface surface, std::function<uint32_t()> getWidth, std::function<uint32_t()> getHeight, std::shared_ptr<RCTMessageThread> jsThread): _instance(instance), _surface(surface), _getWidth(getWidth), _getHeight(getHeight), _jsThread(jsThread) {}
+    WGPUContext(WGPUInstance instance, WGPUSurface surface, std::function<uint32_t()> getWidth, std::function<uint32_t()> getHeight, std::shared_ptr<RCTMessageThread> jsThread): _instance(instance), _surface(surface), _getWidth(getWidth), _getHeight(getHeight), _jsThread(jsThread) {
+        _adapter = nullptr;
+        _device = nullptr;
+    }
     ~WGPUContext() {
         wgpuSurfaceRelease(_surface);
         wgpuInstanceRelease(_instance);

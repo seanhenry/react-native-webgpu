@@ -14,6 +14,7 @@
 #import "UIImage+Bitmap.h"
 #import "React-Core/React/RCTMessageThread.h"
 #import "TimerHostObject.h"
+#import "ConstantConversion.h"
 
 using namespace facebook::react;
 using namespace facebook::jsi;
@@ -164,8 +165,18 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
         return Object::createFromHostObject(runtime, std::make_shared<TimerHostObject>(&runtime));
     });
 
+    auto getPreferredCanvasFormat = WGPU_FUNC_FROM_HOST_FUNC(getPreferredCanvasFormat, 1, []) {
+        if (count == 0) {
+            throw makeJSError(runtime, "You must pass an adapter to getPreferredCanvasFormat for this native implementation");
+        }
+        auto adapter = arguments[0].asObject(runtime).asHostObject<AdapterHostObject>(runtime);
+        auto format = wgpuSurfaceGetPreferredFormat(adapter->_context->_surface, adapter->_value);
+        return String::createFromUtf8(runtime, WGPUTextureFormatToString(format));
+    });
+
     auto gpu = Object(runtime);
     gpu.setProperty(runtime, "requestAdapter", std::move(requestAdapter));
+    gpu.setProperty(runtime, "getPreferredCanvasFormat", std::move(getPreferredCanvasFormat));
 
     auto navigator = Object(runtime);
     navigator.setProperty(runtime, "gpu", std::move(gpu));

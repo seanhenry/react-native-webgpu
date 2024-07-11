@@ -8,7 +8,7 @@ import { cubePositionOffset, cubeUVOffset, cubeVertexArray, cubeVertexCount, cub
 import cubeWGSL from './cube.wgsl';
 import { ArcballCamera, WASDCamera } from './camera';
 import { createInputHandler, type InputHandlers } from './input';
-import { View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { CenterSquare } from '../../../Components/CenterSquare';
 
 export const Cameras = () => {
@@ -47,8 +47,8 @@ export const Cameras = () => {
     const device = await adapter!.requestDevice();
 
     const {width, height} = context;
-    const {formats, alphaModes} = context.surfaceCapabilities;
-    const presentationFormat = formats[0]!;
+    const {alphaModes} = context.surfaceCapabilities;
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(adapter!);
 
     context.configure({
       device,
@@ -241,6 +241,8 @@ export const Cameras = () => {
   };
 
   return (
+    <>
+      <Text style={styles.instructions}>Swipe the cube to rotate</Text>
     <CenterSquare>
       <View style={globalStyles.fill}
             pointerEvents="box-only"
@@ -253,5 +255,13 @@ export const Cameras = () => {
         <WebGpuView onInit={onInit} identifier="Cameras" style={globalStyles.fill} />
       </View>
     </CenterSquare>
+    </>
   );
 };
+
+const styles = StyleSheet.create({
+  instructions: {
+    marginTop: 8,
+    marginLeft: 8,
+  }
+})

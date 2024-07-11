@@ -23,9 +23,9 @@ export const InstancedCube = () => {
     const adapter = await navigator.gpu.requestAdapter({context});
     const device = await adapter!.requestDevice();
 
-    const {formats, alphaModes} = context.surfaceCapabilities;
+    const {alphaModes} = context.surfaceCapabilities;
     const {width, height} = context;
-    const presentationFormat = formats[0]!;
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(adapter!);
 
     context.configure({
       device,

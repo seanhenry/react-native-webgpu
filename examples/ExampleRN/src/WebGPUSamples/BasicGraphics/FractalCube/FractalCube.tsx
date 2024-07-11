@@ -24,9 +24,9 @@ export const FractalCube = () => {
     const device = await adapter!.requestDevice();
 
     const {width, height} = context;
-    const {formats, alphaModes} = context.surfaceCapabilities;
+    const {alphaModes} = context.surfaceCapabilities;
 
-    const presentationFormat = formats[0]!;
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(adapter!);
 
     context.configure({
       device,

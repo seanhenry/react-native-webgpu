@@ -19,8 +19,8 @@ export const CubeMap = () => {
     const device = await adapter!.requestDevice();
 
     const { width, height } = context;
-    const { formats, alphaModes } = context.surfaceCapabilities;
-    const presentationFormat = formats[0]!;
+    const { alphaModes } = context.surfaceCapabilities;
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(adapter!);
 
     context.configure({
       device,

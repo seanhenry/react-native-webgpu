@@ -16,8 +16,8 @@ export const GameOfLife = () => {
     const adapter = await navigator.gpu.requestAdapter({context});
     const device = await adapter!.requestDevice();
 
-    const {formats, alphaModes} = context.surfaceCapabilities;
-    const presentationFormat = formats[0]!
+    const {alphaModes} = context.surfaceCapabilities;
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(adapter!)
 
     context.configure({
       device,

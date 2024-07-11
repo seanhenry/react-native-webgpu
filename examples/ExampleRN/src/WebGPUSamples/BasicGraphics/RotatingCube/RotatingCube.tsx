@@ -18,11 +18,12 @@ export function RotatingCube() {
     const adapter = await navigator.gpu.requestAdapter({context});
     const device = await adapter!.requestDevice();
 
-    const { formats, alphaModes} = context.surfaceCapabilities;
+    const { alphaModes} = context.surfaceCapabilities;
     const {width, height} = context;
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(adapter!);
     context.configure({
       device,
-      format: formats[0]!,
+      format: presentationFormat,
       alphaMode: alphaModes[0],
     });
 
@@ -70,7 +71,7 @@ export function RotatingCube() {
         }),
         targets: [
           {
-            format: formats[0]!,
+            format: presentationFormat,
           },
         ],
       },

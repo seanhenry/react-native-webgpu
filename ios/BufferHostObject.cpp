@@ -95,6 +95,7 @@ static void handle_map_async(WGPUBufferMapAsyncStatus status, void *userdata) {
             auto error = makeJSError(promise->runtime, messageFmt.str());
             promise->reject->call(promise->runtime, std::move(error));
         }
+        promise->runtime.drainMicrotasks();
         delete promise;
     });
 }

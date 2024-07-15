@@ -53,20 +53,6 @@ export const WebGpuView = ({ identifier, onInit, onError, ...props }: WebGpuView
   return (
     <>
       <WGPUWebGPUView {...props} identifier={identifier} onInit={onInitInternal} />
-      <Workaround />
     </>
   );
 };
-
-// A temporary workaround for development purposes (not planning to release this!).
-// Promises are not fired unless the app is interacted with.
-const Workaround = () => {
-  const [_, inc] = useState(0)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      inc(a => a + 1)
-    }, 0)
-    return () => clearInterval(interval);
-  }, []);
-  return null;
-}

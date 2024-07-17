@@ -1,24 +1,27 @@
 #import "WGPUJsi.h"
 #import "React/RCTBridge+Private.h"
 #import "webgpu.h"
-#import "wgpu.h"
-#import "WGPUMetalLayers.h"
 #import <jsi/jsi.h>
-#import <iostream>
-#import <stdio.h>
 #import "WGPUJsiUtils.h"
 #import "AdapterHostObject.h"
-#import "ImageBitmapHostObject.h"
 #import <boost/format.hpp>
-#import <UIKit/UIKit.h>
-#import "UIImage+Bitmap.h"
-#import "React-Core/React/RCTMessageThread.h"
-#import "TimerHostObject.h"
 #import "ConstantConversion.h"
+#import <React-callinvoker/ReactCommon/CallInvoker.h>
+#include "JSIInstance.h"
+#include "CreateImageBitmap.h"
 
 using namespace facebook::react;
 using namespace facebook::jsi;
 using namespace wgpu;
+
+static void wgpuHandleRequestAdapter(WGPURequestAdapterStatus status, WGPUAdapter adapter, char const *message, void *userdata);
+typedef struct HandleRequestAdapterData {
+    std::shared_ptr<Surface> optionalSurface;
+} HandleRequestAdapterData;
+
+@interface RCTBridge ()
+- (std::shared_ptr<CallInvoker>)jsCallInvoker;
+@end
 
 @implementation WGPUJsi
 
@@ -26,185 +29,134 @@ RCT_EXPORT_MODULE(WGPUJsi)
 
 @synthesize bridge;
 
-static void handle_request_adapter(WGPURequestAdapterStatus status, WGPUAdapter adapter, char const *message, void *userdata);
-
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
     RCTCxxBridge *cxxBridge = (RCTCxxBridge*)self.bridge;
     if (cxxBridge == nil) {
         NSLog(@"Cxx bridge not found");
         return @(NO);
     }
-    auto jsMessageThread = std::make_shared<RCTMessageThread>([NSRunLoop currentRunLoop], ^(NSError *error) {
-      if (error) {
-          NSLog(@"Error running on js thread: %@", error);
-      }
-    });
 
     auto &runtime = *(Runtime *)cxxBridge.runtime;
-    auto getContext = WGPU_FUNC_FROM_HOST_FUNC("getContext", 1, [jsMessageThread]) {
-        NSString *identifier = @"main";
-        if (count > 0) {
-            auto obj = arguments[0].asObject(runtime);
-            if (obj.hasProperty(runtime, "identifier") && obj.getProperty(runtime, "identifier").isString()) {
-                auto identifierStr = obj.getProperty(runtime, "identifier").asString(runtime).utf8(runtime);
-                identifier = [NSString stringWithCString:identifierStr.data() encoding:NSUTF8StringEncoding];
+
+    auto surfaces = std::make_shared<std::unordered_map<std::string, std::shared_ptr<Surface>>>();
+    JSIInstance::instance = std::make_unique<JSIInstance>(runtime, std::make_shared<Thread>([cxxBridge jsCallInvoker]));
+    JSIInstance::instance->onCreateSurface = [surfaces](std::string uuid, std::shared_ptr<Surface> surface) {
+        surfaces->insert_or_assign(uuid, surface);
+    };
+
+    auto getSurfaceBackedWebGPU = WGPU_FUNC_FROM_HOST_FUNC(getWebGPUForSurface, 1, [surfaces]) {
+        auto uuid = arguments[0].asString(runtime).utf8(runtime);
+        auto surfaceHandle = surfaces->extract(uuid);
+        if (surfaceHandle.empty()) {
+            throw JSError(runtime, "getWebGPUForSurface failed to find surface");
+        }
+        auto surface = std::move(surfaceHandle.mapped());
+
+        auto result = Object(runtime);
+
+        result.setProperty(runtime, "context", Object::createFromHostObject(runtime, std::make_shared<ContextHostObject>(surface)));
+        result.setProperty(runtime, "requestAnimationFrame", WGPU_FUNC_FROM_HOST_FUNC(requestAnimationFrame, 1, [surface]) {
+            surface->requestAnimationFrame(arguments[0].asObject(runtime).asFunction(runtime));
+            return Value::undefined();
+        }));
+
+        auto gpu = Object(runtime);
+        gpu.setProperty(runtime, "requestAdapter", WGPU_FUNC_FROM_HOST_FUNC(requestAdapter, 1, [surface]) {
+            auto promise = new Promise<HandleRequestAdapterData>(runtime);
+            return promise->jsPromise([promise, surface]() {
+                promise->data = {
+                    .optionalSurface = surface,
+                };
+                WGPURequestAdapterOptions adapterOptions = {
+                    .compatibleSurface = surface->getWGPUSurface(),
+                    .backendType = WGPUBackendType_Undefined,
+                    .powerPreference = WGPUPowerPreference_Undefined,
+                    .forceFallbackAdapter = false,
+                    .nextInChain = NULL,
+                };
+
+                wgpuInstanceRequestAdapter(surface->getWGPUInstance(), &adapterOptions, wgpuHandleRequestAdapter, promise);
+            });
+        }));
+        gpu.setProperty(runtime, "getPreferredCanvasFormat", WGPU_FUNC_FROM_HOST_FUNC(getPreferredCanvasFormat, 0, [surface]) {
+            auto adapter = surface->getUnownedWGPUAdapter().lock();
+            if (adapter == nullptr) {
+                jsLog(runtime, "warn", {"Adapter not found. Call navigator.gpu.requestAdapter before navigator.gpu.getPreferredCanvasFormat"});
+                return String::createFromUtf8(runtime, "bgra8unorm-srgb");
             }
-        }
-        CAMetalLayer *metalLayer = [[WGPUMetalLayers instance].layers objectForKey:identifier];
-        if (metalLayer == nil) {
-            NSString *message = [NSString stringWithFormat:@"CAMetalLayer is nil for identifier %@", identifier];
-            throw JSError(runtime, [message cStringUsingEncoding:NSUTF8StringEncoding]);
-        }
+            auto format = wgpuSurfaceGetPreferredFormat(surface->getWGPUSurface(), adapter->_adapter);
+            return String::createFromUtf8(runtime, WGPUTextureFormatToString(format));
+        }));
 
-        auto instance = wgpuCreateInstance(NULL);
+        auto navigator = Object(runtime);
+        navigator.setProperty(runtime, "gpu", std::move(gpu));
 
-        if (instance == nullptr) {
-            throw JSError(runtime, "Failed to create WGPU instance");
-        }
+        result.setProperty(runtime, "navigator", std::move(navigator));
 
-        struct WGPUSurfaceDescriptorFromMetalLayer descriptorFromMetalLayer = {
-            .chain = (const WGPUChainedStruct){
-                .sType = WGPUSType_SurfaceDescriptorFromMetalLayer,
-            },
-            .layer = (__bridge void *)metalLayer,
-        };
-        struct WGPUSurfaceDescriptor descriptor = {
-            .nextInChain = (const WGPUChainedStruct *)&descriptorFromMetalLayer,
-        };
-        auto surface = wgpuInstanceCreateSurface(instance, &descriptor);
-
-        if (surface == nullptr) {
-            throw JSError(runtime, "Failed to create WGPU surface");
-        }
-
-        __weak CAMetalLayer *weakMetalLayer = metalLayer;
-        auto context = new WGPUContext(instance, surface, [weakMetalLayer]() {
-            auto layer = weakMetalLayer;
-            if (layer != nil) {
-                return (uint32_t)layer.frame.size.width;
-            }
-            return (uint32_t)0;
-        }, [weakMetalLayer]() {
-            auto layer = weakMetalLayer;
-            if (layer != nil) {
-                return (uint32_t)layer.frame.size.height;
-            }
-            return (uint32_t)0;
-        }, jsMessageThread);
-
-        return Object::createFromHostObject(runtime, std::make_shared<ContextHostObject>(context));
+        return std::move(result);
     });
 
-    auto requestAdapter = WGPU_FUNC_FROM_HOST_FUNC(requestAdapter, 1, []) {
-        auto descriptor = arguments[0].asObject(runtime);
-        auto context = WGPU_HOST_OBJ(descriptor, context, ContextHostObject);
-        return makePromise(runtime, context->_context, [](Promise *promise) {
-            auto surface = promise->context->_surface;
-            auto instance = promise->context->_instance;
+    auto getHeadlessWebGPU = WGPU_FUNC_FROM_HOST_FUNC(getWebGPUForHeadless, 0, []) {
+        // context, requestAnimationFrame, getPreferredCanvasFormat don't make sense without a surface
+        auto result = Object(runtime);
 
-            const WGPURequestAdapterOptions adapterOptions = {
-                .compatibleSurface = surface,
-            };
+        auto gpu = Object(runtime);
+        gpu.setProperty(runtime, "requestAdapter", WGPU_FUNC_FROM_HOST_FUNC(requestAdapter, 1, []) {
+            auto promise = new Promise<HandleRequestAdapterData>(runtime);
+            return promise->jsPromise([promise]() {
+                auto instance = wgpuCreateInstance(nullptr);
 
-            wgpuInstanceRequestAdapter(instance, &adapterOptions, handle_request_adapter, promise);
-        });
-    });
-
-    auto createImageBitmap = WGPU_FUNC_FROM_HOST_FUNC(_createImageBitmap, 1, [jsMessageThread]) {
-        // https://developer.mozilla.org/en-US/docs/Web/API/createImageBitmap
-        // TODO: Support blob, etc
-        // TODO: Support options
-        // TODO: Support cropping
-        auto uri = arguments[0].asObject(runtime).getProperty(runtime, "uri").asString(runtime).utf8(runtime);
-
-        return makePromise(runtime, nullptr, [uri = std::move(uri), jsMessageThread](Promise *promise) {
-            // TODO: Support file urls
-            NSURL *url = [NSURL URLWithString:[NSString stringWithCString:uri.data() encoding:NSUTF8StringEncoding]];
-            NSURLSession *session = NSURLSession.sharedSession;
-            NSURLSessionTask *task = [session dataTaskWithURL:url completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-                auto &runtime = promise->runtime;
-                if (error != nil) {
-                    auto message = (boost::format("%s %s")
-                        % [error.userInfo[NSLocalizedFailureReasonErrorKey] cStringUsingEncoding:NSUTF8StringEncoding]
-                        % [error.userInfo[NSLocalizedRecoverySuggestionErrorKey] cStringUsingEncoding:NSUTF8StringEncoding]).str();
-
-                    jsMessageThread->runOnQueue([promise, &runtime, message]() {
-                        promise->reject->call(promise->runtime, makeJSError(runtime, message));
-                        delete promise;
-                    });
-                } else if (data == nil) {
-                    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-                    auto message = (boost::format("[%li] No response") % httpResponse.statusCode).str();
-                    jsMessageThread->runOnQueue([promise, &runtime, message]() {
-                        promise->reject->call(promise->runtime, makeJSError(runtime, message));
-                        delete promise;
-                    });
-                } else {
-                    BitmapImage bitmapImage = {0};
-                    auto result = [[UIImage imageWithData:data] createBitmapImage:&bitmapImage runtime:runtime];
-
-                    if (!result) {
-                        jsMessageThread->runOnQueue([promise, &runtime]() {
-                            promise->reject->call(promise->runtime, makeJSError(runtime, "Failed to create bitmap"));
-                            delete promise;
-                        });
-                    } else {
-                        jsMessageThread->runOnQueue([promise, &runtime, bitmapImage]() {
-                            auto obj = Object::createFromHostObject(runtime, std::make_shared<wgpu::ImageBitmapHostObject>(bitmapImage.data, bitmapImage.size, bitmapImage.width, bitmapImage.height));
-                            promise->resolve->call(promise->runtime, std::move(obj));
-                            delete promise;
-                        });
-                    }
+                if (instance == nullptr) {
+                    promise->reject(makeJSError(promise->runtime, "Failed to make wgpu instance"));
+                    delete promise;
+                    return;
                 }
-            }];
-            [task resume];
-        });
+
+                WGPURequestAdapterOptions adapterOptions = {
+                    .compatibleSurface = NULL,
+                    .backendType = WGPUBackendType_Undefined,
+                    .powerPreference = WGPUPowerPreference_Undefined,
+                    .forceFallbackAdapter = false,
+                    .nextInChain = NULL,
+                };
+
+                wgpuInstanceRequestAdapter(instance, &adapterOptions, wgpuHandleRequestAdapter, promise);
+            });
+        }));
+        auto navigator = Object(runtime);
+        navigator.setProperty(runtime, "gpu", std::move(gpu));
+
+        result.setProperty(runtime, "navigator", std::move(navigator));
+
+        return std::move(result);
     });
-
-    auto makeTimer = WGPU_FUNC_FROM_HOST_FUNC(makeTimer, 1, []) {
-        return Object::createFromHostObject(runtime, std::make_shared<TimerHostObject>(&runtime));
-    });
-
-    auto getPreferredCanvasFormat = WGPU_FUNC_FROM_HOST_FUNC(getPreferredCanvasFormat, 1, []) {
-        if (count == 0) {
-            throw makeJSError(runtime, "You must pass an adapter to getPreferredCanvasFormat for this native implementation");
-        }
-        auto adapter = arguments[0].asObject(runtime).asHostObject<AdapterHostObject>(runtime);
-        auto format = wgpuSurfaceGetPreferredFormat(adapter->_context->_surface, adapter->_value);
-        return String::createFromUtf8(runtime, WGPUTextureFormatToString(format));
-    });
-
-    auto gpu = Object(runtime);
-    gpu.setProperty(runtime, "requestAdapter", std::move(requestAdapter));
-    gpu.setProperty(runtime, "getPreferredCanvasFormat", std::move(getPreferredCanvasFormat));
-
-    auto navigator = Object(runtime);
-    navigator.setProperty(runtime, "gpu", std::move(gpu));
 
     auto webgpu = Object(runtime);
-    webgpu.setProperty(runtime, "navigator", std::move(navigator));
-    webgpu.setProperty(runtime, "getContext", std::move(getContext));
-    webgpu.setProperty(runtime, "__createImageBitmap", std::move(createImageBitmap));
-    webgpu.setProperty(runtime, "makeTimer", std::move(makeTimer));
+    webgpu.setProperty(runtime, "createImageBitmap", createImageBitmap(runtime));
+    webgpu.setProperty(runtime, "getSurfaceBackedWebGPU", std::move(getSurfaceBackedWebGPU));
+    webgpu.setProperty(runtime, "getHeadlessWebGPU", std::move(getHeadlessWebGPU));
 
-    runtime.global().setProperty(runtime, "__webGPUNative", std::move(webgpu));
+    runtime.global().setProperty(runtime, "__reactNativeWebGPU", std::move(webgpu));
 
     return @(YES);
 }
 
 @end
 
-static void handle_request_adapter(WGPURequestAdapterStatus status, WGPUAdapter adapter, char const *message, void *userdata) {
-    Promise *promise = (Promise *)userdata;
+static void wgpuHandleRequestAdapter(WGPURequestAdapterStatus status, WGPUAdapter adapter, char const *message, void *userdata) {
+    auto promise = (Promise<HandleRequestAdapterData> *)userdata;
     Runtime &runtime = promise->runtime;
-    auto sharedContext = promise->context;
 
     if (status == WGPURequestAdapterStatus_Success) {
-        auto adapterHostObject = Object::createFromHostObject(runtime, std::make_shared<AdapterHostObject>(adapter, sharedContext));
-        promise->resolve->call(runtime, std::move(adapterHostObject));
+        auto adapterWrapper = std::make_shared<AdapterWrapper>(adapter);
+        if (promise->data.optionalSurface != nullptr) {
+            promise->data.optionalSurface->setAdapter(adapterWrapper);
+        }
+        auto adapterHostObject = Object::createFromHostObject(runtime, std::make_shared<AdapterHostObject>(adapterWrapper));
+        promise->resolve(std::move(adapterHostObject));
     } else {
         auto error = boost::format("[%s] %#.8x %s") % __FILE_NAME__ % status % message;
-        promise->reject->call(runtime, String::createFromUtf8(runtime, error.str()));
+        promise->reject(String::createFromUtf8(runtime, error.str()));
     }
     delete promise;
 }

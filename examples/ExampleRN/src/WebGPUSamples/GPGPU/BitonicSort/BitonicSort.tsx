@@ -11,8 +11,7 @@ import { NaiveBitonicCompute } from './bitonicCompute';
 // import atomicToZero from './atomicToZero.wgsl';
 
 export const BitonicSort = () => {
-  const onInit: WebGpuViewProps['onInit'] = async ({ context, timer }) => {
-    const {requestAnimationFrame} = timer;
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame }) => {
     // Type of step that will be executed in our shader
     enum StepEnum {
       NONE,
@@ -956,12 +955,12 @@ export const BitonicSort = () => {
 
       // init({ canvas, stats, gui });
 
-      init({ context });
+      init({ context, navigator });
     });
   };
   return (
     <CenterSquare>
-      <WebGpuView identifier="BitonicSort" onInit={onInit} style={globalStyles.fill} />
+      <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
     </CenterSquare>
   );
 };

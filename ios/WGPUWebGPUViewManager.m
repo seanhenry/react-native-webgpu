@@ -1,6 +1,5 @@
 #import <React/RCTViewManager.h>
 #import <UIKit/UIKit.h>
-#import "WGPUMetalLayers.h"
 #import "WGPUWebGPUView.h"
 
 @interface WGPUWebGPUViewManager : RCTViewManager
@@ -9,8 +8,7 @@
 @implementation WGPUWebGPUViewManager
 
 RCT_EXPORT_MODULE(WGPUWebGPUView)
-RCT_EXPORT_VIEW_PROPERTY(onInit, RCTBubblingEventBlock)
-RCT_EXPORT_VIEW_PROPERTY(identifier, NSString)
+RCT_EXPORT_VIEW_PROPERTY(onCreateSurface, RCTBubblingEventBlock)
 
 - (UIView *)view {
     WGPUWebGPUView* view = [[WGPUWebGPUView alloc] init];

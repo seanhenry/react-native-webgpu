@@ -1,7 +1,6 @@
 #pragma once
 
 #include <jsi/jsi.h>
-#include "wgpu.h"
 #include "webgpu.h"
 
 using namespace facebook::jsi;

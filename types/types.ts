@@ -1,11 +1,19 @@
+export interface SurfaceBackedWebGPU {
+  navigator: NavigatorGPU;
+  requestAnimationFrame(callback: (time: number) => void): void;
+  context: WGPUContext;
+}
 
+export interface HeadlessWebGPU {
+  navigator: {
+    gpu: Pick<GPU, 'requestAdapter'>;
+  };
+}
 
-export interface WGPUContext {
-  configure(options: GPUCanvasConfiguration): void;
-  surfaceCapabilities: WGPUSurfaceCapabilities;
+export interface WGPUContext extends Omit<GPUCanvasContext, 'getCurrentTexture'> {
+  surfaceCapabilities(adapter: GPUAdapter): WGPUSurfaceCapabilities;
   getCurrentTexture(): GPUTexture | null;
   presentSurface(texture: GPUTexture): void;
-  destroy(): void;
   width: number;
   height: number;
 }
@@ -13,13 +21,6 @@ export interface WGPUContext {
 export interface WGPUSurfaceCapabilities {
   formats: GPUTextureFormat[];
   alphaModes: GPUCanvasAlphaMode[];
-}
-
-export interface WGPUTimer {
-  start(): void;
-  stop(): void;
-  invalidate(): void;
-  requestAnimationFrame(callback: (time: number) => void): void;
 }
 
 export interface ImageBitmap {

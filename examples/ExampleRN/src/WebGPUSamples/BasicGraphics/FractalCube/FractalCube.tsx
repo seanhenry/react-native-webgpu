@@ -17,16 +17,13 @@ import basicVertWGSL from '../../shaders/basic.vert.wgsl';
 import sampleSelfWGSL from './sampleSelf.frag.wgsl';
 
 export const FractalCube = () => {
-  const onInit: WebGpuViewProps['onInit'] = async ({ context, timer }) => {
-    const {requestAnimationFrame} = timer;
-    const {navigator} = global.webGPU;
-    const adapter = await navigator.gpu.requestAdapter({context});
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame }) => {
+    const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter!.requestDevice();
 
     const {width, height} = context;
-    const {alphaModes} = context.surfaceCapabilities;
 
-    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(adapter!);
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
     context.configure({
       device,
@@ -35,7 +32,7 @@ export const FractalCube = () => {
       // Specify we want both RENDER_ATTACHMENT and COPY_SRC since we
       // will copy out of the swapchain texture.
       usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
-      alphaMode: alphaModes[0],
+      alphaMode: "premultiplied",
     });
 
     // Create a vertex buffer from the cube data.
@@ -236,7 +233,7 @@ export const FractalCube = () => {
 
   return (
     <CenterSquare>
-      <WebGpuView identifier="globalStyles" onInit={onInit} style={globalStyles.fill} />
+      <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
     </CenterSquare>
   )
 }

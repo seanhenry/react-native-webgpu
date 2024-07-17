@@ -1337,11 +1337,6 @@ interface GPURenderPipelineDescriptor
 }
 
 interface GPURequestAdapterOptions {
-  /**
-   * [react-native-webgpu only]
-   * Use `global.webGPU.getContext()` to get the context.
-   */
-  context: WGPUContext
 //   /**
 //    * Optionally provides a hint indicating what class of adapter should be selected from
 //    * the system's available adapters.
@@ -1878,7 +1873,7 @@ interface GPU {
    * @param options - Criteria used to select the adapter.
    */
   requestAdapter(
-    options: GPURequestAdapterOptions
+    options?: GPURequestAdapterOptions
   ): Promise<GPUAdapter | null>;
   /**
    * Returns an optimal {@link GPUTextureFormat} for displaying 8-bit depth, standard dynamic range
@@ -1890,8 +1885,7 @@ interface GPU {
    * Note: Canvases which are not displayed to the screen may or may not benefit from using this
    * format.
    */
-  getPreferredCanvasFormat(adapter: GPUAdapter): GPUTextureFormat;
-  // getPreferredCanvasFormat(): GPUTextureFormat;
+  getPreferredCanvasFormat(): GPUTextureFormat;
 //   readonly wgslLanguageFeatures: WGSLLanguageFeatures;
 }
 
@@ -2100,18 +2094,18 @@ interface GPUCanvasContext {
   configure(
     configuration: GPUCanvasConfiguration
   ): undefined;
-//   /**
-//    * Removes the context configuration. Destroys any textures produced while configured.
-//    */
-//   unconfigure(): undefined;
-//   /**
-//    * Get the {@link GPUTexture} that will be composited to the document by the {@link GPUCanvasContext}
-//    * next.
-//    * Note: The same {@link GPUTexture} object will be returned by every
-//    * call to {@link GPUCanvasContext#getCurrentTexture} until "[$Expire the current texture$]"
-//    * runs, even if that {@link GPUTexture} is destroyed, failed validation, or failed to allocate.
-//    */
-//   getCurrentTexture(): GPUTexture;
+  /**
+   * Removes the context configuration. Destroys any textures produced while configured.
+   */
+  unconfigure(): undefined;
+  /**
+   * Get the {@link GPUTexture} that will be composited to the document by the {@link GPUCanvasContext}
+   * next.
+   * Note: The same {@link GPUTexture} object will be returned by every
+   * call to {@link GPUCanvasContext#getCurrentTexture} until "[$Expire the current texture$]"
+   * runs, even if that {@link GPUTexture} is destroyed, failed validation, or failed to allocate.
+   */
+  getCurrentTexture(): GPUTexture;
 }
 
 // declare var GPUCanvasContext: {

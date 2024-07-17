@@ -1,12 +1,11 @@
 #include "ShaderModuleHostObject.h"
 #include "WGPUJsiUtils.h"
-#include "WGPUContext.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
 
 void wgpuShaderModuleGetCompilationInfoCallback(WGPUCompilationInfoRequestStatus status, struct WGPUCompilationInfo const *compilationInfo, WGPU_NULLABLE void *userdata) {
-    Promise *promise = (Promise *)userdata;
+    auto promise = (Promise<void *> *)userdata;
     Runtime &runtime = promise->runtime;
     if (status == WGPUCompilationInfoRequestStatus_Success) {
         auto messages = cArrayToJsi(runtime, compilationInfo->messages, compilationInfo->messageCount, [](Runtime &runtime, WGPUCompilationMessage item) {
@@ -21,9 +20,9 @@ void wgpuShaderModuleGetCompilationInfoCallback(WGPUCompilationInfoRequestStatus
         
         auto result = Object(runtime);
         result.setProperty(runtime, "messages", messages);
-        promise->resolve->call(runtime, std::move(result));
+        promise->resolve(std::move(result));
     } else {
-        promise->reject->call(runtime, "getCompilationInfo error");
+        promise->reject(makeJSError(runtime, "getCompilationInfo failed"));
     }
     delete promise;
 }
@@ -34,8 +33,9 @@ Value ShaderModuleHostObject::get(Runtime &runtime, const PropNameID &propName) 
     // Not supported on iOS
     if (name == "getCompilationInfo") {
         return WGPU_FUNC_FROM_HOST_FUNC(getCompilationInfo, 0, [this]) {
-            return makePromise(runtime, _context, [this](Promise *promise) {
-                wgpuShaderModuleGetCompilationInfo(_value, wgpuShaderModuleGetCompilationInfoCallback, &promise);
+            auto promise = new Promise<void *>(runtime);
+            return promise->jsPromise([this, promise]() {
+                wgpuShaderModuleGetCompilationInfo(_value, wgpuShaderModuleGetCompilationInfoCallback, promise);
             });
         });
     }

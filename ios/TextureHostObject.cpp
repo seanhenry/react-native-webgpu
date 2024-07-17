@@ -25,7 +25,7 @@ Value TextureHostObject::get(Runtime &runtime, const PropNameID &propName) {
                 view = wgpuTextureCreateView(_value, NULL);
             }
 
-            return Object::createFromHostObject(runtime, std::make_shared<TextureViewHostObject>(view, _context, label));
+            return Object::createFromHostObject(runtime, std::make_shared<TextureViewHostObject>(view, _context, std::move(label)));
         });
     }
 

@@ -11,20 +11,16 @@ import { CenterSquare } from '../../../Components/CenterSquare';
 import { globalStyles } from '../../../Components/globalStyles';
 
 export function RotatingCube() {
-  const onInit: WebGpuViewProps['onInit'] = async ({ context, timer }) => {
-    const {requestAnimationFrame} = timer;
-    const {navigator} = global.webGPU;
-
-    const adapter = await navigator.gpu.requestAdapter({context});
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame }) => {
+    const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter!.requestDevice();
 
-    const { alphaModes} = context.surfaceCapabilities;
     const {width, height} = context;
-    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(adapter!);
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: alphaModes[0],
+      alphaMode: "premultiplied",
     });
 
     // Create a vertex buffer from the cube data.
@@ -189,7 +185,7 @@ export function RotatingCube() {
 
   return (
     <CenterSquare>
-      <WebGpuView identifier="RotatingCube" onInit={onInit} style={globalStyles.fill} />
+      <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
     </CenterSquare>
   )
 }

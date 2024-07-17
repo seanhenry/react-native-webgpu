@@ -2,7 +2,8 @@
 
 #include <jsi/jsi.h>
 #include "AutoReleasePool.h"
-#include "WGPUContext.h"
+#include "webgpu.h"
+#include <iostream>
 
 #define WGPU_FUNC_FROM_HOST_FUNC(__name, __argCount, ...) Function::createFromHostFunction(runtime, PropNameID::forAscii(runtime, #__name), __argCount, __VA_ARGS__(Runtime &runtime, const Value &thisValue, const Value *arguments, size_t count) -> Value
 
@@ -10,7 +11,7 @@
 #define WGPU_BOOL_OPT(__obj, __propName, __default) __obj.hasProperty(runtime, #__propName) ? __obj.getProperty(runtime, #__propName).asBool() : __default
 #define WGPU_UTF8_OPT(__obj, __propName, __default) __obj.hasProperty(runtime, #__propName) ? __obj.getProperty(runtime, #__propName).asString(runtime).utf8(runtime) : __default
 #define WGPU_NUMBER_OPT(__obj, __propName, __type, __default) __obj.hasProperty(runtime, #__propName) ? (__type)__obj.getProperty(runtime, #__propName).asNumber() : __default
-#define WGPU_HOST_OBJ_VALUE_OPT(__obj, __propName, __type, __default) __obj.hasProperty(runtime, #__propName) ? __obj.getPropertyAsObject(runtime, #__propName).asHostObject<__type>(runtime)->_value : __default
+#define WGPU_HOST_OBJ_VALUE_OPT(__obj, __propName, __type, __default) __obj.hasProperty(runtime, #__propName) ? __obj.getPropertyAsObject(runtime, #__propName).asHostObject<__type>(runtime)->getValue() : __default
 
 // Required jsi getters
 #define WGPU_UTF8(__obj, __propName) __obj.getProperty(runtime, #__propName).asString(runtime).utf8(runtime)
@@ -48,24 +49,30 @@ Array cArrayToJsi(Runtime &runtime, T *array, size_t size, Transform transform) 
     return result;
 }
 
+template<typename T>
 class Promise {
 public:
     explicit Promise(Runtime &runtime): runtime(runtime) {}
+    Value jsPromise(std::function<void()> &&fn);
+    void resolve(Value value) {
+        _resolve->call(runtime, std::move(value));
+    }
+    void reject(Value value) {
+        _reject->call(runtime, std::move(value));
+    }
     Runtime &runtime;
-    std::unique_ptr<Function> resolve;
-    std::unique_ptr<Function> reject;
-    WGPUContext *context;
-    void * userData;
+    T data;
+private:
+    std::shared_ptr<Function> _resolve;
+    std::shared_ptr<Function> _reject;
 };
 
-template<typename Callback>
-Value makePromise(Runtime &runtime, WGPUContext *context, Callback cb) {
-    auto promiseConstructor = WGPU_FUNC_FROM_HOST_FUNC(promiseConstructor, 2, [cb = std::move(cb), context]) {
-        auto promise = new Promise(runtime);
-        promise->context = context;
-        promise->resolve = std::make_unique<Function>(arguments[0].asObject(runtime).asFunction(runtime));
-        promise->reject = std::make_unique<Function>(arguments[1].asObject(runtime).asFunction(runtime));
-        cb(promise);
+template <typename T>
+Value Promise<T>::jsPromise(std::function<void()> &&fn) {
+    auto promiseCallbackFn = WGPU_FUNC_FROM_HOST_FUNC(promiseCallbackFn, 2, [this, fn = std::move(fn)]) {
+        _resolve = std::make_shared<Function>(arguments[0].asObject(runtime).asFunction(runtime));
+        _reject = std::make_shared<Function>(arguments[1].asObject(runtime).asFunction(runtime));
+        fn();
         return Value::undefined();
     });
 
@@ -73,7 +80,7 @@ Value makePromise(Runtime &runtime, WGPUContext *context, Callback cb) {
         .getProperty(runtime, "Promise")
         .asObject(runtime)
         .asFunction(runtime)
-        .callAsConstructor(runtime, promiseConstructor);
+        .callAsConstructor(runtime, promiseCallbackFn);
 }
 
 // TODO: remove
@@ -149,6 +156,46 @@ inline ArrayBuffer getArrayBufferFromArrayBufferLike(Runtime &runtime, Object ar
         return arrayBufferLike.getPropertyAsObject(runtime, "buffer").getArrayBuffer(runtime);
     }
     throw new JSError(runtime, "Unsupported ArrayBufferLike object");
+}
+
+// Wrapper around c pointer to manage lifetime
+class DeviceWrapper {
+public:
+    explicit DeviceWrapper(WGPUDevice device): _device(device) {}
+    ~DeviceWrapper() { wgpuDeviceRelease(_device); }
+    WGPUDevice _device;
+};
+
+class AdapterWrapper {
+public:
+    explicit AdapterWrapper(WGPUAdapter adapter): _adapter(adapter) {}
+    ~AdapterWrapper() { wgpuAdapterRelease(_adapter); }
+    WGPUAdapter _adapter;
+};
+
+template<typename T, typename U>
+bool cArrayContains(T *data, size_t size, U searchItem) {
+    for (auto i = 0; i < size; i++) {
+        if (data[0] == searchItem) {
+            return true;
+        }
+    }
+    return false;
+}
+
+inline void jsLog(Runtime &runtime, const char *functionName, std::initializer_list<std::string> message) {
+#ifdef DEBUG
+    std::vector<Value> args;
+    args.reserve(args.size());
+    for (auto str : message) {
+        args.emplace_back(String::createFromUtf8(runtime, str));
+    }
+
+    runtime.global()
+        .getPropertyAsObject(runtime, "console")
+        .getPropertyAsFunction(runtime, functionName)
+        .call(runtime, (const Value*)args.data(), args.size());
+#endif
 }
 
 } // namespace

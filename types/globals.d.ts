@@ -1,16 +1,16 @@
-import type { ImageSourcePropType } from 'react-native';
-import type { WGPUContext, ImageBitmap, WGPUTimer } from './types';
+import type { ImageResolvedAssetSource, ImageSourcePropType } from 'react-native';
+import type { HeadlessWebGPU, ImageBitmap, SurfaceBackedWebGPU } from './types';
 
 declare global {
-  var webGPU: {
-    navigator: NavigatorGPU;
-    /**
-     * Pass information about the context.
-     *
-     * @param props Pass `identifier` from `onInit` when using multiple instances at once.
-     */
-    getContext(props?: {identifier: string}): WGPUContext;
+  var __reactNativeWebGPU: {
+    createImageBitmap(source: ImageResolvedAssetSource): Promise<ImageBitmap>;
+    getSurfaceBackedWebGPU(uuid: string): SurfaceBackedWebGPU;
+    getHeadlessWebGPU(uuid: string): HeadlessWebGPU;
+  };
+
+  var reactNativeWebGPU: {
     createImageBitmap(source: ImageSourcePropType): Promise<ImageBitmap>;
-    makeTimer(): WGPUTimer;
+    getSurfaceBackedWebGPU(uuid: string): SurfaceBackedWebGPU;
+    getHeadlessWebGPU(uuid: string): HeadlessWebGPU;
   };
 }

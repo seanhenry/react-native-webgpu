@@ -28,7 +28,7 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
                 auto loadOp = WGPU_UTF8(attachment, loadOp);
                 auto storeOp = WGPU_UTF8(attachment, storeOp);
                 return (const WGPURenderPassColorAttachment){
-                    .view = WGPU_HOST_OBJ(attachment, view, TextureViewHostObject)->_value,
+                    .view = WGPU_HOST_OBJ(attachment, view, TextureViewHostObject)->getValue(),
                     .loadOp = StringToWGPULoadOp(loadOp.data()),
                     .storeOp = StringToWGPUStoreOp(storeOp.data()),
                     .depthSlice = WGPU_DEPTH_SLICE_UNDEFINED,
@@ -52,7 +52,7 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
             WGPURenderPassDepthStencilAttachment depthStencilAttachment = {0};
             if (desc.hasProperty(runtime, "depthStencilAttachment")) {
                 auto attachment = desc.getPropertyAsObject(runtime, "depthStencilAttachment");
-                depthStencilAttachment.view = WGPU_HOST_OBJ(attachment, view, TextureViewHostObject)->_value;
+                depthStencilAttachment.view = WGPU_HOST_OBJ(attachment, view, TextureViewHostObject)->getValue();
 
                 depthStencilAttachment.depthClearValue = WGPU_NUMBER_OPT(attachment, depthClearValue, float, 0.0);
 
@@ -72,7 +72,7 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
             }
 
             auto encoder = wgpuCommandEncoderBeginRenderPass(_value, &descriptor);
-            return Object::createFromHostObject(runtime, std::make_shared<RenderPassEncoderHostObject>(encoder, _context, label));
+            return Object::createFromHostObject(runtime, std::make_shared<RenderPassEncoderHostObject>(encoder, _context, std::move(label)));
         });
     }
 
@@ -87,7 +87,7 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
                 .nextInChain = NULL,
             };
             WGPUCommandBuffer buffer = wgpuCommandEncoderFinish(_value, &descriptor);
-            return Object::createFromHostObject(runtime, std::make_shared<CommandBufferHostObject>(buffer, _context, label));
+            return Object::createFromHostObject(runtime, std::make_shared<CommandBufferHostObject>(buffer, _context, std::move(label)));
         });
     }
 
@@ -124,15 +124,15 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
                 }
             }
             auto encoder = wgpuCommandEncoderBeginComputePass(_value, &descriptor);
-            return Object::createFromHostObject(runtime, std::make_shared<ComputePassEncoderHostObject>(encoder, _context, label));
+            return Object::createFromHostObject(runtime, std::make_shared<ComputePassEncoderHostObject>(encoder, _context, std::move(label)));
         });
     }
 
     if (name == "copyBufferToBuffer") {
         return WGPU_FUNC_FROM_HOST_FUNC(copyBufferToBuffer, 5, [this]) {
-            auto source = arguments[0].asObject(runtime).asHostObject<BufferHostObject>(runtime)->_value;
+            auto source = arguments[0].asObject(runtime).asHostObject<BufferHostObject>(runtime)->getValue();
             auto sourceOffset = (uint64_t)arguments[1].asNumber();
-            auto destination = arguments[2].asObject(runtime).asHostObject<BufferHostObject>(runtime)->_value;
+            auto destination = arguments[2].asObject(runtime).asHostObject<BufferHostObject>(runtime)->getValue();
             auto destinationOffset = (uint64_t)arguments[3].asNumber();
             auto size = (uint64_t)arguments[4].asNumber();
             wgpuCommandEncoderCopyBufferToBuffer(_value, source, sourceOffset, destination, destinationOffset, size);
@@ -142,10 +142,10 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
 
     if (name == "resolveQuerySet") {
         return WGPU_FUNC_FROM_HOST_FUNC(resolveQuerySet, 5, [this]) {
-            auto querySet = arguments[0].asObject(runtime).asHostObject<QuerySetHostObject>(runtime)->_value;
+            auto querySet = arguments[0].asObject(runtime).asHostObject<QuerySetHostObject>(runtime)->getValue();
             auto firstQuery = (uint32_t)arguments[1].asNumber();
             auto queryCount = (uint32_t)arguments[2].asNumber();
-            auto destination = arguments[3].asObject(runtime).asHostObject<BufferHostObject>(runtime)->_value;
+            auto destination = arguments[3].asObject(runtime).asHostObject<BufferHostObject>(runtime)->getValue();
             auto destinationOffset = (uint64_t)arguments[4].asNumber();
             wgpuCommandEncoderResolveQuerySet(_value, querySet, firstQuery, queryCount, destination, destinationOffset);
             return Value::undefined();

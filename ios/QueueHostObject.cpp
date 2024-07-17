@@ -17,8 +17,8 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
     if (name == "submit") {
         return WGPU_FUNC_FROM_HOST_FUNC(submit, 1, [this]) {
             auto commandsJsi = arguments[0].asObject(runtime).asArray(runtime);
-            auto commands = jsiArrayToVector<WGPUCommandBuffer>(runtime, std::move(commandsJsi), [](Runtime &runtime, Value item){
-                return item.asObject(runtime).asHostObject<CommandBufferHostObject>(runtime)->_value;
+            auto commands = jsiArrayToVector<WGPUCommandBuffer>(runtime, std::move(commandsJsi), [](Runtime &runtime, Value item) {
+                return item.asObject(runtime).asHostObject<CommandBufferHostObject>(runtime)->getValue();
             });
             wgpuQueueSubmit(_value, commands.size(), commands.data());
             return Value::undefined();
@@ -27,7 +27,7 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
 
     if (name == "writeBuffer") {
         return WGPU_FUNC_FROM_HOST_FUNC(writeBuffer, 5, [this]) {
-            auto buffer = arguments[0].asObject(runtime).asHostObject<BufferHostObject>(runtime)->_value;
+            auto buffer = arguments[0].asObject(runtime).asHostObject<BufferHostObject>(runtime)->getValue();
             auto bufferOffset = (uint64_t)arguments[1].asNumber();
             auto data = getArrayBufferFromArrayBufferLike(runtime, arguments[2].asObject(runtime));
             auto dataOffset = count > 3 ? (size_t)arguments[3].asNumber() : 0;

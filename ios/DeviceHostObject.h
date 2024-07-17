@@ -11,14 +11,16 @@ namespace wgpu {
 
 class DeviceHostObject : public HostObject {
 public:
-    explicit DeviceHostObject(WGPUDevice value, WGPUContext *context): _value(value), _context(context) { 
-        context->_device = value;
-    }
-    ~DeviceHostObject() { wgpuDeviceRelease(_value); }
+    explicit DeviceHostObject(std::shared_ptr<DeviceWrapper> value, std::shared_ptr<WGPUContext> context): _value(value), _context(context) {}
+    ~DeviceHostObject() { }
     std::vector<PropNameID> getPropertyNames(Runtime& runtime) override;
     Value get(Runtime &runtime, const PropNameID &name) override;
-    WGPUDevice _value;
-    WGPUContext *_context;
+    inline WGPUAdapter getAdapter() { return _context->getAdapter(); }
+    inline WGPUDevice getValue() { return _value->_device; }
+    inline std::shared_ptr<WGPUContext> getContext() { return _context; }
+private:
+    std::shared_ptr<DeviceWrapper> _value;
+    std::shared_ptr<WGPUContext> _context;
 };
 
 }

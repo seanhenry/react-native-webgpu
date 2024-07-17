@@ -14,7 +14,7 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
     if (name == "setPipeline") {
         return WGPU_FUNC_FROM_HOST_FUNC(setPipeline, 1, [this]) {
             auto pipeline = arguments[0].asObject(runtime).asHostObject<RenderPipelineHostObject>(runtime);
-            wgpuRenderPassEncoderSetPipeline(this->_value, pipeline->_value);
+            wgpuRenderPassEncoderSetPipeline(this->_value, pipeline->getValue());
             return Value(123);
         });
     }
@@ -44,7 +44,7 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
             WGPUBindGroup bindGroup = NULL;
             if (arguments[1].isObject()) {
                 auto groupIn = arguments[1].asObject(runtime).asHostObject<BindGroupHostObject>(runtime);
-                bindGroup = groupIn->_value;
+                bindGroup = groupIn->getValue();
             }
             wgpuRenderPassEncoderSetBindGroup(_value, index, bindGroup, 0, NULL);
             return Value::undefined();
@@ -57,7 +57,7 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
             WGPUBuffer buffer = NULL;
             if (arguments[1].isObject()) {
                 auto bufferIn = arguments[1].asObject(runtime).asHostObject<BufferHostObject>(runtime);
-                buffer = bufferIn->_value;
+                buffer = bufferIn->getValue();
             }
             auto offset = count > 2 ? (size_t)arguments[2].asNumber() : 0;
             auto size = count > 3 ? (size_t)arguments[3].asNumber() :

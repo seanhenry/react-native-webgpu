@@ -10,7 +10,10 @@
 using namespace facebook::jsi;
 using namespace wgpu;
 
-static void handle_request_device(WGPURequestDeviceStatus status, WGPUDevice device, char const *message, void *userdata);
+static void wgpuHandleRequestDevice(WGPURequestDeviceStatus status, WGPUDevice device, char const *message, void *userdata);
+typedef struct HandleRequestDeviceUserData {
+    std::shared_ptr<AdapterWrapper> adapter;
+} HandleRequestDeviceUserData;
 
 Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
     auto name = propName.utf8(runtime);
@@ -21,7 +24,12 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
             if (count > 0 && arguments[0].isObject()) {
                 sharedObj = std::make_shared<Object>(arguments[0].asObject(runtime));
             }
-            return makePromise(runtime, _context, [this, sharedObj](Promise *promise) {
+            auto promise = new Promise<HandleRequestDeviceUserData>(runtime);
+            return promise->jsPromise([this, promise, sharedObj]() {
+                promise->data = (const HandleRequestDeviceUserData){
+                    .adapter = _adapter,
+                };
+
                 if (sharedObj != nullptr) {
                     auto &runtime = promise->runtime;
                     auto obj = std::move(*sharedObj.get());
@@ -38,9 +46,9 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
                         descriptor.requiredFeatureCount = requiredFeatures.size();
                     }
 
-                    wgpuAdapterRequestDevice(_value, &descriptor, handle_request_device, promise);
+                    wgpuAdapterRequestDevice(_adapter->_adapter, &descriptor, wgpuHandleRequestDevice, promise);
                 } else {
-                    wgpuAdapterRequestDevice(_value, NULL, handle_request_device, promise);
+                    wgpuAdapterRequestDevice(_adapter->_adapter, NULL, wgpuHandleRequestDevice, promise);
                 }
 
             });
@@ -48,16 +56,16 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
     }
 
     if (name == "features") {
-        auto size = wgpuAdapterEnumerateFeatures(_value, NULL);
+        auto size = wgpuAdapterEnumerateFeatures(_adapter->_adapter, NULL);
         std::vector<WGPUFeatureName> features;
         features.resize(size);
-        wgpuAdapterEnumerateFeatures(_value, features.data());
+        wgpuAdapterEnumerateFeatures(_adapter->_adapter, features.data());
         return makeJsiFeatures(runtime, &features);
     }
 
     if (name == "limits") {
         WGPUSupportedLimits limits = {0};
-        wgpuAdapterGetLimits(_value, &limits);
+        wgpuAdapterGetLimits(_adapter->_adapter, &limits);
         return makeJsiLimits(runtime, &limits.limits);
     }
 
@@ -68,16 +76,18 @@ std::vector<PropNameID> AdapterHostObject::getPropertyNames(Runtime& runtime) {
     return PropNameID::names(runtime, "requestDevice", "features", "limits");
 }
 
-static void handle_request_device(WGPURequestDeviceStatus status, WGPUDevice device, char const *message, void *userdata) {
-    auto promise = (Promise *)userdata;
-    auto context = promise->context;
+static void wgpuHandleRequestDevice(WGPURequestDeviceStatus status, WGPUDevice device, char const *message, void *userdata) {
+    auto promise = (Promise<HandleRequestDeviceUserData> *)userdata;
     Runtime &runtime = promise->runtime;
+
     if (status == WGPURequestDeviceStatus_Success) {
-        auto deviceHostObject = Object::createFromHostObject(runtime, std::make_shared<DeviceHostObject>(device, context));
-        promise->resolve->call(runtime, std::move(deviceHostObject));
+        auto deviceWrapper = std::make_shared<DeviceWrapper>(device);
+        auto context = std::make_shared<WGPUContext>(promise->data.adapter, deviceWrapper);
+        auto deviceHostObject = Object::createFromHostObject(runtime, std::make_shared<DeviceHostObject>(deviceWrapper, context));
+        promise->resolve(std::move(deviceHostObject));
     } else {
         auto error = boost::format("[%s] %#.8x %s") % __FILE_NAME__ % status % message;
-        promise->reject->call(runtime, String::createFromUtf8(runtime, error.str()));
+        promise->reject(String::createFromUtf8(runtime, error.str()));
     }
     delete promise;
 }

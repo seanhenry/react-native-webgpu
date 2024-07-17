@@ -10,25 +10,24 @@ import { StyleSheet, TextInput, View } from 'react-native';
 
 export const ComputeBoids = () => {
   const perfDisplayRef = useRef<TextInput | null>(null)
-  const onInit: WebGpuViewProps['onInit'] = async ({ context, timer }) => {
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame }) => {
     const perfDisplay = perfDisplayRef.current!;
-    const {requestAnimationFrame} = timer;
-    const {navigator} = global.webGPU;
 
-    const adapter = await navigator.gpu.requestAdapter({context});
+    const adapter = await navigator.gpu.requestAdapter();
 
     const hasTimestampQuery = adapter!.features.has('timestamp-query');
     const device = await adapter!.requestDevice({
       requiredFeatures: hasTimestampQuery ? ['timestamp-query'] : [],
     });
 
-    const {alphaModes} = context.surfaceCapabilities;
-    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(adapter!);
+    perfDisplay.setNativeProps({text: hasTimestampQuery ? 'Collecting samples...' : 'timestamp-query not supported on this device'});
+
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: alphaModes[0],
+      alphaMode: "premultiplied",
     });
 
     const spriteShaderModule = device.createShaderModule({ code: spriteWGSL });
@@ -128,12 +127,12 @@ export const ComputeBoids = () => {
         usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC,
       });
       computePassDescriptor.timestampWrites = {
-        querySet,
+        querySet: querySet!,
         beginningOfPassWriteIndex: 0,
         endOfPassWriteIndex: 1,
       };
       renderPassDescriptor.timestampWrites = {
-        querySet,
+        querySet: querySet!,
         beginningOfPassWriteIndex: 2,
         endOfPassWriteIndex: 3,
       };
@@ -288,7 +287,7 @@ export const ComputeBoids = () => {
           0,
           resultBuffer,
           0,
-          resultBuffer.size
+          resultBuffer!.size
         );
       }
 
@@ -344,7 +343,7 @@ spare readback buffers:    ${spareResultBuffers.length}`});
         <TextInput ref={perfDisplayRef} editable={false} style={styles.perfDisplay} multiline />
       </View>
       <CenterSquare>
-        <WebGpuView identifier="ComputeBoids" onInit={onInit} style={globalStyles.fill} />
+        <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
       </CenterSquare>
     </>
   )

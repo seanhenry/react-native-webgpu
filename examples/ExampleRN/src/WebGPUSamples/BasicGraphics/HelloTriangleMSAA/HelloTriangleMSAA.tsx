@@ -7,21 +7,17 @@ import React from 'react';
 import { globalStyles } from '../../../Components/globalStyles';
 
 export function HelloTriangleMSAA() {
-  const onInit: WebGpuViewProps['onInit'] = async ({ context, timer }) => {
-    const {requestAnimationFrame} = timer;
-    const { navigator} = global.webGPU;
-
-    const adapter = await navigator.gpu.requestAdapter({context});
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame }) => {
+    const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter!.requestDevice();
 
-    const { alphaModes } = context.surfaceCapabilities;
     const { width, height } = context;
-    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(adapter!)
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat()
 
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: alphaModes[0],
+      alphaMode: "premultiplied",
     });
 
     const sampleCount = 4;
@@ -97,7 +93,7 @@ export function HelloTriangleMSAA() {
   };
   return (
     <CenterSquare>
-      <WebGpuView identifier="HelloTriangleMSAA" onInit={onInit} style={globalStyles.fill} />
+      <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
     </CenterSquare>
   );
 }

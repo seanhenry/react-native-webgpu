@@ -13,10 +13,7 @@ import { CenterSquare } from '../../../Components/CenterSquare';
 
 export const Cameras = () => {
   const inputHandlersRef = useRef<InputHandlers>({})
-  const onInit: WebGpuViewProps['onInit'] = async ({ context, timer }) => {
-    const { requestAnimationFrame } = timer;
-    const {navigator, createImageBitmap} = webGPU
-
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame, createImageBitmap }) => {
     // The input handler
     const inputHandler = createInputHandler(inputHandlersRef.current);
 
@@ -43,17 +40,16 @@ export const Cameras = () => {
     //   oldCameraType = newCameraType;
     // });
 
-    const adapter = await navigator.gpu.requestAdapter({context});
+    const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter!.requestDevice();
 
     const {width, height} = context;
-    const {alphaModes} = context.surfaceCapabilities;
-    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(adapter!);
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: alphaModes[0],
+      alphaMode: 'premultiplied',
     });
 
     // Create a vertex buffer from the cube data.
@@ -252,7 +248,7 @@ export const Cameras = () => {
             onTouchCancel={(e) => inputHandlersRef.current.onTouchEnd?.(e)}
 
       >
-        <WebGpuView onInit={onInit} identifier="Cameras" style={globalStyles.fill} />
+        <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
       </View>
     </CenterSquare>
     </>

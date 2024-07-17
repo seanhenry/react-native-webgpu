@@ -81,7 +81,7 @@ WGPUVertexState wgpu::makeGPUVertexState(Runtime &runtime, AutoReleasePool *auto
     auto entryPoint = getUTF8(runtime, autoReleasePool, obj.getProperty(runtime, "entryPoint"));
     auto constants = makeWGPUConstantEntries(runtime, autoReleasePool, obj);
     WGPUVertexState state = {
-        .module = vertexModule->_value,
+        .module = vertexModule->getValue(),
         .entryPoint = entryPoint->data(),
         .constants = constants != nullptr ? constants->data() : NULL,
         .constantCount = constants != nullptr ? constants->size() : 0,
@@ -118,7 +118,7 @@ WGPUFragmentState wgpu::makeGPUFragmentState(Runtime &runtime, AutoReleasePool *
     auto constants = makeWGPUConstantEntries(runtime, autoReleasePool, obj);
 
     return {
-        .module = obj.getPropertyAsObject(runtime, "module").asHostObject<ShaderModuleHostObject>(runtime)->_value,
+        .module = obj.getPropertyAsObject(runtime, "module").asHostObject<ShaderModuleHostObject>(runtime)->getValue(),
         .entryPoint = entryPoint->data(),
         .targets = sharedTargets->data(),
         .targetCount = sharedTargets->size(),
@@ -132,7 +132,7 @@ WGPUProgrammableStageDescriptor wgpu::makeWGPUProgrammableStageDescriptor(Runtim
     auto entryPoint = getUTF8(runtime, autoReleasePool, obj.getProperty(runtime, "entryPoint"));
     auto constants = makeWGPUConstantEntries(runtime, autoReleasePool, obj);
     return {
-        .module = vertexModule->_value,
+        .module = vertexModule->getValue(),
         .entryPoint = entryPoint->data(),
         .constants = constants != nullptr ? constants->data() : NULL,
         .constantCount = constants != nullptr ? constants->size() : 0,
@@ -159,15 +159,15 @@ WGPUExtent3D wgpu::makeGPUExtent3D(Runtime &runtime, Object obj) {
 
 void wgpu::makeWGPUBindingResource(Runtime &runtime, Value value, WGPUBindGroupEntry *entry) {
     if (value.isObject() && value.asObject(runtime).isHostObject<SamplerHostObject>(runtime)) {
-        entry->sampler = value.asObject(runtime).asHostObject<SamplerHostObject>(runtime)->_value;
+        entry->sampler = value.asObject(runtime).asHostObject<SamplerHostObject>(runtime)->getValue();
     } else if (value.isObject() && value.asObject(runtime).isHostObject<TextureViewHostObject>(runtime)) {
-        entry->textureView = value.asObject(runtime).asHostObject<TextureViewHostObject>(runtime)->_value;
+        entry->textureView = value.asObject(runtime).asHostObject<TextureViewHostObject>(runtime)->getValue();
     } else if (value.isObject() && value.asObject(runtime).hasProperty(runtime, "buffer")) {
         auto obj = value.asObject(runtime);
         auto buffer = WGPU_HOST_OBJ(obj, buffer, BufferHostObject);
-        entry->buffer = buffer->_value;
+        entry->buffer = buffer->getValue();
         entry->offset = WGPU_NUMBER_OPT(obj, offset, size_t, 0);
-        entry->size = WGPU_NUMBER_OPT(obj, size, size_t, wgpuBufferGetSize(buffer->_value) - entry->offset);
+        entry->size = WGPU_NUMBER_OPT(obj, size, size_t, wgpuBufferGetSize(buffer->getValue()) - entry->offset);
     } else {
         // TODO: GPUExternalTexture
         throw JSError(runtime, "GPUExternalTexture is not supported");
@@ -203,7 +203,7 @@ WGPUColor wgpu::makeWGPUColorFromProp(Runtime &runtime, Object &obj, const char 
 }
 
 WGPUImageCopyTexture wgpu::makeWGPUImageCopyTexture(Runtime &runtime, Object obj) {
-    auto textureIn = WGPU_HOST_OBJ(obj, texture, TextureHostObject)->_value;
+    auto textureIn = WGPU_HOST_OBJ(obj, texture, TextureHostObject)->getValue();
     auto textureOut = makeDefaultImageCopyTexture(textureIn);
     if (obj.hasProperty(runtime, "origin")) {
         textureOut.origin = makeWGPUOrigin3D(runtime, obj.getPropertyAsObject(runtime, "origin"));
@@ -280,7 +280,7 @@ Value wgpu::makeJsiFeatures(Runtime &runtime, std::vector<WGPUFeatureName> *feat
 // TODO: figure out defaults https://www.w3.org/TR/webgpu/#timestamp
 WGPUComputePassTimestampWrites wgpu::makeWGPUComputePassTimestampWrites(Runtime &runtime, Object obj) {
     return {
-        .querySet = WGPU_HOST_OBJ(obj, querySet, QuerySetHostObject)->_value,
+        .querySet = WGPU_HOST_OBJ(obj, querySet, QuerySetHostObject)->getValue(),
         .beginningOfPassWriteIndex = WGPU_NUMBER(obj, beginningOfPassWriteIndex, uint32_t),
         .endOfPassWriteIndex = WGPU_NUMBER(obj, endOfPassWriteIndex, uint32_t),
     };
@@ -289,7 +289,7 @@ WGPUComputePassTimestampWrites wgpu::makeWGPUComputePassTimestampWrites(Runtime 
 // TODO: figure out defaults https://www.w3.org/TR/webgpu/#timestamp
 WGPURenderPassTimestampWrites wgpu::makeWGPURenderPassTimestampWrites(Runtime &runtime, Object obj) {
     return {
-        .querySet = WGPU_HOST_OBJ(obj, querySet, QuerySetHostObject)->_value,
+        .querySet = WGPU_HOST_OBJ(obj, querySet, QuerySetHostObject)->getValue(),
         .beginningOfPassWriteIndex = WGPU_NUMBER(obj, beginningOfPassWriteIndex, uint32_t),
         .endOfPassWriteIndex = WGPU_NUMBER(obj, endOfPassWriteIndex, uint32_t),
     };

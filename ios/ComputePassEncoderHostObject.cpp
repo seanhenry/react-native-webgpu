@@ -13,7 +13,7 @@ Value ComputePassEncoderHostObject::get(Runtime &runtime, const PropNameID &prop
     if (name == "setPipeline") {
         return WGPU_FUNC_FROM_HOST_FUNC(setPipeline, 1, [this]) {
             auto pipeline = arguments[0].asObject(runtime).asHostObject<ComputePipelineHostObject>(runtime);
-            wgpuComputePassEncoderSetPipeline(_value, pipeline->_value);
+            wgpuComputePassEncoderSetPipeline(_value, pipeline->getValue());
             return Value::undefined();
         });
     }
@@ -25,7 +25,7 @@ Value ComputePassEncoderHostObject::get(Runtime &runtime, const PropNameID &prop
             WGPUBindGroup bindGroup = NULL;
             if (arguments[1].isObject()) {
                 auto groupIn = arguments[1].asObject(runtime).asHostObject<BindGroupHostObject>(runtime);
-                bindGroup = groupIn->_value;
+                bindGroup = groupIn->getValue();
             }
             wgpuComputePassEncoderSetBindGroup(_value, index, bindGroup, 0, NULL);
             return Value::undefined();

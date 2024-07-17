@@ -5,8 +5,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface WGPUWebGPUView : UIView
 
-@property (nonatomic, copy) RCTBubblingEventBlock onInit;
-@property (nonatomic, copy) NSString *identifier;
+@property (nonatomic, copy) RCTBubblingEventBlock onCreateSurface;
+@property (nonatomic, copy) NSString *uuid;
 - (CAMetalLayer *)metalLayer;
 
 @end

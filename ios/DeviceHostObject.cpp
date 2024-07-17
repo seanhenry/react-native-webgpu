@@ -37,7 +37,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
 
             WGPURenderPipelineDescriptor descriptor = {
                 .label = label.data(),
-                .layout = options.hasProperty(runtime, "layout") && options.getProperty(runtime, "layout").isObject() ? WGPU_HOST_OBJ(options, layout, PipelineLayoutHostObject)->_value : NULL,
+                .layout = options.hasProperty(runtime, "layout") && options.getProperty(runtime, "layout").isObject() ? WGPU_HOST_OBJ(options, layout, PipelineLayoutHostObject)->getValue() : NULL,
                 .vertex = vertex,
                 .primitive = NULL,
                 .depthStencil = NULL,
@@ -67,9 +67,9 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
             }
             descriptor.multisample = multisample;
 
-            auto pipeline = wgpuDeviceCreateRenderPipeline(_value, &descriptor);
+            auto pipeline = wgpuDeviceCreateRenderPipeline(getValue(), &descriptor);
 
-            return Object::createFromHostObject(runtime, std::make_shared<RenderPipelineHostObject>(pipeline, _context, label));
+            return Object::createFromHostObject(runtime, std::make_shared<RenderPipelineHostObject>(pipeline, _context, std::move(label)));
         });
     }
 
@@ -81,11 +81,11 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
             WGPUComputePipelineDescriptor descriptor = {
                 .label = label.data(),
                 .compute = makeWGPUProgrammableStageDescriptor(runtime, &autoReleasePool, WGPU_OBJ(options, compute)),
-                .layout = options.hasProperty(runtime, "layout") && options.getProperty(runtime, "layout").isObject() ? WGPU_HOST_OBJ(options, layout, PipelineLayoutHostObject)->_value : NULL,
+                .layout = options.hasProperty(runtime, "layout") && options.getProperty(runtime, "layout").isObject() ? WGPU_HOST_OBJ(options, layout, PipelineLayoutHostObject)->getValue() : NULL,
                 .nextInChain = NULL,
             };
-            auto pipeline = wgpuDeviceCreateComputePipeline(_value, &descriptor);
-            return Object::createFromHostObject(runtime, std::make_shared<ComputePipelineHostObject>(pipeline, _context, label));
+            auto pipeline = wgpuDeviceCreateComputePipeline(getValue(), &descriptor);
+            return Object::createFromHostObject(runtime, std::make_shared<ComputePipelineHostObject>(pipeline, _context, std::move(label)));
         });
     }
 
@@ -108,8 +108,8 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
             };
             descriptor.nextInChain = (const WGPUChainedStruct *)&desc;
 
-            auto shader = wgpuDeviceCreateShaderModule(_value, &descriptor);
-            return Object::createFromHostObject(runtime, std::make_shared<ShaderModuleHostObject>(shader, _context, label));
+            auto shader = wgpuDeviceCreateShaderModule(getValue(), &descriptor);
+            return Object::createFromHostObject(runtime, std::make_shared<ShaderModuleHostObject>(shader, _context, std::move(label)));
         });
     }
 
@@ -123,13 +123,13 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
                 .label = label.data(),
                 .nextInChain = NULL,
             };
-            auto command_encoder = wgpuDeviceCreateCommandEncoder(_value, &descriptor);
-            return Object::createFromHostObject(runtime, std::make_shared<CommandEncoderHostObject>(command_encoder, _context, label));
+            auto command_encoder = wgpuDeviceCreateCommandEncoder(getValue(), &descriptor);
+            return Object::createFromHostObject(runtime, std::make_shared<CommandEncoderHostObject>(command_encoder, _context, std::move(label)));
         });
     }
 
     if (name == "queue") {
-        auto queue = wgpuDeviceGetQueue(_value);
+        auto queue = wgpuDeviceGetQueue(getValue());
         return Object::createFromHostObject(runtime, std::make_shared<QueueHostObject>(queue, _context));
     }
 
@@ -143,8 +143,8 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
                 .size = (uint64_t)desc.getProperty(runtime, "size").asNumber(),
                 .usage = (WGPUBufferUsageFlags)desc.getProperty(runtime, "usage").asNumber(),
             };
-            auto buffer = wgpuDeviceCreateBuffer(_value, &descriptor);
-            return Object::createFromHostObject(runtime, std::make_shared<BufferHostObject>(buffer, _context, label));
+            auto buffer = wgpuDeviceCreateBuffer(getValue(), &descriptor);
+            return Object::createFromHostObject(runtime, std::make_shared<BufferHostObject>(buffer, _context, std::move(label)));
         });
     }
 
@@ -160,8 +160,8 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
             descriptor.usage = WGPU_NUMBER(desc, usage, WGPUTextureUsageFlags);
             descriptor.sampleCount = WGPU_NUMBER_OPT(desc, sampleCount, uint32_t, 1);
             descriptor.dimension = StringToWGPUTextureDimension(dimension.data());
-            auto texture = wgpuDeviceCreateTexture(_value, &descriptor);
-            return Object::createFromHostObject(runtime, std::make_shared<TextureHostObject>(texture, _context, label));
+            auto texture = wgpuDeviceCreateTexture(getValue(), &descriptor);
+            return Object::createFromHostObject(runtime, std::make_shared<TextureHostObject>(texture, _context, std::move(label)));
         });
     }
 
@@ -184,13 +184,13 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
             auto label = WGPU_UTF8_OPT(desc, label, "");
             WGPUBindGroupDescriptor descriptor = {
                 .label = label.data(),
-                .layout = layout->_value,
+                .layout = layout->getValue(),
                 .entries = entries.data(),
                 .entryCount = entries.size(),
             };
 
-            auto bindGroup = wgpuDeviceCreateBindGroup(_value, &descriptor);
-            return Object::createFromHostObject(runtime, std::make_shared<BindGroupHostObject>(bindGroup, _context, label));
+            auto bindGroup = wgpuDeviceCreateBindGroup(getValue(), &descriptor);
+            return Object::createFromHostObject(runtime, std::make_shared<BindGroupHostObject>(bindGroup, _context, std::move(label)));
         });
     }
 
@@ -207,8 +207,8 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
                 descriptor.magFilter = StringToWGPUFilterMode(magFilter.data());
                 descriptor.minFilter = StringToWGPUFilterMode(minFilter.data());
             }
-            auto sampler = wgpuDeviceCreateSampler(_value, &descriptor);
-            return Object::createFromHostObject(runtime, std::make_shared<SamplerHostObject>(sampler, _context, label));
+            auto sampler = wgpuDeviceCreateSampler(getValue(), &descriptor);
+            return Object::createFromHostObject(runtime, std::make_shared<SamplerHostObject>(sampler, _context, std::move(label)));
         });
     }
 
@@ -239,8 +239,8 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
                 .entries = entries.data(),
                 .entryCount = entries.size(),
             };
-            auto layout = wgpuDeviceCreateBindGroupLayout(_value, &descriptor);
-            return Object::createFromHostObject(runtime, std::make_shared<BindGroupLayoutHostObject>(layout, _context, label));
+            auto layout = wgpuDeviceCreateBindGroupLayout(getValue(), &descriptor);
+            return Object::createFromHostObject(runtime, std::make_shared<BindGroupLayoutHostObject>(layout, _context, std::move(label)));
         });
     }
 
@@ -248,7 +248,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         return WGPU_FUNC_FROM_HOST_FUNC(createPipelineLayout, 1, [this]) {
             auto desc = arguments[0].asObject(runtime);
             auto layouts = jsiArrayToVector<WGPUBindGroupLayout>(runtime, WGPU_ARRAY(desc, bindGroupLayouts), [](Runtime &runtime, Value value) {
-                return value.asObject(runtime).asHostObject<BindGroupLayoutHostObject>(runtime)->_value;
+                return value.asObject(runtime).asHostObject<BindGroupLayoutHostObject>(runtime)->getValue();
             });
             auto label = WGPU_UTF8_OPT(desc, label, "");
             WGPUPipelineLayoutDescriptor descriptor = {
@@ -257,22 +257,22 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
                 .bindGroupLayoutCount = layouts.size(),
                 .nextInChain = NULL,
             };
-            auto layout = wgpuDeviceCreatePipelineLayout(_value, &descriptor);
-            return Object::createFromHostObject(runtime, std::make_shared<PipelineLayoutHostObject>(layout, _context, label));
+            auto layout = wgpuDeviceCreatePipelineLayout(getValue(), &descriptor);
+            return Object::createFromHostObject(runtime, std::make_shared<PipelineLayoutHostObject>(layout, _context, std::move(label)));
         });
     }
 
     if (name == "features") {
-        auto size = wgpuDeviceEnumerateFeatures(_value, NULL);
+        auto size = wgpuDeviceEnumerateFeatures(getValue(), NULL);
         std::vector<WGPUFeatureName> features;
         features.resize(size);
-        wgpuDeviceEnumerateFeatures(_value, features.data());
+        wgpuDeviceEnumerateFeatures(getValue(), features.data());
         return makeJsiFeatures(runtime, &features);
     }
 
     if (name == "limits") {
         WGPUSupportedLimits limits = {0};
-        wgpuDeviceGetLimits(_value, &limits);
+        wgpuDeviceGetLimits(getValue(), &limits);
         return makeJsiLimits(runtime, &limits.limits);
     }
 
@@ -287,8 +287,8 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
                 .count = WGPU_NUMBER(desc, count, uint32_t),
                 .nextInChain = NULL,
             };
-            auto querySet = wgpuDeviceCreateQuerySet(_value, &descriptor);
-            return Object::createFromHostObject(runtime, std::make_shared<QuerySetHostObject>(querySet, _context, std::move(label)));
+            auto querySet = wgpuDeviceCreateQuerySet(getValue(), &descriptor);
+            return Object::createFromHostObject(runtime, std::make_shared<QuerySetHostObject>(querySet, _context, std::move(std::move(label))));
         });
     }
 

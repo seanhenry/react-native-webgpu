@@ -17,20 +17,17 @@ import React from 'react';
 import { globalStyles } from '../../../Components/globalStyles';
 
 export const TexturedCube = () => {
-  const onInit: WebGpuViewProps['onInit'] = async ({ context, timer }) => {
-    const {requestAnimationFrame} = timer;
-    const {navigator, createImageBitmap} = global.webGPU;
-    const adapter = await navigator.gpu.requestAdapter({context});
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame, createImageBitmap }) => {
+    const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter!.requestDevice();
 
-    const {alphaModes} = context.surfaceCapabilities;
     const {width, height} = context;
-    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(adapter!);
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: alphaModes[0],
+      alphaMode: "premultiplied",
     });
 
     // Create a vertex buffer from the cube data.
@@ -232,7 +229,7 @@ export const TexturedCube = () => {
   }
   return (
     <CenterSquare>
-      <WebGpuView identifier="TexturedCube" onInit={onInit} style={globalStyles.fill} />
+      <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
     </CenterSquare>
   )
 }

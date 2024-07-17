@@ -14,15 +14,9 @@ const LINKING_ERROR =
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n';
 
+export type OnCreateSurfaceEvent = NativeSyntheticEvent<{ uuid: string } | {error: string}>;
 export type WGPUWebGPUViewProps = ViewProps & {
-  /**
-   * Called on the native UI thread to configure the device and pipeline
-   */
-  onInit(props: NativeSyntheticEvent<{identifier: string}>): void,
-  /**
-   * Used to identify the view with the graphics context.
-   */
-  identifier: string
+  onCreateSurface(event: OnCreateSurfaceEvent): void;
 }
 
 export const WGPUWebGPUView = requireNativeComponent<WGPUWebGPUViewProps>('WGPUWebGPUView')
@@ -40,14 +34,12 @@ if (!webGpuJsi.install()) {
   throw new Error("Failed to install JSI");
 }
 
-const globalObj = (globalThis as any).__webGPUNative;
-
 function createImageBitmap(source: ImageSourcePropType) {
   const resolvedSource = Image.resolveAssetSource(source)
-  return globalObj.__createImageBitmap(resolvedSource);
+  return __reactNativeWebGPU.createImageBitmap(resolvedSource);
 }
 
-globalThis.webGPU = new Proxy(globalObj, {
+globalThis.reactNativeWebGPU = new Proxy(__reactNativeWebGPU, {
   get: function(target, prop, receiver) {
     if (prop === 'createImageBitmap') {
       return createImageBitmap;

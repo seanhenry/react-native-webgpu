@@ -1,13 +1,18 @@
 #include "BufferHostObject.h"
 #include "WGPUJsiUtils.h"
 #include "WGPUContext.h"
+#include "JSIInstance.h"
 #include <boost/format.hpp>
 #include <thread>
 
 using namespace facebook::jsi;
 using namespace wgpu;
 
-static void handle_map_async(WGPUBufferMapAsyncStatus status, void *userdata);
+static void wgpuHandleMapAsync(WGPUBufferMapAsyncStatus status, void *userdata);
+typedef struct HandleMapAsyncData {
+    volatile bool *isReady;
+    std::shared_ptr<WGPUContext> context;
+} HandleMapAsyncData;
 
 Value BufferHostObject::get(Runtime &runtime, const PropNameID &propName) {
     auto name = propName.utf8(runtime);
@@ -30,18 +35,21 @@ Value BufferHostObject::get(Runtime &runtime, const PropNameID &propName) {
 
     if (name == "mapAsync") {
         return WGPU_FUNC_FROM_HOST_FUNC(mapAsync, 3, [this]) {
-            auto buffer = _value;
-            auto device = _context->_device;
             WGPUMapModeFlags mode = (WGPUMapModeFlags)arguments[0].asNumber();
             uint64_t offset = count > 1 ? (uint64_t)arguments[1].asNumber() : 0;
             uint64_t size = count > 2 ? (uint64_t)arguments[2].asNumber() : (wgpuBufferGetSize(_value) - offset);
-            return makePromise(runtime, _context, [buffer, mode, offset, size, device](Promise *promise) {
-                auto thread = std::thread([buffer, mode, offset, size, device, promise]() {
-                    bool isReady = false;
-                    promise->userData = &isReady;
-                    wgpuBufferMapAsync(buffer, mode, offset, size, handle_map_async, promise);
+
+            auto promise = new Promise<HandleMapAsyncData>(runtime);
+            return promise->jsPromise([this, mode, offset, size, promise]() {
+                auto thread = std::thread([this, mode, offset, size, promise]() {
+                    volatile bool isReady = false;
+                    promise->data = {
+                        .isReady = &isReady,
+                        .context = _context,
+                    };
+                    wgpuBufferMapAsync(_value, mode, offset, size, wgpuHandleMapAsync, promise);
                     while (!isReady) {
-                        wgpuDevicePoll(device, true, NULL);
+                        _context->poll(true);
                     }
                 });
                 thread.detach();
@@ -83,19 +91,17 @@ static std::string mapAsyncStatusToString(WGPUBufferMapAsyncStatus status) {
     }
 }
 
-static void handle_map_async(WGPUBufferMapAsyncStatus status, void *userdata) {
-    auto promise = (Promise *)userdata;
-    auto isReady = (bool *)promise->userData;
-    *isReady = true;
-    promise->context->runOnJsThread([status, promise]() {
+static void wgpuHandleMapAsync(WGPUBufferMapAsyncStatus status, void *userdata) {
+    auto promise = (Promise<HandleMapAsyncData> *)userdata;
+    *promise->data.isReady = true;
+    JSIInstance::instance->jsThread->run([status, promise]() {
         if (status == WGPUBufferMapAsyncStatus_Success) {
-            promise->resolve->call(promise->runtime, Value::undefined());
+            promise->resolve(Value::undefined());
         } else {
             auto messageFmt = boost::format("GPUBuffer.mapAsync error: %s") % mapAsyncStatusToString(status);
             auto error = makeJSError(promise->runtime, messageFmt.str());
-            promise->reject->call(promise->runtime, std::move(error));
+            promise->reject(std::move(error));
         }
-        promise->runtime.drainMicrotasks();
         delete promise;
     });
 }

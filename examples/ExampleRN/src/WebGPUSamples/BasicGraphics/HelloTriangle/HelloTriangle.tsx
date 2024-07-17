@@ -8,20 +8,16 @@ import { globalStyles } from '../../../Components/globalStyles';
 
 export function HelloTriangle() {
 
-  const onInit: WebGpuViewProps['onInit'] = async ({context, timer}) => {
-    const { requestAnimationFrame } = timer;
-    const { navigator } = global.webGPU;
-
-    const adapter = await navigator.gpu.requestAdapter({ context });
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({context, navigator, requestAnimationFrame}) => {
+    const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter!.requestDevice();
 
-    const { alphaModes } = context.surfaceCapabilities;
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
-    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(adapter!);
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: alphaModes[0],
+      alphaMode: "premultiplied",
     });
 
     const pipeline = device.createRenderPipeline({
@@ -81,7 +77,7 @@ export function HelloTriangle() {
 
   return (
     <CenterSquare>
-      <WebGpuView identifier="HwlloTriangle" onInit={onInit} style={globalStyles.fill} />
+      <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
     </CenterSquare>
   );
 }

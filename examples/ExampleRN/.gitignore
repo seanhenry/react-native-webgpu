@@ -166,3 +166,4 @@ vendor/
 /.idea
 /ios/Pods
 /ios/build
+/android/app/build

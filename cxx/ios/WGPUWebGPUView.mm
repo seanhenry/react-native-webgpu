@@ -82,7 +82,6 @@ typedef struct SurfaceObjCWrapper {
         }
         std::string uuidStr = [strongSelf.uuid cStringUsingEncoding:NSUTF8StringEncoding];
         JSIInstance::instance->onCreateSurface(std::move(uuidStr), managedSurface);
-        managedSurface->createTimer();
         strongSelf.onCreateSurface(@{ @"uuid": strongSelf.uuid });
     });
 }

@@ -5,7 +5,7 @@
 #include "ConstantConversion.h"
 #include "WGPUConversions.h"
 #include <stdio.h>
-#include <boost/format.hpp>
+#include <sstream>
 
 using namespace facebook::jsi;
 using namespace wgpu;
@@ -86,8 +86,9 @@ static void wgpuHandleRequestDevice(WGPURequestDeviceStatus status, WGPUDevice d
         auto deviceHostObject = Object::createFromHostObject(runtime, std::make_shared<DeviceHostObject>(deviceWrapper, context));
         promise->resolve(std::move(deviceHostObject));
     } else {
-        auto error = boost::format("[%s] %#.8x %s") % __FILE_NAME__ % status % message;
-        promise->reject(String::createFromUtf8(runtime, error.str()));
+        std::ostringstream ss;
+        ss << __FILE__ << ":" << __LINE__ << " Adapter.requestDevice() failed with status " << status << ". " << message;
+        promise->reject(String::createFromUtf8(runtime, ss.str()));
     }
     delete promise;
 }

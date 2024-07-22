@@ -1,5 +1,6 @@
 #include "ConstantConversion.h"
 #include "WGPUJsiUtils.h"
+#include <unordered_map>
 
 const char* WGPUTextureFormatToString(WGPUTextureFormat format) {
     static std::unordered_map<WGPUTextureFormat, const char *> map;

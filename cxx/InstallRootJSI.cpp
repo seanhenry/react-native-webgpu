@@ -1,56 +1,28 @@
-#import "WGPUJsi.h"
-#import "React/RCTBridge+Private.h"
-#import "webgpu.h"
-#import <jsi/jsi.h>
-#import "WGPUJsiUtils.h"
-#import "AdapterHostObject.h"
-#import <boost/format.hpp>
-#import "ConstantConversion.h"
-#import <React-callinvoker/ReactCommon/CallInvoker.h>
-#include "JSIInstance.h"
+#include "InstallRootJSI.h"
+#include "WGPUJsiUtils.h"
+#include "Surface.h"
+#include "ContextHostObject.h"
+#include "AdapterHostObject.h"
 #include "CreateImageBitmap.h"
+#include "ConstantConversion.h"
+#include <sstream>
 
-using namespace facebook::react;
 using namespace facebook::jsi;
-using namespace wgpu;
 
 static void wgpuHandleRequestAdapter(WGPURequestAdapterStatus status, WGPUAdapter adapter, char const *message, void *userdata);
 typedef struct HandleRequestAdapterData {
     std::shared_ptr<Surface> optionalSurface;
 } HandleRequestAdapterData;
 
-@interface RCTBridge ()
-- (std::shared_ptr<CallInvoker>)jsCallInvoker;
-@end
-
-@implementation WGPUJsi
-
-RCT_EXPORT_MODULE(WGPUJsi)
-
-@synthesize bridge;
-
-RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
-    RCTCxxBridge *cxxBridge = (RCTCxxBridge*)self.bridge;
-    if (cxxBridge == nil) {
-        NSLog(@"Cxx bridge not found");
-        return @(NO);
-    }
-
-    auto &runtime = *(Runtime *)cxxBridge.runtime;
-
-    auto surfaces = std::make_shared<std::unordered_map<std::string, std::shared_ptr<Surface>>>();
-    JSIInstance::instance = std::make_unique<JSIInstance>(runtime, std::make_shared<Thread>([cxxBridge jsCallInvoker]));
-    JSIInstance::instance->onCreateSurface = [surfaces](std::string uuid, std::shared_ptr<Surface> surface) {
-        surfaces->insert_or_assign(uuid, surface);
-    };
-
-    auto getSurfaceBackedWebGPU = WGPU_FUNC_FROM_HOST_FUNC(getWebGPUForSurface, 1, [surfaces]) {
+void wgpu::installRootJSI(Runtime &runtime, const std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<Surface>>>& newSurfaces) {
+    auto getSurfaceBackedWebGPU = WGPU_FUNC_FROM_HOST_FUNC(getWebGPUForSurface, 1, [newSurfaces]) {
         auto uuid = arguments[0].asString(runtime).utf8(runtime);
-        auto surfaceHandle = surfaces->extract(uuid);
+        auto surfaceHandle = newSurfaces->extract(uuid);
         if (surfaceHandle.empty()) {
             throw JSError(runtime, "getWebGPUForSurface failed to find surface");
         }
         auto surface = std::move(surfaceHandle.mapped());
+        (*JSIInstance::instance->weakSurfaces)[uuid] = surface;
 
         auto result = Object(runtime);
 
@@ -68,11 +40,11 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
                     .optionalSurface = surface,
                 };
                 WGPURequestAdapterOptions adapterOptions = {
+                    .nextInChain = nullptr,
                     .compatibleSurface = surface->getWGPUSurface(),
-                    .backendType = WGPUBackendType_Undefined,
                     .powerPreference = WGPUPowerPreference_Undefined,
+                    .backendType = WGPUBackendType_Undefined,
                     .forceFallbackAdapter = false,
-                    .nextInChain = NULL,
                 };
 
                 wgpuInstanceRequestAdapter(surface->getWGPUInstance(), &adapterOptions, wgpuHandleRequestAdapter, promise);
@@ -113,11 +85,11 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
                 }
 
                 WGPURequestAdapterOptions adapterOptions = {
-                    .compatibleSurface = NULL,
-                    .backendType = WGPUBackendType_Undefined,
+                    .nextInChain = nullptr,
+                    .compatibleSurface = nullptr,
                     .powerPreference = WGPUPowerPreference_Undefined,
+                    .backendType = WGPUBackendType_Undefined,
                     .forceFallbackAdapter = false,
-                    .nextInChain = NULL,
                 };
 
                 wgpuInstanceRequestAdapter(instance, &adapterOptions, wgpuHandleRequestAdapter, promise);
@@ -137,11 +109,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
     webgpu.setProperty(runtime, "getHeadlessWebGPU", std::move(getHeadlessWebGPU));
 
     runtime.global().setProperty(runtime, "__reactNativeWebGPU", std::move(webgpu));
-
-    return @(YES);
 }
-
-@end
 
 static void wgpuHandleRequestAdapter(WGPURequestAdapterStatus status, WGPUAdapter adapter, char const *message, void *userdata) {
     auto promise = (Promise<HandleRequestAdapterData> *)userdata;
@@ -155,8 +123,9 @@ static void wgpuHandleRequestAdapter(WGPURequestAdapterStatus status, WGPUAdapte
         auto adapterHostObject = Object::createFromHostObject(runtime, std::make_shared<AdapterHostObject>(adapterWrapper));
         promise->resolve(std::move(adapterHostObject));
     } else {
-        auto error = boost::format("[%s] %#.8x %s") % __FILE_NAME__ % status % message;
-        promise->reject(String::createFromUtf8(runtime, error.str()));
+        std::ostringstream ss;
+        ss << __FILE__ << ":" << __LINE__ << " navigator.gpu.requestAdapter() failed with status " << status << ". " << message;
+        promise->reject(String::createFromUtf8(runtime, ss.str()));
     }
     delete promise;
 }

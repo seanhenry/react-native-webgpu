@@ -39,7 +39,7 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
             wgpuSurfaceGetCapabilities(_surface->getWGPUSurface(), device->getAdapter(), &capabilities);
 
             if (capabilities.alphaModeCount == 0) {
-                throw makeJSError(runtime, "Surface had 0 alpha modes");
+                throw JSError(runtime, "Surface had 0 alpha modes");
             }
 
             auto isAlphaModeValid = cArrayContains(capabilities.alphaModes, capabilities.alphaModeCount, alphaMode);
@@ -56,18 +56,19 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
             }
 
             WGPUSurfaceConfiguration config = {
-              .width = width,
-              .height = height,
               .device = device->getValue(),
               .format = StringToWGPUTextureFormat(format),
               .usage = WGPU_NUMBER_OPT(options, usage, WGPUTextureUsage, WGPUTextureUsage_RenderAttachment),
-              .presentMode = WGPUPresentMode_Fifo, // TODO:
-//              .viewFormats = {},
-//              .viewFormatCount = 0,
+              .viewFormatCount = 0,
+              .viewFormats = nullptr,
               .alphaMode = alphaMode,
+              .width = width,
+              .height = height,
+              .presentMode = WGPUPresentMode_Fifo, // TODO:
             };
             wgpuSurfaceConfigure(_surface->getWGPUSurface(), &config);
             _configuredContext = device->getContext();
+            _surface->createTimer();
 
             return Value::undefined();
         });
@@ -75,6 +76,7 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
 
     if (name == "unconfigure") {
         return WGPU_FUNC_FROM_HOST_FUNC(unconfigure, 0, [this]) {
+            _surface->invalidateTimer();
             wgpuSurfaceUnconfigure(_surface->getWGPUSurface());
             _configuredContext = nullptr;
             return Value::undefined();
@@ -109,7 +111,7 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
     if (name == "getCurrentTexture") {
         return WGPU_FUNC_FROM_HOST_FUNC(getCurrentTexture, 0, [this]) {
             if (_configuredContext == nullptr) {
-                throw makeJSError(runtime, "Call context.configure() before context.getCurrentTexture()");
+                throw JSError(runtime, "Call context.configure() before context.getCurrentTexture()");
             }
             WGPUSurfaceTexture texture;
             wgpuSurfaceGetCurrentTexture(_surface->getWGPUSurface(), &texture);

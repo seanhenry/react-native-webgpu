@@ -29,24 +29,24 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
                 auto storeOp = WGPU_UTF8(attachment, storeOp);
                 return (const WGPURenderPassColorAttachment){
                     .view = WGPU_HOST_OBJ(attachment, view, TextureViewHostObject)->getValue(),
+                    .depthSlice = WGPU_DEPTH_SLICE_UNDEFINED,
+                    .resolveTarget = WGPU_HOST_OBJ_VALUE_OPT(attachment, resolveTarget, TextureViewHostObject, NULL),
                     .loadOp = StringToWGPULoadOp(loadOp.data()),
                     .storeOp = StringToWGPUStoreOp(storeOp.data()),
-                    .depthSlice = WGPU_DEPTH_SLICE_UNDEFINED,
                     .clearValue = makeWGPUColorFromProp(runtime, attachment, "clearValue"),
-                    .resolveTarget = WGPU_HOST_OBJ_VALUE_OPT(attachment, resolveTarget, TextureViewHostObject, NULL),
                 };
             });
 
             auto label = WGPU_UTF8_OPT(desc, label, "");
 
             WGPURenderPassDescriptor descriptor = {
+                .nextInChain = nullptr,
                 .label = label.data(),
                 .colorAttachmentCount = colorAttachments.size(),
                 .colorAttachments = colorAttachments.data(),
-                .depthStencilAttachment = NULL,
-                .nextInChain = NULL,
-                .occlusionQuerySet = NULL,
-                .timestampWrites = NULL,
+                .depthStencilAttachment = nullptr,
+                .occlusionQuerySet = nullptr,
+                .timestampWrites = nullptr,
             };
 
             WGPURenderPassDepthStencilAttachment depthStencilAttachment = {0};
@@ -83,8 +83,8 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
                 label = WGPU_UTF8_OPT(arguments[0].asObject(runtime), label, "");
             }
             WGPUCommandBufferDescriptor descriptor = {
+                .nextInChain = nullptr,
                 .label = label.data(),
-                .nextInChain = NULL,
             };
             WGPUCommandBuffer buffer = wgpuCommandEncoderFinish(_value, &descriptor);
             return Object::createFromHostObject(runtime, std::make_shared<CommandBufferHostObject>(buffer, _context, std::move(label)));
@@ -109,9 +109,9 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
             std::string label;
             WGPUComputePassTimestampWrites timestampWrites;
             WGPUComputePassDescriptor descriptor = {
-                .label = NULL,
-                .nextInChain = NULL,
-                .timestampWrites = NULL,
+                .nextInChain = nullptr,
+                .label = nullptr,
+                .timestampWrites = nullptr,
             };
             if (count > 0) {
                 auto desc = arguments[0].asObject(runtime);

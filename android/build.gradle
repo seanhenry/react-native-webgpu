@@ -1,3 +1,5 @@
+import java.nio.file.Paths
+
 buildscript {
   // Buildscript is evaluated before everything else so we can't use getExtOrDefault
   def kotlin_version = rootProject.ext.has("kotlinVersion") ? rootProject.ext.get("kotlinVersion") : project.properties["Webgpu_kotlinVersion"]
@@ -47,6 +49,29 @@ def supportsNamespace() {
   return (major == 7 && minor >= 3) || major >= 8
 }
 
+static def findNodeModules(baseDir) {
+  def basePath = baseDir.toPath().normalize()
+  // Node's module resolution algorithm searches up to the root directory,
+  // after which the base path will be null
+  while (basePath) {
+    def nodeModulesPath = Paths.get(basePath.toString(), "node_modules")
+    def reactNativePath = Paths.get(nodeModulesPath.toString(), "react-native")
+    if (nodeModulesPath.toFile().exists() && reactNativePath.toFile().exists()) {
+      return nodeModulesPath.toString()
+    }
+    basePath = basePath.getParent()
+  }
+  throw new GradleException("react-native-webgpu: Failed to find node_modules path")
+}
+
+def nodeModules = findNodeModules(projectDir)
+
+tasks.register('deleteCmakeCache') {
+  doFirst {
+    delete "${projectDir}/.cxx"
+  }
+}
+
 android {
   if (supportsNamespace()) {
     namespace "com.webgpu"
@@ -64,6 +89,17 @@ android {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
 
+    externalNativeBuild {
+      cmake {
+        arguments "-DANDROID_STL=c++_shared", "-DANDROID_TOOLCHAIN=clang", "-DNODE_MODULES_DIR=${nodeModules}"
+        abiFilters "armeabi-v7a", "x86", "x86_64", "arm64-v8a"
+      }
+    }
+  }
+
+  buildFeatures {
+    prefab true
+    prefabPublishing true
   }
 
   buildTypes {
@@ -79,6 +115,33 @@ android {
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8
     targetCompatibility JavaVersion.VERSION_1_8
+  }
+
+  externalNativeBuild {
+    cmake {
+      path "CMakeLists.txt"
+    }
+  }
+
+  packagingOptions {
+    // https://developer.android.com/build/releases/past-releases/agp-4-0-0-release-notes#cmake-imported-targets
+    excludes = [
+            "META-INF",
+            "META-INF/**",
+            "**/libc++_shared.so",
+            "**/libfbjni.so",
+            "**/libjsi.so",
+            "**/libfolly_json.so",
+            "**/libfolly_runtime.so",
+            "**/libglog.so",
+            "**/libhermes.so",
+            "**/libhermes-executor-debug.so",
+            "**/libhermes_executor.so",
+            "**/libreactnativejni.so",
+            "**/libturbomodulejsijni.so",
+            "**/libreact_nativemodule_core.so",
+            "**/libjscexecutor.so",
+    ]
   }
 }
 
@@ -97,3 +160,9 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
+tasks.configureEach { task ->
+  // C++ clean
+  if (task.name.contains("clean")) {
+    task.dependsOn(deleteCmakeCache)
+  }
+}

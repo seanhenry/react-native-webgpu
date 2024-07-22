@@ -4,7 +4,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { Routes } from './types/navigationTypes';
 import { ExampleScreen } from './Components/ExampleScreen';
+import { Appearance } from 'react-native';
 
+Appearance.setColorScheme('light')
 const Stack = createNativeStackNavigator<Routes>();
 
 export default function App() {

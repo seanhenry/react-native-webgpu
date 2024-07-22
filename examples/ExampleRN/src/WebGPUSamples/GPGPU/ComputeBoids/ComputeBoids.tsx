@@ -10,9 +10,9 @@ import { StyleSheet, TextInput, View } from 'react-native';
 
 export const ComputeBoids = () => {
   const perfDisplayRef = useRef<TextInput | null>(null)
-  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame }) => {
-    const perfDisplay = perfDisplayRef.current!;
+  const setText = (text: string) => perfDisplayRef.current?.setNativeProps({text})
 
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame }) => {
     const adapter = await navigator.gpu.requestAdapter();
 
     const hasTimestampQuery = adapter!.features.has('timestamp-query');
@@ -20,7 +20,7 @@ export const ComputeBoids = () => {
       requiredFeatures: hasTimestampQuery ? ['timestamp-query'] : [],
     });
 
-    perfDisplay.setNativeProps({text: hasTimestampQuery ? 'Collecting samples...' : 'timestamp-query not supported on this device'});
+    setText(hasTimestampQuery ? 'Collecting samples...' : 'timestamp-query not supported on this device');
 
     const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
@@ -319,10 +319,10 @@ export const ComputeBoids = () => {
             const avgRenderMicroseconds = Math.round(
               renderPassDurationSum / timerSamples / 1000
             );
-            perfDisplay.setNativeProps({text: `\
+            setText(`\
 avg compute pass duration: ${avgComputeMicroseconds}µs
 avg render pass duration:  ${avgRenderMicroseconds}µs
-spare readback buffers:    ${spareResultBuffers.length}`});
+spare readback buffers:    ${spareResultBuffers.length}`);
             computePassDurationSum = 0;
             renderPassDurationSum = 0;
             timerSamples = 0;

@@ -2,7 +2,6 @@
 #include "WGPUJsiUtils.h"
 #include "WGPUContext.h"
 #include "JSIInstance.h"
-#include <boost/format.hpp>
 #include <thread>
 
 using namespace facebook::jsi;
@@ -98,8 +97,8 @@ static void wgpuHandleMapAsync(WGPUBufferMapAsyncStatus status, void *userdata) 
         if (status == WGPUBufferMapAsyncStatus_Success) {
             promise->resolve(Value::undefined());
         } else {
-            auto messageFmt = boost::format("GPUBuffer.mapAsync error: %s") % mapAsyncStatusToString(status);
-            auto error = makeJSError(promise->runtime, messageFmt.str());
+            auto message = "GPUBuffer.mapAsync error: " + mapAsyncStatusToString(status);
+            auto error = makeJSError(promise->runtime, message);
             promise->reject(std::move(error));
         }
         delete promise;

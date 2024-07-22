@@ -165,3 +165,8 @@ vendor/
 /.yarn
 /.idea
 /bin
+/android/.cxx
+/android/build
+/android/gradle
+/android/gradlew
+/android/gradlew.bat

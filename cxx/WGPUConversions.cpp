@@ -25,7 +25,7 @@ WGPUDepthStencilState wgpu::makeWGPUDepthStencilState(Runtime &runtime, Object o
 }
 
 WGPUPrimitiveState wgpu::makeWGPUPrimitiveState(Runtime &runtime, Object obj) {
-    WGPUPrimitiveState state = {0};
+    WGPUPrimitiveState state = {nullptr};
     auto topology = WGPU_UTF8_OPT(obj, topology, "point-list");
     state.topology = StringToWGPUPrimitiveTopology(topology.data());
     auto cullMode = WGPU_UTF8_OPT(obj, cullMode, "none");
@@ -53,9 +53,9 @@ WGPUVertexBufferLayout wgpu::makeWGPUVertexBufferLayout(Runtime &runtime, AutoRe
 
     return {
         .arrayStride = WGPU_NUMBER(obj, arrayStride, uint64_t),
-        .attributes = sharedAttributes->data(),
-        .attributeCount = attributes.size(),
         .stepMode = StringToWGPUVertexStepMode(stepMode.data()),
+        .attributeCount = attributes.size(),
+        .attributes = sharedAttributes->data(),
     };
 }
 
@@ -83,8 +83,8 @@ WGPUVertexState wgpu::makeGPUVertexState(Runtime &runtime, AutoReleasePool *auto
     WGPUVertexState state = {
         .module = vertexModule->getValue(),
         .entryPoint = entryPoint->data(),
-        .constants = constants != nullptr ? constants->data() : NULL,
         .constantCount = constants != nullptr ? constants->size() : 0,
+        .constants = constants != nullptr ? constants->data() : nullptr,
     };
     if (obj.hasProperty(runtime, "buffers")) {
         auto buffersIn = WGPU_ARRAY(obj, buffers);
@@ -103,7 +103,7 @@ WGPUFragmentState wgpu::makeGPUFragmentState(Runtime &runtime, AutoReleasePool *
     auto targets = jsiArrayToVector<WGPUColorTargetState>(runtime, WGPU_ARRAY(obj, targets), [](Runtime &runtime, Value value) {
         if (value.isNull()) {
             // TODO: handle null state
-            return (const WGPUColorTargetState){0};
+            return (const WGPUColorTargetState){nullptr};
         }
         auto target = value.asObject(runtime);
         auto format = WGPU_UTF8(target, format);
@@ -120,10 +120,10 @@ WGPUFragmentState wgpu::makeGPUFragmentState(Runtime &runtime, AutoReleasePool *
     return {
         .module = obj.getPropertyAsObject(runtime, "module").asHostObject<ShaderModuleHostObject>(runtime)->getValue(),
         .entryPoint = entryPoint->data(),
-        .targets = sharedTargets->data(),
-        .targetCount = sharedTargets->size(),
-        .constants = constants != nullptr ? constants->data() : NULL,
         .constantCount = constants != nullptr ? constants->size() : 0,
+        .constants = constants != nullptr ? constants->data() : nullptr,
+        .targetCount = sharedTargets->size(),
+        .targets = sharedTargets->data(),
     };
 }
 
@@ -134,8 +134,8 @@ WGPUProgrammableStageDescriptor wgpu::makeWGPUProgrammableStageDescriptor(Runtim
     return {
         .module = vertexModule->getValue(),
         .entryPoint = entryPoint->data(),
-        .constants = constants != nullptr ? constants->data() : NULL,
         .constantCount = constants != nullptr ? constants->size() : 0,
+        .constants = constants != nullptr ? constants->data() : nullptr,
     };
 }
 
@@ -270,7 +270,7 @@ Value wgpu::makeJsiFeatures(Runtime &runtime, std::vector<WGPUFeatureName> *feat
     values.reserve(features->size());
     for (WGPUFeatureName featureName : *features) {
         auto name = WGPUFeatureNameToString(featureName);
-        if (name != NULL) {
+        if (name != nullptr) {
             values.emplace_back(String::createFromUtf8(runtime, name));
         }
     }

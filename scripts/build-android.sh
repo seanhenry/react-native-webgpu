@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-cd submodules/wgpu-native
+pushd submodules/wgpu-native
 
 # Taken from https://github.com/gfx-rs/wgpu-native/issues/183 and modified
 
@@ -58,3 +58,16 @@ export CARGO_BUILD_TARGET=i686-linux-android
 
 rustup target add $CARGO_BUILD_TARGET
 cargo build --release
+
+popd
+
+# Move libraries
+mkdir -p \
+  bin/arm64-v8a \
+  bin/armeabi-v7a \
+  bin/x86_64 \
+  bin/x86
+mv submodules/wgpu-native/target/aarch64-linux-android/release/libwgpu_native.a bin/arm64-v8a
+mv submodules/wgpu-native/target/armv7-linux-androideabi/release/libwgpu_native.a bin/armeabi-v7a
+mv submodules/wgpu-native/target/x86_64-linux-android/release/libwgpu_native.a bin/x86_64
+mv submodules/wgpu-native/target/i686-linux-android/release/libwgpu_native.a bin/x86

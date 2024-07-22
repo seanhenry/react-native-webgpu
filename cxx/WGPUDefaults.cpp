@@ -30,15 +30,15 @@ WGPUExtent3D wgpu::makeDefaultWGPUExtent3D() {
 // https://developer.mozilla.org/en-US/docs/Web/API/GPUDevice/createTexture#parameters
 WGPUTextureDescriptor wgpu::makeDefaultWGPUTextureDescriptor(WGPUTextureFormat format) {
     return {
-        .format = format,
-        .label = NULL,
+        .label = nullptr,
+        .usage = 0,
+        .dimension = WGPUTextureDimension_2D,
         .size = makeDefaultWGPUExtent3D(),
+        .format = format,
         .mipLevelCount = 1,
         .sampleCount = 1,
-        .dimension = WGPUTextureDimension_2D,
-        .usage = 0,
-        .viewFormats = NULL,
         .viewFormatCount = 0,
+        .viewFormats = nullptr,
     };
 }
 
@@ -48,23 +48,23 @@ WGPUSamplerDescriptor wgpu::makeDefaultSamplerDescriptor() {
         .addressModeU = WGPUAddressMode_ClampToEdge,
         .addressModeV = WGPUAddressMode_ClampToEdge,
         .addressModeW = WGPUAddressMode_ClampToEdge,
-        .compare = WGPUCompareFunction_Undefined,
-        .lodMinClamp = 0,
-        .lodMaxClamp = 32,
-        .maxAnisotropy = 1,
         .magFilter = WGPUFilterMode_Nearest,
         .minFilter = WGPUFilterMode_Nearest,
         .mipmapFilter = WGPUMipmapFilterMode_Nearest,
+        .lodMinClamp = 0,
+        .lodMaxClamp = 32,
+        .compare = WGPUCompareFunction_Undefined,
+        .maxAnisotropy = 1,
     };
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/GPUQueue/copyExternalImageToTexture#destination
 WGPUImageCopyTexture wgpu::makeDefaultImageCopyTexture(WGPUTexture texture) {
     return {
-        .aspect = WGPUTextureAspect_All,
-        .origin = (WGPUOrigin3D){0},
-        .mipLevel = 0,
         .texture = texture,
+        .mipLevel = 0,
+        .origin = (WGPUOrigin3D){0},
+        .aspect = WGPUTextureAspect_All,
     };
 }
 
@@ -124,14 +124,14 @@ WGPUTextureViewDescriptor wgpu::makeDefaultWGPUTextureViewDescriptor(Runtime &ru
     }
 
     return {
+        .nextInChain = nullptr,
+        .label = nullptr,
+        .format = format,
+        .dimension = dimension,
+        .baseMipLevel = baseMipLevel,
+        .mipLevelCount = mipLevelCount,
+        .baseArrayLayer = baseArrayLayer,
         .arrayLayerCount = arrayLayerCount,
         .aspect = aspect,
-        .baseArrayLayer = baseArrayLayer,
-        .baseMipLevel = baseMipLevel,
-        .dimension = dimension,
-        .format = format,
-        .label = NULL,
-        .mipLevelCount = mipLevelCount,
-        .nextInChain = NULL,
     };
 }

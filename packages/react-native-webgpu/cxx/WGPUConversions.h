@@ -1,10 +1,10 @@
 #pragma once
 #include <jsi/jsi.h>
-#include "webgpu.h"
+
 #include "AutoReleasePool.h"
+#include "webgpu.h"
 
 using namespace facebook::jsi;
-
 
 namespace wgpu {
 
@@ -17,7 +17,8 @@ WGPUVertexBufferLayout makeWGPUVertexBufferLayout(Runtime &runtime, AutoReleaseP
 ConstantEntries makeWGPUConstantEntries(Runtime &runtime, AutoReleasePool *autoReleasePool, Object &obj);
 WGPUVertexState makeGPUVertexState(Runtime &runtime, AutoReleasePool *autoReleasePool, Object obj);
 WGPUFragmentState makeGPUFragmentState(Runtime &runtime, AutoReleasePool *autoReleasePool, Object obj);
-WGPUProgrammableStageDescriptor makeWGPUProgrammableStageDescriptor(Runtime &runtime, AutoReleasePool *autoReleasePool, Object obj);
+WGPUProgrammableStageDescriptor makeWGPUProgrammableStageDescriptor(Runtime &runtime, AutoReleasePool *autoReleasePool,
+                                                                    Object obj);
 WGPUExtent3D makeGPUExtent3D(Runtime &runtime, Object obj);
 void makeWGPUBindingResource(Runtime &runtime, Value value, WGPUBindGroupEntry *entry);
 WGPUColor makeWGPUColor(Runtime &runtime, Value &value);
@@ -30,4 +31,4 @@ WGPUComputePassTimestampWrites makeWGPUComputePassTimestampWrites(Runtime &runti
 WGPURenderPassTimestampWrites makeWGPURenderPassTimestampWrites(Runtime &runtime, Object obj);
 WGPUTextureDataLayout makeWGPUTextureDataLayout(Runtime &runtime, Object obj, WGPUExtent3D *extent);
 
-}
+}  // namespace wgpu

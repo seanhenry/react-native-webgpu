@@ -1,7 +1,8 @@
 #pragma once
 
-#include "webgpu.h"
 #include <jsi/jsi.h>
+
+#include "webgpu.h"
 
 using namespace facebook::jsi;
 
@@ -18,4 +19,4 @@ WGPUSamplerDescriptor makeDefaultSamplerDescriptor();
 WGPUImageCopyTexture makeDefaultImageCopyTexture(WGPUTexture texture);
 WGPUTextureViewDescriptor makeDefaultWGPUTextureViewDescriptor(Runtime &runtime, Object &desc, WGPUTexture texture);
 
-}
+}  // namespace wgpu

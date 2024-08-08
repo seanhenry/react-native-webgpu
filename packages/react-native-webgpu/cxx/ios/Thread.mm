@@ -3,6 +3,4 @@
 
 using namespace wgpu;
 
-void Thread::run(std::function<void ()> &&fn) {
-    _invoker->invokeAsync(std::move(fn));
-}
+void Thread::run(std::function<void()> &&fn) { _invoker->invokeAsync(std::move(fn)); }

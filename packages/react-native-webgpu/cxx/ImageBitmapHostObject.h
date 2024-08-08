@@ -6,28 +6,27 @@ using namespace facebook::jsi;
 
 namespace wgpu {
 
-class ImageBitmapHostObject: public HostObject {
-public:
-    explicit ImageBitmapHostObject(uint8_t *data, size_t size, uint32_t width, uint32_t height): _data(data), _size(size), _width(width), _height(height) {}
+class ImageBitmapHostObject : public HostObject {
+ public:
+  explicit ImageBitmapHostObject(uint8_t *data, size_t size, uint32_t width, uint32_t height)
+    : _data(data), _size(size), _width(width), _height(height) {}
 
-    ~ImageBitmapHostObject() {
-        destroy();
+  ~ImageBitmapHostObject() { destroy(); }
+
+  std::vector<PropNameID> getPropertyNames(Runtime &runtime) override;
+  Value get(Runtime &runtime, const PropNameID &name) override;
+
+  void destroy() {
+    if (_data != nullptr) {
+      _data = nullptr;
+      free(_data);
     }
+  }
 
-    std::vector<PropNameID> getPropertyNames(Runtime& runtime) override;
-    Value get(Runtime &runtime, const PropNameID &name) override;
-
-    void destroy() {
-        if (_data != nullptr) {
-            _data = nullptr;
-            free(_data);
-        }
-    }
-
-    uint8_t *_data = nullptr;
-    size_t _size;
-    uint32_t _width;
-    uint32_t _height;
+  uint8_t *_data = nullptr;
+  size_t _size;
+  uint32_t _width;
+  uint32_t _height;
 };
 
-}
+}  // namespace wgpu

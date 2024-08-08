@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
-#import <React-Core/React/RCTBridgeModule.h>
 #import <React-Core/React/RCTBlobManager.h>
+#import <React-Core/React/RCTBridgeModule.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -8,7 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (WGPUObjCInstance *)shared;
 
-@property (nonatomic, weak) RCTBlobManager *blobManager;
+@property(nonatomic, weak) RCTBlobManager *blobManager;
 
 - (void)loadModules:(RCTModuleRegistry *)moduleRegistry;
 

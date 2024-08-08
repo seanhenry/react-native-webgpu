@@ -69,9 +69,18 @@ typedef struct SurfaceObjCWrapper {
     return;
   }
 
-  auto width = (uint32_t)CGRectGetWidth(self.metalLayer.frame);
-  auto height = (uint32_t)CGRectGetHeight(self.metalLayer.frame);
-  auto managedSurface = std::make_shared<Surface>(instance, surface, width, height, UIScreen.mainScreen.scale);
+  auto width = CGRectGetWidth(self.metalLayer.frame);
+  auto height = CGRectGetHeight(self.metalLayer.frame);
+  auto scale = UIScreen.mainScreen.scale;
+  SurfaceSize surfaceSize = {
+    .pixelWidth = (uint32_t)(width * scale),
+    .pixelHeight = (uint32_t)(height * scale),
+    .scale = (float)scale,
+    .pointWidth = (float)width,
+    .pointHeight = (float)height,
+  };
+
+  auto managedSurface = std::make_shared<Surface>(instance, surface, surfaceSize);
 
   self->wrapper.surface = managedSurface;
 

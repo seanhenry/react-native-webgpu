@@ -1,55 +1,43 @@
-# react-native-webgpu
+# React Native WebGPU
 
 Coming soon. A [WebGPU](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API) port for react native which aims to provide direct access to Metal and Vulkan for iOS and Android, and support for libraries like [Three.js](https://threejs.org).
 
-Interested in this project? Star it in GitHub to show your support.
+For documentation and examples check the subpackages:
+- [react-native-webgpu](packages/react-native-webgpu)
 
-Dependent projects:
-- [react-native-webgpu-three](https://github.com/seanhenry/react-native-webgpu-three)
+Direct access to the low-level graphics api [WebGPU](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API) in React Native.
 
-## Examples
+- [react-native-webgpu-three](packages/react-native-webgpu-three)
 
-If you want to check the progress of this project, or play around with what's been implemented so far, you can check out the examples.
+A small helper library to enable [Three.js](https://threejs.org/) projects on React Native.
 
-1. Install library dependencies
+## Manually building wgpu dependencies
 
-```bash
-git submodule update --init --recursive
-yarn
-```
+Looking to build the examples? You don't need to manually build the dependencies for that. See [react-native-webgpu](packages/react-native-webgpu) for instructions instead.
 
-2. Download the libraries from the [release page](https://github.com/seanhenry/react-native-webgpu/releases/tag/v0.0.0).
-3. Create a `/bin` folder at the root of this project and move the libraries there
-4. Install examples dependencies
-
-```bash
-cd examples/ExampleRN
-yarn
-
-# iOS
-cd ios
-pod install
-cd ..
-
-# Android coming soon
-```
-
-5. Build and run
-
-```bash
-yarn ios
-```
-
-## License
-
-MIT
-
-## Build locally
-
-### Build C bindings
+- [Install Rust](https://www.rust-lang.org/tools/install)
+- Install submodules
 
 ```shell
 git submodule update --init --recursive
+```
+
+- Build libraries and copy
+
+```shell
 ./scripts/build-android.sh
 ./scripts/build-ios.sh
 ```
+
+- Copy headers
+
+```shell
+./scripts/copy-headers.sh
+```
+
+
+
+
+
+
+

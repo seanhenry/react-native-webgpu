@@ -1,0 +1,39 @@
+{
+  "name": "react-native-webgpu-three",
+  "version": "0.0.1",
+  "description": "Coming soon. Aims to provide support to run [Three.js](https://threejs.org) natively, in React Native.",
+  "main": "src/index.js",
+  "types": "types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./babel": "./babel/index.js",
+    "./metro": "./metro/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sean Henry <sean.henry6@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seanhenry/react-native-webgpu.git"
+  },
+  "bugs": {
+    "url": "https://github.com/seanhenry/react-native-webgpu/issues"
+  },
+  "homepage": "https://github.com/seanhenry/react-native-webgpu",
+  "peerDependencies": {
+    "@babel/plugin-transform-export-namespace-from": "^7.24.7",
+    "fast-text-encoding": "^1.0.6",
+    "react-native-webgpu": "*",
+    "three": "0.166.1"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-export-namespace-from": "^7.24.7",
+    "fast-text-encoding": "^1.0.6",
+    "react-native-webgpu": "workspace:*"
+  }
+}

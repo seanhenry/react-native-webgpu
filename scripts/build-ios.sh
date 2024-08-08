@@ -22,8 +22,9 @@ cargo build --release
 
 popd
 
-# Make fat lib for simulators
-mkdir -p bin
-TARGET_DIR=submodules/wgpu-native/target
-lipo $TARGET_DIR/aarch64-apple-ios-sim/release/libwgpu_native.a $TARGET_DIR/x86_64-apple-ios/release/libwgpu_native.a -create -output bin/libwgpu_native_iossim_x86_64_aarch64.a
-cp $TARGET_DIR/aarch64-apple-ios/release/libwgpu_native.a bin/libwgpu_native_ios_aarch64.a
+OUT_DIR="packages/react-native-webgpu/bin"
+TARGET_DIR="submodules/wgpu-native/target"
+
+mkdir -p "$OUT_DIR"
+lipo "$TARGET_DIR/aarch64-apple-ios-sim/release/libwgpu_native.a" "$TARGET_DIR/x86_64-apple-ios/release/libwgpu_native.a" -create -output "$OUT_DIR/libwgpu_native_iossim_x86_64_aarch64.a"
+cp "$TARGET_DIR/aarch64-apple-ios/release/libwgpu_native.a" "$OUT_DIR/libwgpu_native_ios_aarch64.a"

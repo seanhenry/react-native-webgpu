@@ -61,13 +61,15 @@ cargo build --release
 
 popd
 
-# Move libraries
-mkdir -p \
-  bin/arm64-v8a \
-  bin/armeabi-v7a \
-  bin/x86_64 \
-  bin/x86
-mv submodules/wgpu-native/target/aarch64-linux-android/release/libwgpu_native.a bin/arm64-v8a
-mv submodules/wgpu-native/target/armv7-linux-androideabi/release/libwgpu_native.a bin/armeabi-v7a
-mv submodules/wgpu-native/target/x86_64-linux-android/release/libwgpu_native.a bin/x86_64
-mv submodules/wgpu-native/target/i686-linux-android/release/libwgpu_native.a bin/x86
+function mv_lib {
+  TRIPLE="$1"
+  ARCH="$2"
+  OUT_DIR="packages/react-native-webgpu/bin/$ARCH"
+  mkdir -p "$OUT_DIR"
+  mv "submodules/wgpu-native/target/$TRIPLE/release/libwgpu_native.a" "$OUT_DIR"
+}
+
+mv_lib aarch64-linux-android arm64-v8a
+mv_lib armv7-linux-androideabi armeabi-v7a
+mv_lib x86_64-linux-android x86_64
+mv_lib i686-linux-android x86

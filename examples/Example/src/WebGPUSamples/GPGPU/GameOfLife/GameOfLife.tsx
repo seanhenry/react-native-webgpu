@@ -1,7 +1,6 @@
-import { CenterSquare } from '../../../Components/CenterSquare';
-import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
-import { globalStyles } from '../../../Components/globalStyles';
-import React from 'react';
+import {CenterSquare} from '../../../Components/CenterSquare';
+import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
+import {globalStyles} from '../../../Components/globalStyles';
 
 // import { GUI } from 'dat.gui';
 import computeWGSL from './compute.wgsl';
@@ -9,16 +8,20 @@ import vertWGSL from './vert.wgsl';
 import fragWGSL from './frag.wgsl';
 
 export const GameOfLife = () => {
-  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame }) => {
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
+    context,
+    navigator,
+    requestAnimationFrame,
+  }) => {
     const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter!.requestDevice();
 
-    const presentationFormat = navigator.gpu.getPreferredCanvasFormat()
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: "premultiplied",
+      alphaMode: 'premultiplied',
     });
 
     const GameOptions = {
@@ -28,7 +31,7 @@ export const GameOfLife = () => {
       workgroupSize: 8,
     };
 
-    const computeShader = device.createShaderModule({ code: computeWGSL });
+    const computeShader = device.createShaderModule({code: computeWGSL});
     const bindGroupLayoutCompute = device.createBindGroupLayout({
       entries: [
         {
@@ -76,8 +79,8 @@ export const GameOfLife = () => {
       ],
     };
 
-    const vertexShader = device.createShaderModule({ code: vertWGSL });
-    const fragmentShader = device.createShaderModule({ code: fragWGSL });
+    const vertexShader = device.createShaderModule({code: vertWGSL});
+    const fragmentShader = device.createShaderModule({code: fragWGSL});
     let commandEncoder: GPUCommandEncoder;
 
     const bindGroupLayoutRender = device.createBindGroupLayout({
@@ -170,18 +173,18 @@ export const GameOfLife = () => {
       const bindGroup0 = device.createBindGroup({
         layout: bindGroupLayoutCompute,
         entries: [
-          { binding: 0, resource: { buffer: sizeBuffer } },
-          { binding: 1, resource: { buffer: buffer0 } },
-          { binding: 2, resource: { buffer: buffer1 } },
+          {binding: 0, resource: {buffer: sizeBuffer}},
+          {binding: 1, resource: {buffer: buffer0}},
+          {binding: 2, resource: {buffer: buffer1}},
         ],
       });
 
       const bindGroup1 = device.createBindGroup({
         layout: bindGroupLayoutCompute,
         entries: [
-          { binding: 0, resource: { buffer: sizeBuffer } },
-          { binding: 1, resource: { buffer: buffer1 } },
-          { binding: 2, resource: { buffer: buffer0 } },
+          {binding: 0, resource: {buffer: sizeBuffer}},
+          {binding: 1, resource: {buffer: buffer1}},
+          {binding: 2, resource: {buffer: buffer0}},
         ],
       });
 
@@ -279,7 +282,6 @@ export const GameOfLife = () => {
 
       requestAnimationFrame(loop);
     })();
-
   };
   return (
     <CenterSquare>

@@ -1,6 +1,6 @@
 const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 const path = require('path');
-const threeConfig = require('react-native-webgpu-three/metro')
+const threeConfig = require('react-native-webgpu-three/metro');
 
 const root = path.resolve(__dirname, '../..');
 
@@ -15,7 +15,7 @@ const config = {
   resolver: {
     resolveRequest: threeConfig.resolver.resolveRequest,
     unstable_enablePackageExports: true,
-  }
+  },
 };
 
 module.exports = mergeConfig(getDefaultConfig(__dirname), config);

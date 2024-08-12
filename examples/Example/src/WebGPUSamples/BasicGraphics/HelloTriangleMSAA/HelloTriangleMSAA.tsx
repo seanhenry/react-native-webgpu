@@ -1,23 +1,26 @@
 // https://webgpu.github.io/webgpu-samples/?sample=helloTriangleMSAA
-import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
+import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
 import triangleVertWGSL from '../../shaders/triangle.vert.wgsl';
 import redFragWGSL from '../../shaders/red.frag.wgsl';
-import { CenterSquare } from '../../../Components/CenterSquare';
-import React from 'react';
-import { globalStyles } from '../../../Components/globalStyles';
+import {CenterSquare} from '../../../Components/CenterSquare';
+import {globalStyles} from '../../../Components/globalStyles';
 
 export function HelloTriangleMSAA() {
-  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame }) => {
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
+    context,
+    navigator,
+    requestAnimationFrame,
+  }) => {
     const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter!.requestDevice();
 
-    const { width, height } = context;
-    const presentationFormat = navigator.gpu.getPreferredCanvasFormat()
+    const {width, height} = context;
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: "premultiplied",
+      alphaMode: 'premultiplied',
     });
 
     const sampleCount = 4;

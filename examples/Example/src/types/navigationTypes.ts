@@ -1,8 +1,11 @@
-import type { Example } from '../Components/ExampleScreen';
+import type {Examples, Example} from '../Components/ExampleScreen';
 
 export type Routes = {
-  root: undefined,
+  root: undefined;
+  examples: {
+    name: Examples;
+  };
   example: {
-    name: Example
-  }
-}
+    name: Example;
+  };
+};

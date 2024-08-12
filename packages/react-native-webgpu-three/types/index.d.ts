@@ -1,6 +1,6 @@
-import { WebGpuViewProps } from 'react-native-webgpu';
-import { OnCreateSurfacePayload } from 'react-native-webgpu/src';
-import React from 'react';
+import type { WebGpuViewProps } from 'react-native-webgpu';
+import type { OnCreateSurfacePayload } from 'react-native-webgpu/src';
+import type {FC} from 'react';
 
 export declare const enableDebugLogging: (enable: boolean) => void;
 
@@ -14,4 +14,4 @@ interface ThreeWebGpuViewProps extends Omit<WebGpuViewProps, 'onCreateSurface'> 
   onCreateSurface(payload: ThreeOnCreateSurfacePayload): void;
 }
 
-export declare const ThreeWebGpuView: React.FC<ThreeWebGpuViewProps>;
+export declare const ThreeWebGpuView: FC<ThreeWebGpuViewProps>;

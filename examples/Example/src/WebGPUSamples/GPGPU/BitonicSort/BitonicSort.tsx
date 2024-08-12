@@ -1,25 +1,28 @@
-import { CenterSquare } from '../../../Components/CenterSquare';
-import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
-import { globalStyles } from '../../../Components/globalStyles';
-import React from 'react';
+import {CenterSquare} from '../../../Components/CenterSquare';
+import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
+import {globalStyles} from '../../../Components/globalStyles';
 
 // import { GUI } from 'dat.gui';
 // import Stats from 'stats.js';
-import { createBindGroupCluster, SampleInitFactoryWebGPU } from './utils';
+import {createBindGroupCluster, SampleInitFactoryWebGPU} from './utils';
 import BitonicDisplayRenderer from './bitonicDisplay';
-import { NaiveBitonicCompute } from './bitonicCompute';
+import {NaiveBitonicCompute} from './bitonicCompute';
 // import atomicToZero from './atomicToZero.wgsl';
 
 export const BitonicSort = () => {
-  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame }) => {
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
+    context,
+    navigator,
+    requestAnimationFrame,
+  }) => {
     // Type of step that will be executed in our shader
-    enum StepEnum {
-      NONE,
-      FLIP_LOCAL,
-      DISPERSE_LOCAL,
-      FLIP_GLOBAL,
-      DISPERSE_GLOBAL,
-    }
+    // enum StepEnum {
+    //   NONE,
+    //   FLIP_LOCAL,
+    //   DISPERSE_LOCAL,
+    //   FLIP_GLOBAL,
+    //   DISPERSE_GLOBAL,
+    // }
 
     type StepType =
       // NONE: No sort step has or will occur
@@ -89,14 +92,14 @@ export const BitonicSort = () => {
 
     SampleInitFactoryWebGPU(
       async ({
-               device,
-               // gui,
-               presentationFormat,
-               context,
-               // canvas,
-               timestampQueryAvailable,
-             }) => {
-
+        device,
+        // gui,
+        presentationFormat,
+        // eslint-disable-next-line @typescript-eslint/no-shadow
+        context,
+        // canvas,
+        timestampQueryAvailable,
+      }) => {
         const maxInvocationsX = device.limits.maxComputeWorkgroupSizeX;
 
         // let querySet: GPUQuerySet;
@@ -167,7 +170,7 @@ export const BitonicSort = () => {
           // The total number of steps required to sort the displayed elements.
           'Total Steps': getNumSteps(maxElements),
           // A string that condenses 'Step Index' and 'Total Steps' into a single GUI Controller display element.
-          'Current Step': `0 of 91`,
+          'Current Step': '0 of 91',
           // The category of the previously executed step. Always begins the bitonic sort with a value of 'NONE' and ends with a value of 'DISPERSE_LOCAL'
           'Prev Step': 'NONE',
           // The category of the next step that will be executed. Always begins the bitonic sort with a value of 'FLIP_LOCAL' and ends with a value of 'NONE'
@@ -229,7 +232,7 @@ export const BitonicSort = () => {
 
         // Initialize initial elements array
         let elements = new Uint32Array(
-          Array.from({ length: settings['Total Elements'] }, (_, i) => i),
+          Array.from({length: settings['Total Elements']}, (_, i) => i),
         );
 
         // Initialize elementsBuffer and elementsStagingBuffer
@@ -277,24 +280,24 @@ export const BitonicSort = () => {
           ],
           ['buffer', 'buffer', 'buffer', 'buffer'],
           [
-            { type: 'read-only-storage' },
-            { type: 'storage' },
-            { type: 'uniform' },
-            { type: 'storage' },
+            {type: 'read-only-storage'},
+            {type: 'storage'},
+            {type: 'uniform'},
+            {type: 'storage'},
           ],
           [
             [
-              { buffer: elementsInputBuffer },
-              { buffer: elementsOutputBuffer },
-              { buffer: computeUniformsBuffer },
-              { buffer: atomicSwapsOutputBuffer },
+              {buffer: elementsInputBuffer},
+              {buffer: elementsOutputBuffer},
+              {buffer: computeUniformsBuffer},
+              {buffer: atomicSwapsOutputBuffer},
             ],
           ],
           'BitonicSort',
           device,
         );
 
-        let computePipeline = device.createComputePipeline({
+        const computePipeline = device.createComputePipeline({
           layout: device.createPipelineLayout({
             bindGroupLayouts: [computeBGCluster.bindGroupLayout],
           }),
@@ -461,37 +464,44 @@ export const BitonicSort = () => {
           let swappedIndex: number;
           switch (settings['Next Step']) {
             case 'FLIP_LOCAL':
-            case 'FLIP_GLOBAL': {
-              const blockHeight = settings['Next Swap Span'];
-              const p2 = Math.floor(settings['Hovered Cell'] / blockHeight) + 1;
-              const p3 = settings['Hovered Cell'] % blockHeight;
-              swappedIndex = blockHeight * p2 - p3 - 1;
-              // swappedCellController.setValue(swappedIndex);
-              settings['Swapped Cell'] = swappedIndex;
-            }
+            case 'FLIP_GLOBAL':
+              {
+                const blockHeight = settings['Next Swap Span'];
+                const p2 =
+                  Math.floor(settings['Hovered Cell'] / blockHeight) + 1;
+                const p3 = settings['Hovered Cell'] % blockHeight;
+                swappedIndex = blockHeight * p2 - p3 - 1;
+                // swappedCellController.setValue(swappedIndex);
+                settings['Swapped Cell'] = swappedIndex;
+              }
               break;
-            case 'DISPERSE_LOCAL': {
-              const blockHeight = settings['Next Swap Span'];
-              const halfHeight = blockHeight / 2;
-              swappedIndex =
-                settings['Hovered Cell'] % blockHeight < halfHeight
-                  ? settings['Hovered Cell'] + halfHeight
-                  : settings['Hovered Cell'] - halfHeight;
-              // swappedCellController.setValue(swappedIndex);
-              settings['Swapped Cell'] = swappedIndex;
-            }
+            case 'DISPERSE_LOCAL':
+              {
+                const blockHeight = settings['Next Swap Span'];
+                const halfHeight = blockHeight / 2;
+                swappedIndex =
+                  settings['Hovered Cell'] % blockHeight < halfHeight
+                    ? settings['Hovered Cell'] + halfHeight
+                    : settings['Hovered Cell'] - halfHeight;
+                // swappedCellController.setValue(swappedIndex);
+                settings['Swapped Cell'] = swappedIndex;
+              }
               break;
-            case 'NONE': {
-              swappedIndex = settings['Hovered Cell'];
-              // swappedCellController.setValue(swappedIndex);
-              settings['Swapped Cell'] = swappedIndex;
-            }
+            case 'NONE':
+              // eslint-disable-next-line no-lone-blocks
+              {
+                swappedIndex = settings['Hovered Cell'];
+                // swappedCellController.setValue(swappedIndex);
+                settings['Swapped Cell'] = swappedIndex;
+              }
               break;
-            default: {
-              swappedIndex = settings['Hovered Cell'];
-              // swappedCellController.setValue(swappedIndex);
-              settings['Swapped Cell'] = swappedIndex;
-            }
+            default:
+              // eslint-disable-next-line no-lone-blocks
+              {
+                swappedIndex = settings['Hovered Cell'];
+                // swappedCellController.setValue(swappedIndex);
+                settings['Swapped Cell'] = swappedIndex;
+              }
               break;
           }
         };
@@ -607,16 +617,16 @@ export const BitonicSort = () => {
         //   randomizeElementArray();
         //   resetExecutionInformation();
         //   resetTimeInfo();
-          // Unlock workgroup size limit controller since sort has stopped
-          // sizeLimitController.domElement.style.pointerEvents = 'auto';
+        // Unlock workgroup size limit controller since sort has stopped
+        // sizeLimitController.domElement.style.pointerEvents = 'auto';
         // });
         // controlFolder
         //   .add(settings, 'Log Elements')
         //   .onChange(() => console.log(elements));
         // controlFolder.add(settings, 'Auto Sort').onChange(() => {
-          // Invocation Limit locked upon sort
-          // sizeLimitController.domElement.style.pointerEvents = 'none';
-          // startSortInterval();
+        // Invocation Limit locked upon sort
+        // sizeLimitController.domElement.style.pointerEvents = 'none';
+        // startSortInterval();
         // });
         // controlFolder.add(settings, 'Auto Sort Speed', 50, 1000).step(50);
         // controlFolder.open();
@@ -750,7 +760,9 @@ export const BitonicSort = () => {
 
           device.queue.writeBuffer(computeUniformsBuffer, 8, stepDetails);
 
-          (renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[])[0]!.view = framebuffer.createView();
+          (
+            renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[]
+          )[0]!.view = framebuffer.createView();
 
           const commandEncoder = device.createCommandEncoder();
           bitonicDisplayRenderer.startRun(commandEncoder, {
@@ -760,7 +772,7 @@ export const BitonicSort = () => {
             settings.executeStep &&
             highestBlockHeight < settings['Total Elements'] * 2
           ) {
-            let computePassEncoder: GPUComputePassEncoder;
+            // let computePassEncoder: GPUComputePassEncoder;
             // if (timestampQueryAvailable) {
             //   computePassEncoder = commandEncoder.beginComputePass({
             //     timestampWrites: {
@@ -770,11 +782,13 @@ export const BitonicSort = () => {
             //     },
             //   });
             // } else {
-              computePassEncoder = commandEncoder.beginComputePass();
+            const computePassEncoder = commandEncoder.beginComputePass();
             // }
             computePassEncoder.setPipeline(computePipeline);
             computePassEncoder.setBindGroup(0, computeBGCluster.bindGroups[0]!);
-            computePassEncoder.dispatchWorkgroups(settings['Workgroups Per Step']);
+            computePassEncoder.dispatchWorkgroups(
+              settings['Workgroups Per Step'],
+            );
             computePassEncoder.end();
             // Resolve time passed in between beginning and end of computePass
             if (timestampQueryAvailable) {
@@ -802,7 +816,7 @@ export const BitonicSort = () => {
             // prevBlockHeightController.setValue(settings['Next Swap Span']);
             settings['Prev Swap Span'] = settings['Next Swap Span'];
             // nextBlockHeightController.setValue(settings['Next Swap Span'] / 2);
-            settings['Next Swap Span'] = settings['Next Swap Span'] / 2
+            settings['Next Swap Span'] = settings['Next Swap Span'] / 2;
             // Each cycle of a bitonic sort contains a flip operation followed by multiple disperse operations
             // Next Swap Span will equal one when the sort needs to begin a new cycle of flip and disperse operations
             if (settings['Next Swap Span'] === 1) {
@@ -819,7 +833,9 @@ export const BitonicSort = () => {
                 // Finally, with our sort completed, we can increment the number of total completed sorts executed with n 'Total Elements'
                 // and x 'Size Limit', which will allow us to calculate the average time of all sorts executed with this specific
                 // configuration of compute resources
-                settings.configToCompleteSwapsMap[settings.configKey]!.sorts += 1;
+                settings.configToCompleteSwapsMap[
+                  settings.configKey
+                ]!.sorts += 1;
               } else if (highestBlockHeight > settings['Workgroup Size'] * 2) {
                 // // The next cycle's maximum swap span exceeds the range of a single workgroup, so our next flip will operate on global indices.
                 // nextStepController.setValue('FLIP_GLOBAL');
@@ -838,7 +854,10 @@ export const BitonicSort = () => {
               // settings['Next Swap Span'] > settings['Workgroup Size'] * 2
               //   ? nextStepController.setValue('DISPERSE_GLOBAL')
               //   : nextStepController.setValue('DISPERSE_LOCAL');
-              settings['Next Step'] = settings['Next Swap Span'] > settings['Workgroup Size'] * 2 ? 'DISPERSE_GLOBAL' : 'DISPERSE_LOCAL';
+              settings['Next Step'] =
+                settings['Next Swap Span'] > settings['Workgroup Size'] * 2
+                  ? 'DISPERSE_GLOBAL'
+                  : 'DISPERSE_LOCAL';
             }
 
             // Copy GPU accessible buffers to CPU accessible buffers
@@ -946,7 +965,7 @@ export const BitonicSort = () => {
 
         requestAnimationFrame(frame);
       },
-    ).then((init) => {
+    ).then(init => {
       // const canvas = document.querySelector('canvas') as HTMLCanvasElement;
       // const stats = new Stats();
       // const gui = new GUI();
@@ -955,7 +974,7 @@ export const BitonicSort = () => {
 
       // init({ canvas, stats, gui });
 
-      init({ context, navigator });
+      init({context, navigator});
     });
   };
   return (

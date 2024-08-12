@@ -1,27 +1,37 @@
-import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
-import { globalStyles } from '../../../Components/globalStyles';
-import React from 'react';
-import { CenterSquare } from '../../../Components/CenterSquare';
+import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
+import {globalStyles} from '../../../Components/globalStyles';
+import {CenterSquare} from '../../../Components/CenterSquare';
 
-import { mat4, vec3 } from 'wgpu-matrix';
+import {mat4, vec3} from 'wgpu-matrix';
 
-import { cubePositionOffset, cubeUVOffset, cubeVertexArray, cubeVertexCount, cubeVertexSize } from '../../meshes/cube';
+import {
+  cubePositionOffset,
+  cubeUVOffset,
+  cubeVertexArray,
+  cubeVertexCount,
+  cubeVertexSize,
+} from '../../meshes/cube';
 
 import basicVertWGSL from '../../shaders/basic.vert.wgsl';
 import sampleCubemapWGSL from './sampleCubemap.frag.wgsl';
 
 export const CubeMap = () => {
-  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame, createImageBitmap }) => {
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
+    context,
+    navigator,
+    requestAnimationFrame,
+    createImageBitmap,
+  }) => {
     const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter!.requestDevice();
 
-    const { width, height } = context;
+    const {width, height} = context;
     const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: "premultiplied",
+      alphaMode: 'premultiplied',
     });
 
     // Create a vertex buffer from the cube data.
@@ -108,7 +118,7 @@ export const CubeMap = () => {
         require('../../assets/img/cubemap/posz.jpg'),
         require('../../assets/img/cubemap/negz.jpg'),
       ];
-      const promises = imgSrcs.map(async (src) => {
+      const promises = imgSrcs.map(async src => {
         return createImageBitmap(src);
       });
       const imageBitmaps = await Promise.all(promises);
@@ -128,8 +138,8 @@ export const CubeMap = () => {
       for (let i = 0; i < imageBitmaps.length; i++) {
         const imageBitmap = imageBitmaps[i]!;
         device.queue.copyExternalImageToTexture(
-          { source: imageBitmap },
-          { texture: cubemapTexture, origin: [0, 0, i] },
+          {source: imageBitmap},
+          {texture: cubemapTexture, origin: [0, 0, i]},
           [imageBitmap.width, imageBitmap.height],
         );
       }
@@ -188,7 +198,12 @@ export const CubeMap = () => {
     };
 
     const aspect = width / height;
-    const projectionMatrix = mat4.perspective((2 * Math.PI) / 5, aspect, 1, 3000);
+    const projectionMatrix = mat4.perspective(
+      (2 * Math.PI) / 5,
+      aspect,
+      1,
+      3000,
+    );
 
     const modelMatrix = mat4.scaling(vec3.fromValues(1000, 1000, 1000));
     const modelViewProjectionMatrix = mat4.create();
@@ -232,7 +247,9 @@ export const CubeMap = () => {
         modelViewProjectionMatrix.byteLength,
       );
 
-      (renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[])[0]!.view = framebuffer.createView();
+      (
+        renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[]
+      )[0]!.view = framebuffer.createView();
 
       const commandEncoder = device.createCommandEncoder();
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
@@ -248,7 +265,6 @@ export const CubeMap = () => {
     }
 
     requestAnimationFrame(frame);
-
   };
 
   return (

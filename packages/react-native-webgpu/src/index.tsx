@@ -1,6 +1,6 @@
 import './constants';
 import { type OnCreateSurfaceEvent, WGPUWebGPUView } from './native';
-import React, { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { type ImageSourcePropType, StyleSheet, View, type ViewProps } from 'react-native';
 import type { ImageBitmap, SurfaceBackedWebGPU, WGPUContext } from '../types/types';
 
@@ -11,7 +11,7 @@ export interface OnCreateSurfacePayload extends SurfaceBackedWebGPU {
 }
 
 export interface WebGpuViewProps extends ViewProps {
-  onCreateSurface(payload: OnCreateSurfacePayload): Promise<() => void> | (() => void) | void;
+  onCreateSurface(payload: OnCreateSurfacePayload): Promise<() => void> | (() => void) | Promise<void> | void;
   onError?(error: Error): void;
 }
 

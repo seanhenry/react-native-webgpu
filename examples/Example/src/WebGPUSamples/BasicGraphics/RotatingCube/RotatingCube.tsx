@@ -1,17 +1,26 @@
 // https://webgpu.github.io/webgpu-samples/?sample=rotatingCube
-import { mat4, vec3 } from 'wgpu-matrix';
+import {mat4, vec3} from 'wgpu-matrix';
 
-import { cubePositionOffset, cubeUVOffset, cubeVertexArray, cubeVertexCount, cubeVertexSize } from '../../meshes/cube';
+import {
+  cubePositionOffset,
+  cubeUVOffset,
+  cubeVertexArray,
+  cubeVertexCount,
+  cubeVertexSize,
+} from '../../meshes/cube';
 
 import basicVertWGSL from '../../shaders/basic.vert.wgsl';
 import vertexPositionColorWGSL from '../../shaders/vertexPositionColor.frag.wgsl';
-import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
-import React from 'react';
-import { CenterSquare } from '../../../Components/CenterSquare';
-import { globalStyles } from '../../../Components/globalStyles';
+import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
+import {CenterSquare} from '../../../Components/CenterSquare';
+import {globalStyles} from '../../../Components/globalStyles';
 
 export function RotatingCube() {
-  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame }) => {
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
+    context,
+    navigator,
+    requestAnimationFrame,
+  }) => {
     const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter!.requestDevice();
 
@@ -20,7 +29,7 @@ export function RotatingCube() {
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: "premultiplied",
+      alphaMode: 'premultiplied',
     });
 
     // Create a vertex buffer from the cube data.
@@ -36,7 +45,7 @@ export function RotatingCube() {
     const pipeline = device.createRenderPipeline({
       layout: 'auto',
       vertex: {
-        entryPoint: "main",
+        entryPoint: 'main',
         module: device.createShaderModule({
           code: basicVertWGSL,
         }),
@@ -133,7 +142,12 @@ export function RotatingCube() {
     };
 
     const aspect = width / height;
-    const projectionMatrix = mat4.perspective((2 * Math.PI) / 5, aspect, 1, 100.0);
+    const projectionMatrix = mat4.perspective(
+      (2 * Math.PI) / 5,
+      aspect,
+      1,
+      100.0,
+    );
     const modelViewProjectionMatrix = mat4.create();
 
     function getTransformationMatrix() {
@@ -156,7 +170,7 @@ export function RotatingCube() {
       const framebuffer = context.getCurrentTexture();
       if (!framebuffer) {
         requestAnimationFrame(frame);
-        return
+        return;
       }
 
       const transformationMatrix = getTransformationMatrix();
@@ -167,7 +181,9 @@ export function RotatingCube() {
         transformationMatrix.byteOffset,
         transformationMatrix.byteLength,
       );
-      (renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[])[0]!.view = framebuffer.createView();
+      (
+        renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[]
+      )[0]!.view = framebuffer.createView();
 
       const commandEncoder = device.createCommandEncoder();
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
@@ -187,5 +203,5 @@ export function RotatingCube() {
     <CenterSquare>
       <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
     </CenterSquare>
-  )
+  );
 }

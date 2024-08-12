@@ -1,4 +1,4 @@
 declare module '*.wgsl' {
-  var value: string
-  export default value
+  var value: string;
+  export default value;
 }

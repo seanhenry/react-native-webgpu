@@ -1,14 +1,11 @@
-import { StyleSheet, View } from 'react-native';
-import React from 'react';
-import type { ReactNode } from 'react';
+import {StyleSheet, View} from 'react-native';
+import type {ReactNode} from 'react';
 
 export const CenterSquare = ({children}: {children: ReactNode}) => (
   <View style={styles.container}>
-      <View style={styles.square}>
-        {children}
-      </View>
+    <View style={styles.square}>{children}</View>
   </View>
-)
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -21,5 +18,5 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  }
-})
+  },
+});

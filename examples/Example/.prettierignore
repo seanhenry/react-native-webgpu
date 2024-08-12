@@ -1,0 +1,6 @@
+/.bundle
+/.yarn
+/android
+/ios
+/node_modules
+/vendor

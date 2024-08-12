@@ -1,0 +1,8 @@
+/.bundle
+/.yarn
+/android
+/ios
+/node_modules
+/vendor
+/babel.config.js
+/metro.config.js

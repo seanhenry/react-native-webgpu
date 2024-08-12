@@ -24,7 +24,7 @@
   "bugs": {
     "url": "https://github.com/seanhenry/react-native-webgpu/issues"
   },
-  "homepage": "https://github.com/seanhenry/react-native-webgpu",
+  "homepage": "https://github.com/seanhenry/react-native-webgpu/tree/main/packages/react-native-webgpu-three",
   "peerDependencies": {
     "@babel/plugin-transform-export-namespace-from": "^7.24.7",
     "fast-text-encoding": "^1.0.6",

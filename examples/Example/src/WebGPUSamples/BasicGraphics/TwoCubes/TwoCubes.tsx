@@ -1,18 +1,27 @@
 // https://webgpu.github.io/webgpu-samples/?sample=twoCubes
-import { CenterSquare } from '../../../Components/CenterSquare';
-import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
-import React from 'react';
+import {CenterSquare} from '../../../Components/CenterSquare';
+import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
 
-import { mat4, vec3 } from 'wgpu-matrix';
+import {mat4, vec3} from 'wgpu-matrix';
 
-import { cubePositionOffset, cubeUVOffset, cubeVertexArray, cubeVertexCount, cubeVertexSize } from '../../meshes/cube';
+import {
+  cubePositionOffset,
+  cubeUVOffset,
+  cubeVertexArray,
+  cubeVertexCount,
+  cubeVertexSize,
+} from '../../meshes/cube';
 
 import basicVertWGSL from '../../shaders/basic.vert.wgsl';
 import vertexPositionColorWGSL from '../../shaders/vertexPositionColor.frag.wgsl';
-import { globalStyles } from '../../../Components/globalStyles';
+import {globalStyles} from '../../../Components/globalStyles';
 
 export const TwoCubes = () => {
-  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame }) => {
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
+    context,
+    navigator,
+    requestAnimationFrame,
+  }) => {
     const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter!.requestDevice();
 
@@ -22,7 +31,7 @@ export const TwoCubes = () => {
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: "premultiplied",
+      alphaMode: 'premultiplied',
     });
 
     // Create a vertex buffer from the cube data.
@@ -153,7 +162,12 @@ export const TwoCubes = () => {
     };
 
     const aspect = width / height;
-    const projectionMatrix = mat4.perspective((2 * Math.PI) / 5, aspect, 1, 100.0);
+    const projectionMatrix = mat4.perspective(
+      (2 * Math.PI) / 5,
+      aspect,
+      1,
+      100.0,
+    );
 
     const modelMatrix1 = mat4.translation(vec3.create(-2, 0, 0));
     const modelMatrix2 = mat4.translation(vec3.create(2, 0, 0));
@@ -171,26 +185,26 @@ export const TwoCubes = () => {
         modelMatrix1,
         vec3.fromValues(Math.sin(now), Math.cos(now), 0),
         1,
-        tmpMat41
+        tmpMat41,
       );
       mat4.rotate(
         modelMatrix2,
         vec3.fromValues(Math.cos(now), Math.sin(now), 0),
         1,
-        tmpMat42
+        tmpMat42,
       );
 
       mat4.multiply(viewMatrix, tmpMat41, modelViewProjectionMatrix1);
       mat4.multiply(
         projectionMatrix,
         modelViewProjectionMatrix1,
-        modelViewProjectionMatrix1
+        modelViewProjectionMatrix1,
       );
       mat4.multiply(viewMatrix, tmpMat42, modelViewProjectionMatrix2);
       mat4.multiply(
         projectionMatrix,
         modelViewProjectionMatrix2,
-        modelViewProjectionMatrix2
+        modelViewProjectionMatrix2,
       );
     }
 
@@ -198,7 +212,7 @@ export const TwoCubes = () => {
       const framebuffer = context.getCurrentTexture();
       if (!framebuffer) {
         requestAnimationFrame(frame);
-        return
+        return;
       }
 
       updateTransformationMatrix();
@@ -207,17 +221,19 @@ export const TwoCubes = () => {
         0,
         modelViewProjectionMatrix1.buffer,
         modelViewProjectionMatrix1.byteOffset,
-        modelViewProjectionMatrix1.byteLength
+        modelViewProjectionMatrix1.byteLength,
       );
       device.queue.writeBuffer(
         uniformBuffer,
         offset,
         modelViewProjectionMatrix2.buffer,
         modelViewProjectionMatrix2.byteOffset,
-        modelViewProjectionMatrix2.byteLength
+        modelViewProjectionMatrix2.byteLength,
       );
 
-      (renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[])[0]!.view = framebuffer.createView();
+      (
+        renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[]
+      )[0]!.view = framebuffer.createView();
 
       const commandEncoder = device.createCommandEncoder();
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
@@ -238,12 +254,10 @@ export const TwoCubes = () => {
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
-  }
+  };
   return (
     <CenterSquare>
-      <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill}/>
+      <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
     </CenterSquare>
-  )
-}
-
-
+  );
+};

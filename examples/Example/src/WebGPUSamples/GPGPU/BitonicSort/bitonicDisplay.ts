@@ -11,8 +11,7 @@ interface BitonicDisplayRenderArgs {
 }
 
 export default class BitonicDisplayRenderer extends Base2DRendererClass {
-  // @ts-expect-error
-  switchBindGroup: (name: string) => void;
+  switchBindGroup: (name: string) => void = () => {};
   setArguments: (args: BitonicDisplayRenderArgs) => void;
   computeBGDescript: BindGroupCluster;
 
@@ -21,7 +20,7 @@ export default class BitonicDisplayRenderer extends Base2DRendererClass {
     presentationFormat: GPUTextureFormat,
     renderPassDescriptor: GPURenderPassDescriptor,
     computeBGDescript: BindGroupCluster,
-    label: string
+    label: string,
   ) {
     super();
     this.renderPassDescriptor = renderPassDescriptor;
@@ -36,10 +35,10 @@ export default class BitonicDisplayRenderer extends Base2DRendererClass {
       [0],
       [GPUShaderStage.FRAGMENT],
       ['buffer'],
-      [{ type: 'uniform' }],
-      [[{ buffer: uniformBuffer }]],
+      [{type: 'uniform'}],
+      [[{buffer: uniformBuffer}]],
       label,
-      device
+      device,
     );
 
     this.currentBindGroup = bgCluster.bindGroups[0]!;
@@ -49,14 +48,14 @@ export default class BitonicDisplayRenderer extends Base2DRendererClass {
       label,
       [this.computeBGDescript.bindGroupLayout, bgCluster.bindGroupLayout],
       bitonicDisplay,
-      presentationFormat
+      presentationFormat,
     );
 
     this.setArguments = (args: BitonicDisplayRenderArgs) => {
       device.queue.writeBuffer(
         uniformBuffer,
         0,
-        new Uint32Array([args.highlight])
+        new Uint32Array([args.highlight]),
       );
     };
   }

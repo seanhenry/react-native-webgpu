@@ -1,33 +1,44 @@
-import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
-import { globalStyles } from '../../../Components/globalStyles';
-import React, { useRef } from 'react';
+import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
+import {globalStyles} from '../../../Components/globalStyles';
+import {useRef} from 'react';
 
-import { mat4, vec3 } from 'wgpu-matrix';
+import {mat4, vec3} from 'wgpu-matrix';
 // import { GUI } from 'dat.gui';
-import { cubePositionOffset, cubeUVOffset, cubeVertexArray, cubeVertexCount, cubeVertexSize } from '../../meshes/cube';
+import {
+  cubePositionOffset,
+  cubeUVOffset,
+  cubeVertexArray,
+  cubeVertexCount,
+  cubeVertexSize,
+} from '../../meshes/cube';
 import cubeWGSL from './cube.wgsl';
-import { ArcballCamera, WASDCamera } from './camera';
-import { createInputHandler, type InputHandlers } from './input';
-import { StyleSheet, Text, View } from 'react-native';
-import { CenterSquare } from '../../../Components/CenterSquare';
+import {ArcballCamera, WASDCamera} from './camera';
+import {createInputHandler, type InputHandlers} from './input';
+import {StyleSheet, Text, View} from 'react-native';
+import {CenterSquare} from '../../../Components/CenterSquare';
 
 export const Cameras = () => {
-  const inputHandlersRef = useRef<InputHandlers>({})
-  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame, createImageBitmap }) => {
+  const inputHandlersRef = useRef<InputHandlers>({});
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
+    context,
+    navigator,
+    requestAnimationFrame,
+    createImageBitmap,
+  }) => {
     // The input handler
     const inputHandler = createInputHandler(inputHandlersRef.current);
 
     // The camera types
     const initialCameraPosition = vec3.create(3, 2, 5);
     const cameras = {
-      arcball: new ArcballCamera({ position: initialCameraPosition }),
-      WASD: new WASDCamera({ position: initialCameraPosition }),
+      arcball: new ArcballCamera({position: initialCameraPosition}),
+      WASD: new WASDCamera({position: initialCameraPosition}),
     };
 
     // const gui = new GUI();
 
     // GUI parameters
-    const params: { type: 'arcball' | 'WASD' } = {
+    const params: {type: 'arcball' | 'WASD'} = {
       type: 'arcball',
     };
 
@@ -125,7 +136,9 @@ export const Cameras = () => {
     // Fetch the image and upload it into a GPUTexture.
     let cubeTexture: GPUTexture;
     {
-      const imageBitmap = await createImageBitmap(require('../../assets/img/Di-3d.png'));
+      const imageBitmap = await createImageBitmap(
+        require('../../assets/img/Di-3d.png'),
+      );
 
       cubeTexture = device.createTexture({
         size: [imageBitmap.width, imageBitmap.height, 1],
@@ -136,8 +149,8 @@ export const Cameras = () => {
           GPUTextureUsage.RENDER_ATTACHMENT,
       });
       device.queue.copyExternalImageToTexture(
-        { source: imageBitmap },
-        { texture: cubeTexture },
+        {source: imageBitmap},
+        {texture: cubeTexture},
         [imageBitmap.width, imageBitmap.height],
       );
     }
@@ -188,7 +201,12 @@ export const Cameras = () => {
     };
 
     const aspect = width / height;
-    const projectionMatrix = mat4.perspective((2 * Math.PI) / 5, aspect, 1, 100.0);
+    const projectionMatrix = mat4.perspective(
+      (2 * Math.PI) / 5,
+      aspect,
+      1,
+      100.0,
+    );
     const modelViewProjectionMatrix = mat4.create();
 
     function getModelViewProjectionMatrix(deltaTime: number) {
@@ -218,7 +236,9 @@ export const Cameras = () => {
         modelViewProjection.byteOffset,
         modelViewProjection.byteLength,
       );
-      (renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[])[0]!.view = framebuffer.createView();
+      (
+        renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[]
+      )[0]!.view = framebuffer.createView();
 
       const commandEncoder = device.createCommandEncoder();
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
@@ -240,15 +260,17 @@ export const Cameras = () => {
     <>
       <Text style={styles.instructions}>Swipe the cube to rotate</Text>
       <CenterSquare>
-        <View style={globalStyles.fill}
-              pointerEvents="box-only"
-              onTouchStart={(e) => inputHandlersRef.current.onTouchStart?.(e)}
-              onTouchMove={(e) => inputHandlersRef.current.onTouchMove?.(e)}
-              onTouchEnd={(e) => inputHandlersRef.current.onTouchEnd?.(e)}
-              onTouchCancel={(e) => inputHandlersRef.current.onTouchEnd?.(e)}
-
-        >
-          <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
+        <View
+          style={globalStyles.fill}
+          pointerEvents="box-only"
+          onTouchStart={e => inputHandlersRef.current.onTouchStart?.(e)}
+          onTouchMove={e => inputHandlersRef.current.onTouchMove?.(e)}
+          onTouchEnd={e => inputHandlersRef.current.onTouchEnd?.(e)}
+          onTouchCancel={e => inputHandlersRef.current.onTouchEnd?.(e)}>
+          <WebGpuView
+            onCreateSurface={onCreateSurface}
+            style={globalStyles.fill}
+          />
         </View>
       </CenterSquare>
     </>
@@ -259,5 +281,5 @@ const styles = StyleSheet.create({
   instructions: {
     marginTop: 8,
     marginLeft: 8,
-  }
-})
+  },
+});

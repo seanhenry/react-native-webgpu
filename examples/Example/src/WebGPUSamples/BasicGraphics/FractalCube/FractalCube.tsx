@@ -1,9 +1,8 @@
 // https://webgpu.github.io/webgpu-samples/?sample=fractalCube
-import { CenterSquare } from '../../../Components/CenterSquare';
-import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
-import { globalStyles } from '../../../Components/globalStyles';
-import React from 'react'
-import { mat4, vec3 } from 'wgpu-matrix';
+import {CenterSquare} from '../../../Components/CenterSquare';
+import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
+import {globalStyles} from '../../../Components/globalStyles';
+import {mat4, vec3} from 'wgpu-matrix';
 
 import {
   cubeVertexArray,
@@ -17,7 +16,11 @@ import basicVertWGSL from '../../shaders/basic.vert.wgsl';
 import sampleSelfWGSL from './sampleSelf.frag.wgsl';
 
 export const FractalCube = () => {
-  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame }) => {
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
+    context,
+    navigator,
+    requestAnimationFrame,
+  }) => {
     const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter!.requestDevice();
 
@@ -32,7 +35,7 @@ export const FractalCube = () => {
       // Specify we want both RENDER_ATTACHMENT and COPY_SRC since we
       // will copy out of the swapchain texture.
       usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
-      alphaMode: "premultiplied",
+      alphaMode: 'premultiplied',
     });
 
     // Create a vertex buffer from the cube data.
@@ -166,7 +169,12 @@ export const FractalCube = () => {
     };
 
     const aspect = width / height;
-    const projectionMatrix = mat4.perspective((2 * Math.PI) / 5, aspect, 1, 100.0);
+    const projectionMatrix = mat4.perspective(
+      (2 * Math.PI) / 5,
+      aspect,
+      1,
+      100.0,
+    );
     const modelViewProjectionMatrix = mat4.create();
 
     function getTransformationMatrix() {
@@ -177,7 +185,7 @@ export const FractalCube = () => {
         viewMatrix,
         vec3.fromValues(Math.sin(now), Math.cos(now), 0),
         1,
-        viewMatrix
+        viewMatrix,
       );
 
       mat4.multiply(projectionMatrix, viewMatrix, modelViewProjectionMatrix);
@@ -197,7 +205,7 @@ export const FractalCube = () => {
         0,
         transformationMatrix.buffer,
         transformationMatrix.byteOffset,
-        transformationMatrix.byteLength
+        transformationMatrix.byteLength,
       );
 
       // prettier-ignore
@@ -219,7 +227,7 @@ export const FractalCube = () => {
         {
           texture: cubeTexture,
         },
-        [width, height]
+        [width, height],
       );
 
       device.queue.submit([commandEncoder.finish()]);
@@ -228,12 +236,11 @@ export const FractalCube = () => {
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
-
-  }
+  };
 
   return (
     <CenterSquare>
       <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
     </CenterSquare>
-  )
-}
+  );
+};

@@ -1,7 +1,7 @@
 // Note: The code in this file does not use the 'dst' output parameter of functions in the
 // 'wgpu-matrix' library, so produces many temporary vectors and matrices.
 // This is intentional, as this sample prefers readability over performance.
-import { type Mat4, type Vec3, type Vec4, mat4, vec3 } from 'wgpu-matrix';
+import {type Mat4, type Vec3, type Vec4, mat4, vec3} from 'wgpu-matrix';
 import type Input from './input';
 
 // Common interface for camera implementations
@@ -186,7 +186,7 @@ export class WASDCamera extends CameraBase implements Camera {
     this.velocity = lerp(
       targetVelocity,
       this.velocity,
-      Math.pow(1 - this.frictionCoefficient, deltaTime)
+      Math.pow(1 - this.frictionCoefficient, deltaTime),
     );
 
     // Integrate velocity to calculate new position

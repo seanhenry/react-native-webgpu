@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "rootDir": ".",
-    "paths": {
-      "react-native-webgpu": ["./src/index"]
-    },
+    "outDir": "lib",
+    "declaration": true,
+    "declarationDir": "lib/typescript",
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "lib": ["esnext"],
     "module": "esnext",
     "moduleResolution": "node",

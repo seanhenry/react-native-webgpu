@@ -1,9 +1,8 @@
 // import type { GUI } from 'dat.gui';
 import fullscreenTexturedQuad from '../../shaders/fullscreenTexturedQuad.wgsl';
-import type { SurfaceBackedWebGPU, WGPUContext } from 'react-native-webgpu';
+import type {SurfaceBackedWebGPU, WGPUContext} from 'react-native-webgpu';
 
-type BindGroupBindingLayout =
-  | GPUBufferBindingLayout
+type BindGroupBindingLayout = GPUBufferBindingLayout;
 //   | GPUTextureBindingLayout
 //   | GPUSamplerBindingLayout
 //   | GPUStorageTextureBindingLayout
@@ -17,12 +16,11 @@ export type BindGroupCluster = {
   bindGroupLayout: GPUBindGroupLayout;
 };
 
-type ResourceTypeName =
-  | 'buffer'
-  // | 'texture'
-  // | 'sampler'
-  // | 'externalTexture'
-  // | 'storageTexture';
+type ResourceTypeName = 'buffer';
+// | 'texture'
+// | 'sampler'
+// | 'externalTexture'
+// | 'storageTexture';
 
 /**
  * @param {number[]} bindings - The binding value of each resource in the bind group.
@@ -37,7 +35,7 @@ export const createBindGroupCluster = (
   resourceLayouts: BindGroupBindingLayout[],
   resources: GPUBindingResource[][],
   label: string,
-  device: GPUDevice
+  device: GPUDevice,
 ): BindGroupCluster => {
   const layoutEntries: GPUBindGroupLayoutEntry[] = [];
   for (let i = 0; i < bindings.length; i++) {
@@ -81,6 +79,7 @@ export const createBindGroupCluster = (
 };
 
 export type ShaderKeyInterface<T extends string[]> = {
+  // eslint-disable-next-line no-unused-vars
   [K in T[number]]: number;
 };
 
@@ -104,16 +103,19 @@ interface DeviceInit3DParams extends DeviceInitParms {
 
 type CallbackSync3D = (params: SampleInitParams & DeviceInit3DParams) => void;
 type CallbackAsync3D = (
-  params: SampleInitParams & DeviceInit3DParams
+  params: SampleInitParams & DeviceInit3DParams,
 ) => Promise<void>;
 
 type SampleInitCallback3D = CallbackSync3D | CallbackAsync3D;
 export type SampleInit = (params: SampleInitParams) => void;
 
 export const SampleInitFactoryWebGPU = async (
-  callback: SampleInitCallback3D
+  callback: SampleInitCallback3D,
 ): Promise<SampleInit> => {
-  const init = async ({ context, navigator /* canvas, gui, stats*/ }: SampleInitParams) => {
+  const init = async ({
+    context,
+    navigator /* canvas, gui, stats*/,
+  }: SampleInitParams) => {
     const adapter = await navigator.gpu.requestAdapter();
     const timestampQueryAvailable = adapter!.features.has('timestamp-query');
     let device: GPUDevice;
@@ -124,11 +126,11 @@ export const SampleInitFactoryWebGPU = async (
     } else {
       device = await adapter!.requestDevice();
     }
-    const presentationFormat = navigator.gpu.getPreferredCanvasFormat()
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: "premultiplied",
+      alphaMode: 'premultiplied',
     });
 
     callback({
@@ -151,22 +153,17 @@ export abstract class Base2DRendererClass {
     commandEncoder: GPUCommandEncoder,
     ...args: unknown[]
   ): void;
-  // @ts-expect-error
   renderPassDescriptor: GPURenderPassDescriptor;
-  // @ts-expect-error
   pipeline: GPURenderPipeline;
-  // @ts-expect-error
   bindGroupMap: Record<string, GPUBindGroup>;
-  // @ts-expect-error
   currentBindGroup: GPUBindGroup;
-  // @ts-expect-error
   currentBindGroupName: string;
 
   executeRun(
     commandEncoder: GPUCommandEncoder,
     renderPassDescriptor: GPURenderPassDescriptor,
     pipeline: GPURenderPipeline,
-    bindGroups: GPUBindGroup[]
+    bindGroups: GPUBindGroup[],
   ) {
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
     passEncoder.setPipeline(pipeline);
@@ -177,17 +174,15 @@ export abstract class Base2DRendererClass {
     passEncoder.end();
   }
 
-  setUniformArguments<T extends {[key: string]: number}, K extends readonly string[]>(
-    device: GPUDevice,
-    uniformBuffer: GPUBuffer,
-    instance: T,
-    keys: K
-  ) {
+  setUniformArguments<
+    T extends {[key: string]: number},
+    K extends readonly string[],
+  >(device: GPUDevice, uniformBuffer: GPUBuffer, instance: T, keys: K) {
     for (let i = 0; i < keys.length; i++) {
       device.queue.writeBuffer(
         uniformBuffer,
         i * 4,
-        new Float32Array([instance[keys[i]!]!])
+        new Float32Array([instance[keys[i]!]!]),
       );
     }
   }
@@ -197,7 +192,7 @@ export abstract class Base2DRendererClass {
     label: string,
     bgLayouts: GPUBindGroupLayout[],
     code: string,
-    presentationFormat: GPUTextureFormat
+    presentationFormat: GPUTextureFormat,
   ) {
     return device.createRenderPipeline({
       label: `${label}.pipeline`,

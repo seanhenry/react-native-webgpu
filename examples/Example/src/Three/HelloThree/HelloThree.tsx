@@ -1,13 +1,16 @@
-import { CenterSquare } from '../../Components/CenterSquare';
-import { globalStyles } from '../../Components/globalStyles';
-import React from 'react';
-import { ThreeWebGpuView, ThreeWebGpuViewProps } from 'react-native-webgpu-three';
+import {CenterSquare} from '../../Components/CenterSquare';
+import {globalStyles} from '../../Components/globalStyles';
+import {ThreeWebGpuView, ThreeWebGpuViewProps} from 'react-native-webgpu-three';
 import * as THREE from 'three';
+
 import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 export const HelloThree = () => {
-  const onCreateSurface: ThreeWebGpuViewProps['onCreateSurface'] = async ({ context, rendererParameters }) => {
-    const {width, height} = context
+  const onCreateSurface: ThreeWebGpuViewProps['onCreateSurface'] = async ({
+    context,
+    rendererParameters,
+  }) => {
+    const {width, height} = context;
 
     const camera = new THREE.PerspectiveCamera(70, width / height, 0.01, 10);
     camera.position.z = 1;
@@ -33,18 +36,20 @@ export const HelloThree = () => {
       mesh.rotation.y = time / 1000;
 
       renderer.render(scene, camera);
-      context.presentSurface()
-
+      context.presentSurface();
     }
     renderer.setAnimationLoop(animate);
 
     return () => {
-      renderer.setAnimationLoop(null)
-    }
+      renderer.setAnimationLoop(null);
+    };
   };
   return (
     <CenterSquare>
-      <ThreeWebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
+      <ThreeWebGpuView
+        onCreateSurface={onCreateSurface}
+        style={globalStyles.fill}
+      />
     </CenterSquare>
   );
 };

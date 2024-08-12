@@ -1,8 +1,7 @@
 // https://webgpu.github.io/webgpu-samples/?sample=instancedCube
-import { CenterSquare } from '../../../Components/CenterSquare';
-import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
-import React from 'react'
-import { mat4, type Mat4, vec3 } from 'wgpu-matrix';
+import {CenterSquare} from '../../../Components/CenterSquare';
+import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
+import {mat4, type Mat4, vec3} from 'wgpu-matrix';
 
 import {
   cubeVertexArray,
@@ -13,10 +12,14 @@ import {
 } from '../../meshes/cube';
 import instancedVertWGSL from './instanced.vert.wgsl';
 import vertexPositionColorWGSL from '../../shaders/vertexPositionColor.frag.wgsl';
-import { globalStyles } from '../../../Components/globalStyles';
+import {globalStyles} from '../../../Components/globalStyles';
 
 export const InstancedCube = () => {
-  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame }) => {
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
+    context,
+    navigator,
+    requestAnimationFrame,
+  }) => {
     const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter!.requestDevice();
 
@@ -26,7 +29,7 @@ export const InstancedCube = () => {
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: "premultiplied",
+      alphaMode: 'premultiplied',
     });
 
     // Create a vertex buffer from the cube data.
@@ -127,7 +130,12 @@ export const InstancedCube = () => {
     });
 
     const aspect = width / height;
-    const projectionMatrix = mat4.perspective((2 * Math.PI) / 5, aspect, 1, 100.0);
+    const projectionMatrix = mat4.perspective(
+      (2 * Math.PI) / 5,
+      aspect,
+      1,
+      100.0,
+    );
 
     const modelMatrices = new Array<Mat4>(numInstances);
     const mvpMatricesData = new Float32Array(matrixFloatCount * numInstances);
@@ -142,8 +150,8 @@ export const InstancedCube = () => {
           vec3.fromValues(
             step * (x - xCount / 2 + 0.5),
             step * (y - yCount / 2 + 0.5),
-            0
-          )
+            0,
+          ),
         );
         m++;
       }
@@ -156,7 +164,7 @@ export const InstancedCube = () => {
     // Update the transformation matrix data for each instance.
     function updateTransformationMatrix() {
       const now = Date.now() / 1000;
-
+      // eslint-disable-next-line @typescript-eslint/no-shadow
       let m = 0,
         i = 0;
       for (let x = 0; x < xCount; x++) {
@@ -166,10 +174,10 @@ export const InstancedCube = () => {
             vec3.fromValues(
               Math.sin((x + 0.5) * now),
               Math.cos((y + 0.5) * now),
-              0
+              0,
             ),
             1,
-            tmpMat4
+            tmpMat4,
           );
 
           mat4.multiply(viewMatrix, tmpMat4, tmpMat4);
@@ -215,10 +223,12 @@ export const InstancedCube = () => {
         0,
         mvpMatricesData.buffer,
         mvpMatricesData.byteOffset,
-        mvpMatricesData.byteLength
+        mvpMatricesData.byteLength,
       );
 
-      (renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[])[0]!.view = framebuffer.createView();
+      (
+        renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[]
+      )[0]!.view = framebuffer.createView();
 
       const commandEncoder = device.createCommandEncoder();
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
@@ -233,10 +243,10 @@ export const InstancedCube = () => {
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
-  }
+  };
   return (
     <CenterSquare>
       <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
     </CenterSquare>
-  )
-}
+  );
+};

@@ -1,14 +1,16 @@
 // https://webgpu.github.io/webgpu-samples/?sample=helloTriangle
-import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
+import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
 import triangleVertWGSL from '../../shaders/triangle.vert.wgsl';
 import redFragWGSL from '../../shaders/red.frag.wgsl';
-import React from 'react';
-import { CenterSquare } from '../../../Components/CenterSquare';
-import { globalStyles } from '../../../Components/globalStyles';
+import {CenterSquare} from '../../../Components/CenterSquare';
+import {globalStyles} from '../../../Components/globalStyles';
 
 export function HelloTriangle() {
-
-  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({context, navigator, requestAnimationFrame}) => {
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
+    context,
+    navigator,
+    requestAnimationFrame,
+  }) => {
     const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter!.requestDevice();
 
@@ -17,7 +19,7 @@ export function HelloTriangle() {
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: "premultiplied",
+      alphaMode: 'premultiplied',
     });
 
     const pipeline = device.createRenderPipeline({
@@ -63,7 +65,7 @@ export function HelloTriangle() {
             storeOp: 'store',
           },
         ],
-      }
+      };
 
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
       passEncoder.setPipeline(pipeline);

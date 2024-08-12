@@ -1,5 +1,5 @@
 // https://webgpu.github.io/webgpu-samples/?sample=texturedCube
-import { mat4, vec3 } from 'wgpu-matrix';
+import {mat4, vec3} from 'wgpu-matrix';
 
 import {
   cubeVertexArray,
@@ -11,13 +11,17 @@ import {
 
 import basicVertWGSL from '../../shaders/basic.vert.wgsl';
 import sampleTextureMixColorWGSL from './sampleTextureMixColor.frag.wgsl';
-import { CenterSquare } from '../../../Components/CenterSquare';
-import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
-import React from 'react';
-import { globalStyles } from '../../../Components/globalStyles';
+import {CenterSquare} from '../../../Components/CenterSquare';
+import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
+import {globalStyles} from '../../../Components/globalStyles';
 
 export const TexturedCube = () => {
-  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame, createImageBitmap }) => {
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
+    context,
+    navigator,
+    requestAnimationFrame,
+    createImageBitmap,
+  }) => {
     const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter!.requestDevice();
 
@@ -27,7 +31,7 @@ export const TexturedCube = () => {
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: "premultiplied",
+      alphaMode: 'premultiplied',
     });
 
     // Create a vertex buffer from the cube data.
@@ -122,9 +126,9 @@ export const TexturedCube = () => {
           GPUTextureUsage.RENDER_ATTACHMENT,
       });
       device.queue.copyExternalImageToTexture(
-        { source: imageBitmap },
-        { texture: cubeTexture },
-        [imageBitmap.width, imageBitmap.height]
+        {source: imageBitmap},
+        {texture: cubeTexture},
+        [imageBitmap.width, imageBitmap.height],
       );
 
       imageBitmap.close();
@@ -176,7 +180,12 @@ export const TexturedCube = () => {
     };
 
     const aspect = width / height;
-    const projectionMatrix = mat4.perspective((2 * Math.PI) / 5, aspect, 1, 100.0);
+    const projectionMatrix = mat4.perspective(
+      (2 * Math.PI) / 5,
+      aspect,
+      1,
+      100.0,
+    );
     const modelViewProjectionMatrix = mat4.create();
 
     function getTransformationMatrix() {
@@ -187,7 +196,7 @@ export const TexturedCube = () => {
         viewMatrix,
         vec3.fromValues(Math.sin(now), Math.cos(now), 0),
         1,
-        viewMatrix
+        viewMatrix,
       );
 
       mat4.multiply(projectionMatrix, viewMatrix, modelViewProjectionMatrix);
@@ -198,8 +207,8 @@ export const TexturedCube = () => {
     function frame() {
       const framebuffer = context.getCurrentTexture();
       if (!framebuffer) {
-        requestAnimationFrame(frame)
-        return
+        requestAnimationFrame(frame);
+        return;
       }
 
       const transformationMatrix = getTransformationMatrix();
@@ -208,10 +217,12 @@ export const TexturedCube = () => {
         0,
         transformationMatrix.buffer,
         transformationMatrix.byteOffset,
-        transformationMatrix.byteLength
+        transformationMatrix.byteLength,
       );
 
-      (renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[])[0]!.view = framebuffer.createView();
+      (
+        renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[]
+      )[0]!.view = framebuffer.createView();
 
       const commandEncoder = device.createCommandEncoder();
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
@@ -226,10 +237,10 @@ export const TexturedCube = () => {
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
-  }
+  };
   return (
     <CenterSquare>
       <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
     </CenterSquare>
-  )
-}
+  );
+};

@@ -1,18 +1,23 @@
-import { CenterSquare } from '../../../Components/CenterSquare';
-import { WebGpuView, type WebGpuViewProps } from 'react-native-webgpu';
-import { globalStyles } from '../../../Components/globalStyles';
-import React, { useRef } from 'react';
+import {CenterSquare} from '../../../Components/CenterSquare';
+import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
+import {globalStyles} from '../../../Components/globalStyles';
+import {useRef} from 'react';
 
 import spriteWGSL from './sprite.wgsl';
 import updateSpritesWGSL from './updateSprites.wgsl';
-import { StyleSheet, TextInput, View } from 'react-native';
+import {StyleSheet, TextInput, View} from 'react-native';
 // import { GUI } from 'dat.gui';
 
 export const ComputeBoids = () => {
-  const perfDisplayRef = useRef<TextInput | null>(null)
-  const setText = (text: string) => perfDisplayRef.current?.setNativeProps({text})
+  const perfDisplayRef = useRef<TextInput | null>(null);
+  const setText = (text: string) =>
+    perfDisplayRef.current?.setNativeProps({text});
 
-  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({ context, navigator, requestAnimationFrame }) => {
+  const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
+    context,
+    navigator,
+    requestAnimationFrame,
+  }) => {
     const adapter = await navigator.gpu.requestAdapter();
 
     const hasTimestampQuery = adapter!.features.has('timestamp-query');
@@ -20,17 +25,21 @@ export const ComputeBoids = () => {
       requiredFeatures: hasTimestampQuery ? ['timestamp-query'] : [],
     });
 
-    setText(hasTimestampQuery ? 'Collecting samples...' : 'timestamp-query not supported on this device');
+    setText(
+      hasTimestampQuery
+        ? 'Collecting samples...'
+        : 'timestamp-query not supported on this device',
+    );
 
     const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: "premultiplied",
+      alphaMode: 'premultiplied',
     });
 
-    const spriteShaderModule = device.createShaderModule({ code: spriteWGSL });
+    const spriteShaderModule = device.createShaderModule({code: spriteWGSL});
     const renderPipeline = device.createRenderPipeline({
       layout: 'auto',
       vertex: {
@@ -109,9 +118,9 @@ export const ComputeBoids = () => {
     const computePassDescriptor: GPUComputePassDescriptor = {};
 
     /** Storage for timestamp query results */
-    let querySet: GPUQuerySet | undefined = undefined;
+    let querySet: GPUQuerySet | undefined;
     /** Timestamps are resolved into this buffer */
-    let resolveBuffer: GPUBuffer | undefined = undefined;
+    let resolveBuffer: GPUBuffer | undefined;
     /** Pool of spare buffers for MAP_READing the timestamps back to CPU. A buffer
      * is taken from the pool (if available) when a readback is needed, and placed
      * back into the pool once the readback is done and it's unmapped. */
@@ -180,7 +189,7 @@ export const ComputeBoids = () => {
           simParams.rule1Scale,
           simParams.rule2Scale,
           simParams.rule3Scale,
-        ])
+        ]),
       );
     }
 
@@ -209,7 +218,7 @@ export const ComputeBoids = () => {
         mappedAtCreation: true,
       });
       new Float32Array(particleBuffers[i]!.getMappedRange()).set(
-        initialParticleData
+        initialParticleData,
       );
       particleBuffers[i]!.unmap();
     }
@@ -254,18 +263,23 @@ export const ComputeBoids = () => {
         requestAnimationFrame(frame);
         return;
       }
-      (renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[])[0]!.view = framebuffer.createView();
+      (
+        renderPassDescriptor.colorAttachments as GPURenderPassColorAttachment[]
+      )[0]!.view = framebuffer.createView();
 
       const commandEncoder = device.createCommandEncoder();
       {
-        const passEncoder = commandEncoder.beginComputePass(computePassDescriptor);
+        const passEncoder = commandEncoder.beginComputePass(
+          computePassDescriptor,
+        );
         passEncoder.setPipeline(computePipeline);
         passEncoder.setBindGroup(0, particleBindGroups[t % 2]!);
         passEncoder.dispatchWorkgroups(Math.ceil(numParticles / 64));
         passEncoder.end();
       }
       {
-        const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
+        const passEncoder =
+          commandEncoder.beginRenderPass(renderPassDescriptor);
         passEncoder.setPipeline(renderPipeline);
         passEncoder.setVertexBuffer(0, particleBuffers[(t + 1) % 2]!);
         passEncoder.setVertexBuffer(1, spriteVertexBuffer);
@@ -273,7 +287,7 @@ export const ComputeBoids = () => {
         passEncoder.end();
       }
 
-      let resultBuffer: GPUBuffer | undefined = undefined;
+      let resultBuffer: GPUBuffer | undefined;
       if (hasTimestampQuery) {
         resultBuffer =
           spareResultBuffers.pop() ||
@@ -287,7 +301,7 @@ export const ComputeBoids = () => {
           0,
           resultBuffer,
           0,
-          resultBuffer!.size
+          resultBuffer!.size,
         );
       }
 
@@ -314,10 +328,10 @@ export const ComputeBoids = () => {
           const kNumTimerSamplesPerUpdate = 10;
           if (timerSamples >= kNumTimerSamplesPerUpdate) {
             const avgComputeMicroseconds = Math.round(
-              computePassDurationSum / timerSamples / 1000
+              computePassDurationSum / timerSamples / 1000,
             );
             const avgRenderMicroseconds = Math.round(
-              renderPassDurationSum / timerSamples / 1000
+              renderPassDurationSum / timerSamples / 1000,
             );
             setText(`\
 avg compute pass duration: ${avgComputeMicroseconds}µs
@@ -335,19 +349,27 @@ spare readback buffers:    ${spareResultBuffers.length}`);
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
-  }
+  };
 
   return (
     <>
       <View style={styles.perfDisplayContainer}>
-        <TextInput ref={perfDisplayRef} editable={false} style={styles.perfDisplay} multiline />
+        <TextInput
+          ref={perfDisplayRef}
+          editable={false}
+          style={styles.perfDisplay}
+          multiline
+        />
       </View>
       <CenterSquare>
-        <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
+        <WebGpuView
+          onCreateSurface={onCreateSurface}
+          style={globalStyles.fill}
+        />
       </CenterSquare>
     </>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   perfDisplayContainer: {
@@ -359,5 +381,5 @@ const styles = StyleSheet.create({
   perfDisplay: {
     paddingTop: 8,
     paddingLeft: 8,
-  }
-})
+  },
+});

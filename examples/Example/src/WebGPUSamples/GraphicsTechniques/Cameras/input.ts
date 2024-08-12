@@ -1,5 +1,5 @@
 // Input holds as snapshot of input state
-import { type GestureResponderEvent } from 'react-native/Libraries/Types/CoreEventTypes';
+import {type GestureResponderEvent} from 'react-native/Libraries/Types/CoreEventTypes';
 
 export default interface Input {
   // Digital input (e.g keyboard state)
@@ -27,7 +27,7 @@ export type InputHandlers = {
   onTouchStart?: (event: GestureResponderEvent) => void;
   onTouchMove?: (event: GestureResponderEvent) => void;
   onTouchEnd?: (event: GestureResponderEvent) => void;
-}
+};
 
 // createInputHandler returns an InputHandler by attaching event handlers to the window and canvas.
 export function createInputHandler(handlers: InputHandlers): InputHandler {
@@ -87,24 +87,24 @@ export function createInputHandler(handlers: InputHandlers): InputHandler {
   // window.addEventListener('keyup', (e) => setDigital(e, false));
 
   // canvas.style.touchAction = 'pinch-zoom';
-  let lastX = 0
-  let lastY = 0
-  handlers.onTouchStart = (e) => {
+  let lastX = 0;
+  let lastY = 0;
+  handlers.onTouchStart = e => {
     lastX = e.nativeEvent.pageX;
     lastY = e.nativeEvent.pageY;
     mouseDown = true;
-  }
-  handlers.onTouchEnd = (_e) => {
+  };
+  handlers.onTouchEnd = _e => {
     mouseDown = false;
-  }
-  handlers.onTouchMove = (e) => {
+  };
+  handlers.onTouchMove = e => {
     if (mouseDown) {
       analog.x += e.nativeEvent.pageX - lastX;
       analog.y += e.nativeEvent.pageY - lastY;
       lastX = e.nativeEvent.pageX;
       lastY = e.nativeEvent.pageY;
     }
-  }
+  };
   // canvas.addEventListener(
   //   'wheel',
   //   (e) => {

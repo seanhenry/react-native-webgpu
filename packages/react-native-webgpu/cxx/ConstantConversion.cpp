@@ -622,3 +622,16 @@ WGPUAddressMode StringToWGPUAddressMode(const char *str) {
   }
   return WGPUAddressMode_Repeat;
 }
+
+const char *WGPUBufferMapStateToString(WGPUBufferMapState state) {
+  switch (state) {
+    case WGPUBufferMapState_Unmapped:
+      return "unmapped";
+    case WGPUBufferMapState_Pending:
+      return "pending";
+    case WGPUBufferMapState_Mapped:
+      return "mapped";
+    default:
+      return NULL;
+  }
+}

@@ -37,12 +37,14 @@ export const GLTFLoader = () => {
         .load('royal_esplanade_1k.hdr', function (texture) {
           const pmremGenerator = new PMREMGenerator(renderer);
 
+          // @ts-expect-error PMREMGenerator is not correctly typed
           const envMap = pmremGenerator.fromEquirectangular(texture).texture;
 
           // scene.background = envMap;
           scene.environment = envMap;
 
           texture.dispose();
+          // @ts-expect-error PMREMGenerator is not correctly typed
           pmremGenerator.dispose();
 
           // This method does not reload correctly:

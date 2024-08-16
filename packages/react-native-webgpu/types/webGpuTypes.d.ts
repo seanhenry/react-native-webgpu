@@ -71,10 +71,10 @@ type GPUColorWriteFlags =
   number;
 type GPUDepthBias =
   number;
-// type GPUExtent3D =
-//
-//   | Iterable<GPUIntegerCoordinate>
-//   | GPUExtent3DDict;
+type GPUExtent3D =
+
+  | Iterable<GPUIntegerCoordinate>
+  | GPUExtent3DDict;
 type GPUFlagsConstant =
   number;
 type GPUImageCopyExternalImageSource =
@@ -94,10 +94,10 @@ type GPUIntegerCoordinateOut =
   number;
 type GPUMapModeFlags =
   number;
-// type GPUOrigin2D =
-//
-//   | Iterable<GPUIntegerCoordinate>
-//   | GPUOrigin2DDict;
+type GPUOrigin2D =
+
+  | Iterable<GPUIntegerCoordinate>
+  | GPUOrigin2DDict;
 type GPUOrigin3D =
 
   | Iterable<GPUIntegerCoordinate>
@@ -156,11 +156,11 @@ type GPUBufferBindingType =
   | "uniform"
   | "storage"
   | "read-only-storage";
-// type GPUBufferMapState =
-//
-//   | "unmapped"
-//   | "pending"
-//   | "mapped";
+type GPUBufferMapState =
+
+  | "unmapped"
+  | "pending"
+  | "mapped";
 type GPUCanvasAlphaMode =
 
   | "opaque"
@@ -2024,7 +2024,7 @@ interface GPUBuffer
 //   readonly __brand: "GPUBuffer";
   readonly size: GPUSize64Out;
   readonly usage: GPUFlagsConstant;
-  // readonly mapState: GPUBufferMapState;
+  readonly mapState: GPUBufferMapState;
   /**
    * Maps the given range of the {@link GPUBuffer} and resolves the returned {@link Promise} when the
    * {@link GPUBuffer}'s content is ready to be accessed with {@link GPUBuffer#getMappedRange}.

@@ -2,6 +2,7 @@
 
 #include <thread>
 
+#include "ConstantConversion.h"
 #include "JSIInstance.h"
 #include "WGPUContext.h"
 #include "WGPUJsiUtils.h"
@@ -73,6 +74,10 @@ Value BufferHostObject::get(Runtime &runtime, const PropNameID &propName) {
 
   if (name == "usage") {
     return Value((int)wgpuBufferGetUsage(_value));
+  }
+
+  if (name == "mapState") {
+    return String::createFromUtf8(runtime, WGPUBufferMapStateToString(wgpuBufferGetMapState(_value)));
   }
 
   if (name == "destroy") {

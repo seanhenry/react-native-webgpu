@@ -153,10 +153,15 @@ export abstract class Base2DRendererClass {
     commandEncoder: GPUCommandEncoder,
     ...args: unknown[]
   ): void;
+  // @ts-expect-error fix strict error
   renderPassDescriptor: GPURenderPassDescriptor;
+  // @ts-expect-error fix strict error
   pipeline: GPURenderPipeline;
+  // @ts-expect-error fix strict error
   bindGroupMap: Record<string, GPUBindGroup>;
+  // @ts-expect-error fix strict error
   currentBindGroup: GPUBindGroup;
+  // @ts-expect-error fix strict error
   currentBindGroupName: string;
 
   executeRun(

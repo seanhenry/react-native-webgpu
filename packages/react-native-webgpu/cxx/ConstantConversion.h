@@ -33,3 +33,4 @@ WGPUIndexFormat StringToWGPUIndexFormat(const char *str);
 WGPUSamplerBindingType StringToWGPUSamplerBindingType(const char *str);
 WGPUTextureSampleType StringToWGPUTextureSampleType(const char *str);
 WGPUAddressMode StringToWGPUAddressMode(const char *str);
+const char *WGPUBufferMapStateToString(WGPUBufferMapState state);

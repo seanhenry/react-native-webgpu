@@ -15,6 +15,7 @@ import type {Routes} from '../types/navigationTypes';
 import {Cameras} from '../WebGPUSamples/GraphicsTechniques/Cameras/Cameras';
 import {HelloThree} from '../Three/HelloThree/HelloThree';
 import {GLTFLoader} from '../Three/GLTFLoader/GLTFLoader';
+import {SamplerParameters} from '../WebGPUSamples/WebGPUFeatures/SamplerParameters/SamplerParameters';
 
 export type Examples = 'WebGPUSamples' | 'Three';
 
@@ -32,6 +33,8 @@ export type Example =
   | 'ComputeBoids'
   | 'GameOfLife'
   | 'BitonicSort'
+  // WebGPUFeatures
+  | 'SamplerParameters'
   // GraphicsTechniques
   | 'Cameras'
   // Three
@@ -40,23 +43,25 @@ export type Example =
 
 const examples: Record<Example, ComponentType> = {
   // BasicGraphics
-  HelloTriangle: HelloTriangle,
-  HelloTriangleMSAA: HelloTriangleMSAA,
-  RotatingCube: RotatingCube,
-  TwoCubes: TwoCubes,
-  TexturedCube: TexturedCube,
-  InstancedCube: InstancedCube,
-  FractalCube: FractalCube,
-  CubeMap: CubeMap,
+  HelloTriangle,
+  HelloTriangleMSAA,
+  RotatingCube,
+  TwoCubes,
+  TexturedCube,
+  InstancedCube,
+  FractalCube,
+  CubeMap,
   // GPGPU
-  ComputeBoids: ComputeBoids,
-  GameOfLife: GameOfLife,
-  BitonicSort: BitonicSort,
+  ComputeBoids,
+  GameOfLife,
+  BitonicSort,
+  // WebGPUFeatures
+  SamplerParameters,
   // GraphicsTechniques
-  Cameras: Cameras,
+  Cameras,
   // Three.js
-  HelloThree: HelloThree,
-  GLTFLoader: GLTFLoader,
+  HelloThree,
+  GLTFLoader,
 };
 
 export function ExampleScreen() {

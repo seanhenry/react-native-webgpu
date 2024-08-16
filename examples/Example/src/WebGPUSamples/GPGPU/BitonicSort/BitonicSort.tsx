@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {CenterSquare} from '../../../Components/CenterSquare';
 import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
 import {globalStyles} from '../../../Components/globalStyles';
@@ -16,26 +17,21 @@ export const BitonicSort = () => {
     requestAnimationFrame,
   }) => {
     // Type of step that will be executed in our shader
-    // enum StepEnum {
-    //   NONE,
-    //   FLIP_LOCAL,
-    //   DISPERSE_LOCAL,
-    //   FLIP_GLOBAL,
-    //   DISPERSE_GLOBAL,
-    // }
+    enum StepEnum {
+      NONE,
+      FLIP_LOCAL,
+      DISPERSE_LOCAL,
+      FLIP_GLOBAL,
+      DISPERSE_GLOBAL,
+    }
 
-    type StepType =
-      // NONE: No sort step has or will occur
-      | 'NONE'
-      // FLIP_LOCAL: A sort step that performs a flip operation over indices in a workgroup's locally addressable area
-      // (i.e invocations * workgroup_index -> invocations * (workgroup_index + 1) - 1.
-      | 'FLIP_LOCAL'
-      // DISPERSE_LOCAL A sort step that performs a flip operation over indices in a workgroup's locally addressable area.
-      | 'DISPERSE_LOCAL'
-      // FLIP_GLOBAL A sort step that performs a flip step across a range of indices outside a workgroup's locally addressable area.
-      | 'FLIP_GLOBAL'
-      // DISPERSE_GLOBAL A sort step that performs a disperse operation across a range of indices outside a workgroup's locally addressable area.
-      | 'DISPERSE_GLOBAL';
+    type StepType = keyof typeof StepEnum;
+    // NONE: No sort step has or will occur
+    // FLIP_LOCAL: A sort step that performs a flip operation over indices in a workgroup's locally addressable area
+    //   (i.e invocations * workgroup_index -> invocations * (workgroup_index + 1) - 1.
+    // DISPERSE_LOCAL A sort step that performs a flip operation over indices in a workgroup's locally addressable area.
+    // FLIP_GLOBAL A sort step that performs a flip step across a range of indices outside a workgroup's locally addressable area.
+    // DISPERSE_GLOBAL A sort step that performs a disperse operation across a range of indices outside a workgroup's locally addressable area.
 
     type DisplayType = 'Elements' | 'Swap Highlight';
 

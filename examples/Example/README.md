@@ -6,7 +6,7 @@ You can run the examples using the instructions below.
 
 ```bash
 git clone https://github.com/seanhenry/react-native-webgpu.git
-cd examples/Example
+cd react-native-webgpu/examples/Example
 ```
 
 2. Install JavaScript dependencies

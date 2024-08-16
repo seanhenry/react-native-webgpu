@@ -16,6 +16,7 @@ import {Cameras} from '../WebGPUSamples/GraphicsTechniques/Cameras/Cameras';
 import {HelloThree} from '../Three/HelloThree/HelloThree';
 import {GLTFLoader} from '../Three/GLTFLoader/GLTFLoader';
 import {SamplerParameters} from '../WebGPUSamples/WebGPUFeatures/SamplerParameters/SamplerParameters';
+import {ReversedZ} from '../WebGPUSamples/WebGPUFeatures/ReversedZ/ReversedZ.tsx';
 
 export type Examples = 'WebGPUSamples' | 'Three';
 
@@ -35,6 +36,7 @@ export type Example =
   | 'BitonicSort'
   // WebGPUFeatures
   | 'SamplerParameters'
+  | 'ReversedZ'
   // GraphicsTechniques
   | 'Cameras'
   // Three
@@ -57,6 +59,7 @@ const examples: Record<Example, ComponentType> = {
   BitonicSort,
   // WebGPUFeatures
   SamplerParameters,
+  ReversedZ,
   // GraphicsTechniques
   Cameras,
   // Three.js

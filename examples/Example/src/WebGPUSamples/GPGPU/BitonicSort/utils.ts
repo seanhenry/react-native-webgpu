@@ -79,7 +79,6 @@ export const createBindGroupCluster = (
 };
 
 export type ShaderKeyInterface<T extends string[]> = {
-  // eslint-disable-next-line no-unused-vars
   [K in T[number]]: number;
 };
 

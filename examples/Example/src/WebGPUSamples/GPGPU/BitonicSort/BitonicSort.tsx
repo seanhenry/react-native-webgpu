@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import {CenterSquare} from '../../../Components/CenterSquare';
 import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
 import {globalStyles} from '../../../Components/globalStyles';

@@ -21,7 +21,7 @@ module.exports = {
     'react/jsx-uses-react': 'off',
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off',
-    'no-unused-vars': 'warn',
+    'no-unused-vars': 'off',
     'react-native/no-inline-styles': 'warn',
     'react-native/no-unused-styles': 'warn',
     'react-native/sort-styles': 'off',

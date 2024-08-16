@@ -48,7 +48,7 @@ const sections: Record<Examples, ListProps<Example>['sections']> = {
     },
     {
       title: 'WebGPU Features',
-      data: [{title: 'SamplerParameters'}],
+      data: [{title: 'SamplerParameters'}, {title: 'ReversedZ'}],
     },
     {
       title: 'Graphics Techniques',

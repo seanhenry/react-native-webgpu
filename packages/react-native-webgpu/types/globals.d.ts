@@ -1,4 +1,7 @@
-import type { ImageResolvedAssetSource, ImageSourcePropType } from 'react-native';
+import type {
+  ImageResolvedAssetSource,
+  ImageSourcePropType,
+} from 'react-native';
 import type { HeadlessWebGPU, ImageBitmap, SurfaceBackedWebGPU } from './types';
 
 declare global {

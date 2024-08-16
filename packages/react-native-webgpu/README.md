@@ -28,8 +28,6 @@ You can find instructions to run the examples [here](../../examples/Example).
 
 ```shell
 yarn add react-native-webgpu
-# For importing .wgsl files:
-yarn add -D babel-plugin-inline-import 
 ```
 
 - Install pods
@@ -47,24 +45,42 @@ cd ..
 import 'react-native-webgpu'
 ```
 
-- Add the plugin to `babel.config.js` to support `.wgsl` files
+- Add plugin to `babel.config.js` to support `.wgsl` files
 
 ```javascript
 // babel.config.js
 modules.exports = {
   plugins: [
-    ['babel-plugin-inline-import', { extensions: ['.wgsl'] }],
+    require('react-native-webgpu/babel-plugin-transform-wgsl'),
   ],
 };
 ```
 
-- TypeScript only, add type definition for `.wgsl` files
+- Add to `metro.config.js` to support `.wgsl` files
 
-```typescript
-// index.d.ts
-declare module '*.wgsl' {
-  var value: string
-  export default value
+```javascript
+// metro.config.js
+const defaultConfig = getDefaultConfig(__dirname);
+const webGpuConfig = require('react-native-webgpu/metro');
+const config = {
+  resolver: {
+    sourceExts: [
+      ...defaultConfig.resolver.sourceExts,
+      ...webGpuConfig.resolver.sourceExts,
+    ],
+  },
+};
+```
+
+- TypeScript only, add global types to `tsconfig.json`
+
+```json 
+{
+  "include": [
+    "node_modules/react-native-webgpu/types/webGpuTypes.d.ts",
+    "node_modules/react-native-webgpu/types/globals.d.ts",
+    "node_modules/react-native-webgpu/types/wgsl.d.ts"
+  ]
 }
 ```
 

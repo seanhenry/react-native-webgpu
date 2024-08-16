@@ -10,6 +10,7 @@
 #include "PipelineLayoutHostObject.h"
 #include "QuerySetHostObject.h"
 #include "QueueHostObject.h"
+#include "RenderBundleEncoderHostObject.h"
 #include "RenderPipelineHostObject.h"
 #include "SamplerHostObject.h"
 #include "ShaderModuleHostObject.h"
@@ -350,6 +351,33 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
     });
   }
 
+  if (name == "createRenderBundleEncoder") {
+    return WGPU_FUNC_FROM_HOST_FUNC(createRenderBundleEncoder, 1, [this]) {
+      auto obj = arguments[0].asObject(runtime);
+      auto label = WGPU_UTF8_OPT(obj, label, "");
+      auto depthStencilFormat = WGPU_UTF8_OPT(obj, depthStencilFormat, "undefined");
+      auto colorFormatsIn = WGPU_ARRAY(obj, colorFormats);
+      auto colorFormats =
+        jsiArrayToVector<WGPUTextureFormat>(runtime, std::move(colorFormatsIn), [](Runtime &runtime, Value value) {
+          auto format = value.asString(runtime).utf8(runtime);
+          return StringToWGPUTextureFormat(format);
+        });
+      WGPURenderBundleEncoderDescriptor descriptor = {
+        .nextInChain = nullptr,
+        .label = label.data(),
+        .colorFormatCount = colorFormats.size(),
+        .colorFormats = colorFormats.data(),
+        .depthStencilFormat = StringToWGPUTextureFormat(depthStencilFormat),
+        .sampleCount = WGPU_NUMBER_OPT(obj, sampleCount, uint32_t, 1),
+        .depthReadOnly = WGPU_BOOL_OPT(obj, depthReadOnly, false),
+        .stencilReadOnly = WGPU_BOOL_OPT(obj, depthReadOnly, false),
+      };
+      auto encoder = wgpuDeviceCreateRenderBundleEncoder(getValue(), &descriptor);
+      return Object::createFromHostObject(
+        runtime, std::make_shared<RenderBundleEncoderHostObject>(encoder, _context, std::move(label)));
+    });
+  }
+
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
   return Value::undefined();
@@ -358,5 +386,5 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
 std::vector<PropNameID> DeviceHostObject::getPropertyNames(Runtime &runtime) {
   return PropNameID::names(runtime, "createRenderPipeline", "createShaderModule", "createCommandEncoder", "queue",
                            "createBuffer", "createTexture", "createBindGroup", "createSampler", "createBindGroupLayout",
-                           "createPipelineLayout", "features", "limits", "createQuerySet");
+                           "createPipelineLayout", "features", "limits", "createQuerySet", "createRenderBundleEncoder");
 }

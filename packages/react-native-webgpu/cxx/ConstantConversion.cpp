@@ -207,6 +207,7 @@ WGPUTextureFormat StringToWGPUTextureFormat(std::string &format) {
     map["astc-12x10-unorm-srgb"] = WGPUTextureFormat_ASTC12x10UnormSrgb;
     map["astc-12x12-unorm"] = WGPUTextureFormat_ASTC12x12Unorm;
     map["astc-12x12-unorm-srgb"] = WGPUTextureFormat_ASTC12x12UnormSrgb;
+    map["undefined"] = WGPUTextureFormat_Undefined;
     //    map[""] = WGPUTextureFormat_Force32;
   }
   return map.at(format);

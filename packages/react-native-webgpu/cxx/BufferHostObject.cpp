@@ -93,7 +93,8 @@ Value BufferHostObject::get(Runtime &runtime, const PropNameID &propName) {
 }
 
 std::vector<PropNameID> BufferHostObject::getPropertyNames(Runtime &runtime) {
-  return PropNameID::names(runtime, "getMappedRange", "unmap", "mapAsync", "label", "size", "usage", "destroy");
+  return PropNameID::names(runtime, "getMappedRange", "unmap", "mapAsync", "label", "size", "usage", "mapState",
+                           "destroy");
 }
 
 static std::string mapAsyncStatusToString(WGPUBufferMapAsyncStatus status) {

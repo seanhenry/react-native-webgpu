@@ -4,6 +4,7 @@
 #include "CommandBufferHostObject.h"
 #include "ComputePassEncoderHostObject.h"
 #include "ConstantConversion.h"
+#include "Mixins.h"
 #include "QuerySetHostObject.h"
 #include "RenderPassEncoderHostObject.h"
 #include "TextureViewHostObject.h"
@@ -83,22 +84,7 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
     });
   }
 
-  if (name == "finish") {
-    return WGPU_FUNC_FROM_HOST_FUNC(finish, 1, [this]) {
-      WGPU_LOG_FUNC_ARGS(finish);
-      std::string label;
-      if (count > 0) {
-        label = WGPU_UTF8_OPT(arguments[0].asObject(runtime), label, "");
-      }
-      WGPUCommandBufferDescriptor descriptor = {
-        .nextInChain = nullptr,
-        .label = label.data(),
-      };
-      WGPUCommandBuffer buffer = wgpuCommandEncoderFinish(_value, &descriptor);
-      return Object::createFromHostObject(
-        runtime, std::make_shared<CommandBufferHostObject>(buffer, _context, std::move(label)));
-    });
-  }
+  WGPU_ENCODER_MIXIN_FINISH(wgpuCommandEncoderFinish, WGPUCommandBufferDescriptor, CommandBufferHostObject)
 
   if (name == "copyTextureToTexture") {
     return WGPU_FUNC_FROM_HOST_FUNC(copyTextureToTexture, 3, [this]) {

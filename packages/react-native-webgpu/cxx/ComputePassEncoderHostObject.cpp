@@ -2,6 +2,7 @@
 
 #include "BindGroupHostObject.h"
 #include "ComputePipelineHostObject.h"
+#include "Mixins.h"
 #include "WGPUContext.h"
 #include "WGPUJsiUtils.h"
 
@@ -13,29 +14,9 @@ Value ComputePassEncoderHostObject::get(Runtime &runtime, const PropNameID &prop
 
   WGPU_LOG_GET_PROP;
 
-  if (name == "setPipeline") {
-    return WGPU_FUNC_FROM_HOST_FUNC(setPipeline, 1, [this]) {
-      WGPU_LOG_FUNC_ARGS(setPipeline);
-      auto pipeline = arguments[0].asObject(runtime).asHostObject<ComputePipelineHostObject>(runtime);
-      wgpuComputePassEncoderSetPipeline(_value, pipeline->getValue());
-      return Value::undefined();
-    });
-  }
+  WGPU_GPU_RENDER_COMMANDS_MIXIN_SET_PIPELINE(wgpuComputePassEncoderSetPipeline, ComputePipelineHostObject);
 
-  if (name == "setBindGroup") {
-    // TODO: see overloaded version with 5 args
-    return WGPU_FUNC_FROM_HOST_FUNC(setBindGroup, 5, [this]) {
-      WGPU_LOG_FUNC_ARGS(setBindGroup);
-      auto index = (uint32_t)arguments[0].asNumber();
-      WGPUBindGroup bindGroup = NULL;
-      if (arguments[1].isObject()) {
-        auto groupIn = arguments[1].asObject(runtime).asHostObject<BindGroupHostObject>(runtime);
-        bindGroup = groupIn->getValue();
-      }
-      wgpuComputePassEncoderSetBindGroup(_value, index, bindGroup, 0, NULL);
-      return Value::undefined();
-    });
-  }
+  WGPU_GPU_BINDING_COMMANDS_MIXIN_SET_BIND_GROUP(wgpuComputePassEncoderSetBindGroup)
 
   if (name == "dispatchWorkgroups") {
     return WGPU_FUNC_FROM_HOST_FUNC(dispatchWorkgroups, 3, [this]) {
@@ -60,19 +41,12 @@ Value ComputePassEncoderHostObject::get(Runtime &runtime, const PropNameID &prop
     return String::createFromUtf8(runtime, _label);
   }
 
-  if (name == "setIndexBuffer") {
-    //        return
-  }
-
-  if (name == "drawIndexed") {
-  }
-
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
   return Value::undefined();
 }
 
 std::vector<PropNameID> ComputePassEncoderHostObject::getPropertyNames(Runtime &runtime) {
-  return PropNameID::names(runtime, "setPipeline", "setBindGroup", "dispatchWorkgroups", "end", "label",
-                           "setIndexBuffer", "drawIndexed");
+  return PropNameID::names(runtime, "setPipeline", "dispatchWorkgroups", "end", "label",
+                           WGPU_GPU_BINDING_COMMANDS_MIXIN_PROP_NAMES);
 }

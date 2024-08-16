@@ -17,6 +17,7 @@ import {HelloThree} from '../Three/HelloThree/HelloThree';
 import {GLTFLoader} from '../Three/GLTFLoader/GLTFLoader';
 import {SamplerParameters} from '../WebGPUSamples/WebGPUFeatures/SamplerParameters/SamplerParameters';
 import {ReversedZ} from '../WebGPUSamples/WebGPUFeatures/ReversedZ/ReversedZ.tsx';
+import {RenderBundles} from '../WebGPUSamples/WebGPUFeatures/RenderBundles/RenderBundles.tsx';
 
 export type Examples = 'WebGPUSamples' | 'Three';
 
@@ -37,6 +38,7 @@ export type Example =
   // WebGPUFeatures
   | 'SamplerParameters'
   | 'ReversedZ'
+  | 'RenderBundles'
   // GraphicsTechniques
   | 'Cameras'
   // Three
@@ -60,6 +62,7 @@ const examples: Record<Example, ComponentType> = {
   // WebGPUFeatures
   SamplerParameters,
   ReversedZ,
+  RenderBundles,
   // GraphicsTechniques
   Cameras,
   // Three.js

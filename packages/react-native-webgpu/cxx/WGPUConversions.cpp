@@ -162,16 +162,9 @@ WGPUExtent3D wgpu::makeGPUExtent3D(Runtime &runtime, Object obj) {
     }
   } else {
     extent.width = (uint32_t)obj.getProperty(runtime, "width").asNumber();
-    if (obj.hasProperty(runtime, "height")) {
-      extent.height = (uint32_t)obj.getProperty(runtime, "height").asNumber();
-    }
-    // deprecated:
-    if (obj.hasProperty(runtime, "depth")) {
-      extent.depthOrArrayLayers = (uint32_t)obj.getProperty(runtime, "depth").asNumber();
-    }
-    if (obj.hasProperty(runtime, "depthOrArrayLayers")) {
-      extent.depthOrArrayLayers = (uint32_t)obj.getProperty(runtime, "depthOrArrayLayers").asNumber();
-    }
+    extent.height = WGPU_NUMBER_OPT(obj, height, uint32_t, extent.height);
+    extent.depthOrArrayLayers = WGPU_NUMBER_OPT(obj, depth, uint32_t, extent.depthOrArrayLayers);
+    extent.depthOrArrayLayers = WGPU_NUMBER_OPT(obj, depthOrArrayLayers, uint32_t, extent.depthOrArrayLayers);
   }
   return extent;
 }

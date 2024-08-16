@@ -18,6 +18,7 @@ import {GLTFLoader} from '../Three/GLTFLoader/GLTFLoader';
 import {SamplerParameters} from '../WebGPUSamples/WebGPUFeatures/SamplerParameters/SamplerParameters';
 import {ReversedZ} from '../WebGPUSamples/WebGPUFeatures/ReversedZ/ReversedZ.tsx';
 import {RenderBundles} from '../WebGPUSamples/WebGPUFeatures/RenderBundles/RenderBundles.tsx';
+import {OcclusionQueries} from '../WebGPUSamples/WebGPUFeatures/OcclusionQueries/OcclusionQueries.tsx';
 
 export type Examples = 'WebGPUSamples' | 'Three';
 
@@ -39,6 +40,7 @@ export type Example =
   | 'SamplerParameters'
   | 'ReversedZ'
   | 'RenderBundles'
+  | 'OcclusionQueries'
   // GraphicsTechniques
   | 'Cameras'
   // Three
@@ -63,6 +65,7 @@ const examples: Record<Example, ComponentType> = {
   SamplerParameters,
   ReversedZ,
   RenderBundles,
+  OcclusionQueries,
   // GraphicsTechniques
   Cameras,
   // Three.js

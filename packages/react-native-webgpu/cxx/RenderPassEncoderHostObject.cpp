@@ -64,12 +64,30 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
     });
   }
 
+  if (name == "beginOcclusionQuery") {
+    return WGPU_FUNC_FROM_HOST_FUNC(beginOcclusionQuery, 1, [this]) {
+      WGPU_LOG_FUNC_ARGS(beginOcclusionQuery);
+      auto queryIndex = arguments[0].asNumber();
+      wgpuRenderPassEncoderBeginOcclusionQuery(_value, queryIndex);
+      return Value::undefined();
+    });
+  }
+
+  if (name == "endOcclusionQuery") {
+    return WGPU_FUNC_FROM_HOST_FUNC(endOcclusionQuery, 0, [this]) {
+      WGPU_LOG_FUNC_ARGS(beginOcclusionQuery);
+      wgpuRenderPassEncoderEndOcclusionQuery(_value);
+      return Value::undefined();
+    });
+  }
+
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
   return Value::undefined();
 }
 
 std::vector<PropNameID> RenderPassEncoderHostObject::getPropertyNames(Runtime &runtime) {
-  return PropNameID::names(runtime, "end", "label", "setViewport", "executeBundles",
-                           WGPU_GPU_RENDER_COMMANDS_MIXIN_PROP_NAMES, WGPU_GPU_BINDING_COMMANDS_MIXIN_PROP_NAMES);
+  return PropNameID::names(runtime, "end", "label", "setViewport", "executeBundles", "beginOcclusionQuery",
+                           "endOcclusionQuery", WGPU_GPU_RENDER_COMMANDS_MIXIN_PROP_NAMES,
+                           WGPU_GPU_BINDING_COMMANDS_MIXIN_PROP_NAMES);
 }

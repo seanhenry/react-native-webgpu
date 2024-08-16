@@ -169,6 +169,14 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
     return Value((int)_surface->getPixelHeight());
   }
 
+  if (name == "pointWidth") {
+    return Value((int)_surface->getPointWidth());
+  }
+
+  if (name == "pointHeight") {
+    return Value((int)_surface->getPointHeight());
+  }
+
   if (name == "scale") {
     return Value(_surface->getScale());
   }
@@ -180,5 +188,5 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
 
 std::vector<PropNameID> ContextHostObject::getPropertyNames(Runtime &runtime) {
   return PropNameID::names(runtime, "presentSurface", "configure", "surfaceCapabilities", "getCurrentTexture", "width",
-                           "height", "destroy");
+                           "height", "destroy", "scale", "pointWidth", "pointHeight");
 }

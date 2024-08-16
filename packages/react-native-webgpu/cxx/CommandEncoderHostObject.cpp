@@ -51,7 +51,7 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
         .colorAttachmentCount = colorAttachments.size(),
         .colorAttachments = colorAttachments.data(),
         .depthStencilAttachment = nullptr,
-        .occlusionQuerySet = nullptr,
+        .occlusionQuerySet = WGPU_HOST_OBJ_VALUE_OPT(desc, occlusionQuerySet, QuerySetHostObject, nullptr),
         .timestampWrites = nullptr,
       };
 

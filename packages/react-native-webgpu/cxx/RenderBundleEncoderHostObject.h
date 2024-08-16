@@ -2,6 +2,8 @@
 
 #include <jsi/jsi.h>
 
+#include <memory>
+
 #include "WGPUContext.h"
 #include "webgpu.h"
 

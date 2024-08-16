@@ -52,6 +52,7 @@ const sections: Record<Examples, ListProps<Example>['sections']> = {
         {title: 'SamplerParameters'},
         {title: 'ReversedZ'},
         {title: 'RenderBundles'},
+        {title: 'OcclusionQueries'},
       ],
     },
     {

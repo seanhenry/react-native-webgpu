@@ -76,9 +76,10 @@ Value BufferHostObject::get(Runtime &runtime, const PropNameID &propName) {
     return Value((int)wgpuBufferGetUsage(_value));
   }
 
-  if (name == "mapState") {
-    return String::createFromUtf8(runtime, WGPUBufferMapStateToString(wgpuBufferGetMapState(_value)));
-  }
+  // Not implemented
+  //  if (name == "mapState") {
+  //    return String::createFromUtf8(runtime, WGPUBufferMapStateToString(wgpuBufferGetMapState(_value)));
+  //  }
 
   if (name == "destroy") {
     return WGPU_FUNC_FROM_HOST_FUNC(destroy, 0, [this]) {
@@ -93,8 +94,7 @@ Value BufferHostObject::get(Runtime &runtime, const PropNameID &propName) {
 }
 
 std::vector<PropNameID> BufferHostObject::getPropertyNames(Runtime &runtime) {
-  return PropNameID::names(runtime, "getMappedRange", "unmap", "mapAsync", "label", "size", "usage", "mapState",
-                           "destroy");
+  return PropNameID::names(runtime, "getMappedRange", "unmap", "mapAsync", "label", "size", "usage", "destroy");
 }
 
 static std::string mapAsyncStatusToString(WGPUBufferMapAsyncStatus status) {

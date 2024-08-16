@@ -10,12 +10,16 @@ export interface HeadlessWebGPU {
   };
 }
 
-export interface WGPUContext extends Omit<GPUCanvasContext, 'getCurrentTexture'> {
+export interface WGPUContext
+  extends Omit<GPUCanvasContext, 'getCurrentTexture'> {
   surfaceCapabilities(adapter: GPUAdapter): WGPUSurfaceCapabilities;
   getCurrentTexture(): GPUTexture | null;
   presentSurface(): void;
   width: number;
   height: number;
+  pointWidth: number;
+  pointHeight: number;
+  scale: number;
 }
 
 export interface WGPUSurfaceCapabilities {

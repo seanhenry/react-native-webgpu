@@ -1142,10 +1142,10 @@ interface GPURenderPassDescriptor extends GPUObjectDescriptorBase {
    * may alias another attachment or any resource used inside the render pass.
    */
   depthStencilAttachment?: GPURenderPassDepthStencilAttachment;
-  //   /**
-  //    * The {@link GPUQuerySet} value defines where the occlusion query results will be stored for this pass.
-  //    */
-  //   occlusionQuerySet?: GPUQuerySet;
+  /**
+   * The {@link GPUQuerySet} value defines where the occlusion query results will be stored for this pass.
+   */
+  occlusionQuerySet?: GPUQuerySet;
   /**
    * Defines which timestamp values will be written for this pass, and where to write them to.
    */
@@ -1890,7 +1890,8 @@ interface GPUBuffer extends GPUObjectBase {
   //   readonly __brand: "GPUBuffer";
   readonly size: GPUSize64Out;
   readonly usage: GPUFlagsConstant;
-  readonly mapState: GPUBufferMapState;
+  // Not implemented
+  // readonly mapState: GPUBufferMapState;
   /**
    * Maps the given range of the {@link GPUBuffer} and resolves the returned {@link Promise} when the
    * {@link GPUBuffer}'s content is ready to be accessed with {@link GPUBuffer#getMappedRange}.
@@ -2746,15 +2747,13 @@ interface GPURenderPassEncoder
   //   setStencilReference(
   //     reference: GPUStencilValue
   //   ): undefined;
-  //   /**
-  //    * @param queryIndex - The index of the query in the query set.
-  //    */
-  //   beginOcclusionQuery(
-  //     queryIndex: GPUSize32
-  //   ): undefined;
-  //   /**
-  //    */
-  //   endOcclusionQuery(): undefined;
+  /**
+   * @param queryIndex - The index of the query in the query set.
+   */
+  beginOcclusionQuery(queryIndex: GPUSize32): undefined;
+  /**
+   */
+  endOcclusionQuery(): undefined;
   /**
    * Executes the commands previously recorded into the given {@link GPURenderBundle}s as part of
    * this render pass.

@@ -57,7 +57,7 @@ const sections: Record<Examples, ListProps<Example>['sections']> = {
     },
     {
       title: 'Graphics Techniques',
-      data: [{title: 'Cameras'}],
+      data: [{title: 'Cameras'}, {title: 'NormalMap'}],
     },
   ],
   Three: [

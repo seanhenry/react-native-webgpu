@@ -5,7 +5,8 @@ import {useRef} from 'react';
 
 import spriteWGSL from './sprite.wgsl';
 import updateSpritesWGSL from './updateSprites.wgsl';
-import {StyleSheet, TextInput, View} from 'react-native';
+import {TextInput} from 'react-native';
+import {ControlsContainer} from '../../../Components/ControlsContainer.tsx';
 // import { GUI } from 'dat.gui';
 
 export const ComputeBoids = () => {
@@ -353,33 +354,15 @@ spare readback buffers:    ${spareResultBuffers.length}`);
 
   return (
     <>
-      <View style={styles.perfDisplayContainer}>
-        <TextInput
-          ref={perfDisplayRef}
-          editable={false}
-          style={styles.perfDisplay}
-          multiline
-        />
-      </View>
       <CenterSquare>
         <WebGpuView
           onCreateSurface={onCreateSurface}
           style={globalStyles.fill}
         />
       </CenterSquare>
+      <ControlsContainer>
+        <TextInput ref={perfDisplayRef} editable={false} multiline />
+      </ControlsContainer>
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  perfDisplayContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-  },
-  perfDisplay: {
-    paddingTop: 8,
-    paddingLeft: 8,
-  },
-});

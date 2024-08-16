@@ -20,13 +20,13 @@ export const CollapseMenu = ({title, actions}: CollapseMenuProps) => {
         )}
       </Pressable>
       {expanded
-        ? actions.map(({title, onPress}) => (
+        ? actions.map(action => (
             <Button
-              key={title}
-              title={title}
+              key={action.title}
+              title={action.title}
               onPress={() => {
                 setExpanded(false);
-                onPress();
+                action.onPress();
               }}
             />
           ))
@@ -36,12 +36,6 @@ export const CollapseMenu = ({title, actions}: CollapseMenuProps) => {
 };
 
 const styles = StyleSheet.create({
-  controls: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-  },
   container: {
     padding: 8,
     backgroundColor: '#EFEFEF',

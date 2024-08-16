@@ -7,8 +7,12 @@ import {mat4, vec3} from 'wgpu-matrix';
 // import {GUI} from 'dat.gui';
 import {createSphereMesh, SphereLayout} from '../../meshes/sphere';
 // import Stats from 'stats.js';
-
 import meshWGSL from './mesh.wgsl';
+import {useRef} from 'react';
+import {Toggle} from '../../../Components/Toggle.tsx';
+import {useStats} from '../../../Components/Stats.tsx';
+import {ControlsContainer} from '../../../Components/ControlsContainer.tsx';
+
 interface Renderable {
   vertices: GPUBuffer;
   indices: GPUBuffer;
@@ -16,6 +20,10 @@ interface Renderable {
   bindGroup?: GPUBindGroup;
 }
 export const RenderBundles = () => {
+  const {Stats, stats} = useStats();
+  const onUseRenderBundlesChangedRef = useRef(
+    (_useRenderBundles: boolean) => {},
+  );
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
     createImageBitmap,
     context,
@@ -28,6 +36,9 @@ export const RenderBundles = () => {
     const settings = {
       useRenderBundles: true,
       asteroidCount: 5000,
+    };
+    onUseRenderBundlesChangedRef.current = useRenderBundles => {
+      settings.useRenderBundles = useRenderBundles;
     };
     // const gui = new GUI();
     // gui.add(settings, 'useRenderBundles');
@@ -396,7 +407,7 @@ export const RenderBundles = () => {
         requestAnimationFrame(frame);
         return;
       }
-      // stats.begin();
+      stats.begin();
 
       const transformationMatrix = getTransformationMatrix();
       device.queue.writeBuffer(
@@ -427,7 +438,7 @@ export const RenderBundles = () => {
       passEncoder.end();
       device.queue.submit([commandEncoder.finish()]);
 
-      // stats.end();
+      stats.end();
 
       requestAnimationFrame(frame);
       context.presentSurface();
@@ -436,8 +447,20 @@ export const RenderBundles = () => {
     requestAnimationFrame(frame);
   };
   return (
-    <CenterSquare>
-      <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
-    </CenterSquare>
+    <>
+      <CenterSquare>
+        <WebGpuView
+          onCreateSurface={onCreateSurface}
+          style={globalStyles.fill}
+        />
+      </CenterSquare>
+      <ControlsContainer>
+        <Stats />
+        <Toggle
+          initialValue={true}
+          onChange={value => onUseRenderBundlesChangedRef.current(value)}
+        />
+      </ControlsContainer>
+    </>
   );
 };

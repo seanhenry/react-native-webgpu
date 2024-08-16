@@ -6,7 +6,8 @@ import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
 import {CenterSquare} from '../../../Components/CenterSquare';
 import {globalStyles} from '../../../Components/globalStyles';
 import {useRef} from 'react';
-import {StyleSheet, TextInput, View} from 'react-native';
+import {TextInput} from 'react-native';
+import {ControlsContainer} from '../../../Components/ControlsContainer.tsx';
 
 export const OcclusionQueries = () => {
   const perfDisplayRef = useRef<TextInput | null>(null);
@@ -362,33 +363,15 @@ export const OcclusionQueries = () => {
   };
   return (
     <>
-      <View style={styles.perfDisplayContainer}>
-        <TextInput
-          ref={perfDisplayRef}
-          editable={false}
-          style={styles.perfDisplay}
-          multiline
-        />
-      </View>
       <CenterSquare>
         <WebGpuView
           onCreateSurface={onCreateSurface}
           style={globalStyles.fill}
         />
       </CenterSquare>
+      <ControlsContainer>
+        <TextInput ref={perfDisplayRef} editable={false} multiline />
+      </ControlsContainer>
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  perfDisplayContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-  },
-  perfDisplay: {
-    paddingTop: 8,
-    paddingLeft: 8,
-  },
-});

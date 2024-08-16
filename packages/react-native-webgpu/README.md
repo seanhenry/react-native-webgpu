@@ -9,8 +9,13 @@ Other projects:
 
 ## Contents
 
-- [Getting started](#getting-started)
 - [Running the examples](#running-the-examples)
+- [Getting started](#getting-started)
+- [Converting a WebGPU sample](#converting-a-webgpu-sample)
+
+## Running the examples
+
+You can find instructions to run the examples [here](../../examples/Example).
 
 ## Getting started
 
@@ -238,38 +243,4 @@ export function HelloTriangle() {
 }
 ```
 </details>
-
-## Running the examples
-
-If you want to check the progress of this project, or play around with what's been implemented so far, you can check out the examples.
-
-1. Install library dependencies
-
-```bash
-git submodule update --init --recursive
-yarn
-```
-
-2. Download the libraries/headers from the [release page](https://github.com/seanhenry/react-native-webgpu/releases/tag/v0.0.0).
-3. Unzip and move the libraries/headers to `packages/react-native-webgpu`
-4. Install examples dependencies
-
-```bash
-cd packages/react-native-webgpu/examples/Example
-yarn
-
-# iOS only:
-cd ios
-pod install
-cd ..
-```
-
-5. Build and run
-
-```bash
-# iOS
-yarn ios
-# Android
-yarn android
-```
 

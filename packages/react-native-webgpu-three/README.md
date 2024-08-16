@@ -6,6 +6,16 @@ Interested in this project? Star it in GitHub to show your support.
 
 Looking for more direct access to the GPU through a JavaScript api? Check out [react-native-webgpu](https://github.com/seanhenry/react-native-webgpu).
 
+## Contents
+
+- [Running the examples](#running-the-examples)
+- [Getting started](#getting-started)
+- [Converting a three project](#converting-a-three-project)
+
+## Running the examples
+
+You can find instructions to run the examples [here](../../examples/Example).
+
 ## Getting started
 
 <details>

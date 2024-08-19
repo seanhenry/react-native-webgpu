@@ -1096,35 +1096,35 @@ interface GPURenderPassDepthStencilAttachment {
    * depth component after executing the render pass.
    */
   depthStoreOp?: GPUStoreOp;
-  //   /**
-  //    * Indicates that the depth component of {@link GPURenderPassDepthStencilAttachment#view}
-  //    * is read only.
-  //    */
-  //   depthReadOnly?: boolean;
-  //   /**
-  //    * Indicates the value to clear {@link GPURenderPassDepthStencilAttachment#view}'s stencil component
-  //    * to prior to executing the render pass. Ignored if {@link GPURenderPassDepthStencilAttachment#stencilLoadOp}
-  //    * is not {@link GPULoadOp#"clear"}.
-  //    * The value will be converted to the type of the stencil aspect of `view` by taking the same
-  //    * number of LSBs as the number of bits in the stencil aspect of one texel block|texel of `view`.
-  //    */
-  //   stencilClearValue?: GPUStencilValue;
-  //   /**
-  //    * Indicates the load operation to perform on {@link GPURenderPassDepthStencilAttachment#view}'s
-  //    * stencil component prior to executing the render pass.
-  //    * Note: It is recommended to prefer clearing; see {@link GPULoadOp#"clear"} for details.
-  //    */
-  //   stencilLoadOp?: GPULoadOp;
-  //   /**
-  //    * The store operation to perform on {@link GPURenderPassDepthStencilAttachment#view}'s
-  //    * stencil component after executing the render pass.
-  //    */
-  //   stencilStoreOp?: GPUStoreOp;
-  //   /**
-  //    * Indicates that the stencil component of {@link GPURenderPassDepthStencilAttachment#view}
-  //    * is read only.
-  //    */
-  //   stencilReadOnly?: boolean;
+  /**
+   * Indicates that the depth component of {@link GPURenderPassDepthStencilAttachment#view}
+   * is read only.
+   */
+  depthReadOnly?: boolean;
+  /**
+   * Indicates the value to clear {@link GPURenderPassDepthStencilAttachment#view}'s stencil component
+   * to prior to executing the render pass. Ignored if {@link GPURenderPassDepthStencilAttachment#stencilLoadOp}
+   * is not {@link GPULoadOp#"clear"}.
+   * The value will be converted to the type of the stencil aspect of `view` by taking the same
+   * number of LSBs as the number of bits in the stencil aspect of one texel block|texel of `view`.
+   */
+  stencilClearValue?: GPUStencilValue;
+  /**
+   * Indicates the load operation to perform on {@link GPURenderPassDepthStencilAttachment#view}'s
+   * stencil component prior to executing the render pass.
+   * Note: It is recommended to prefer clearing; see {@link GPULoadOp#"clear"} for details.
+   */
+  stencilLoadOp?: GPULoadOp;
+  /**
+   * The store operation to perform on {@link GPURenderPassDepthStencilAttachment#view}'s
+   * stencil component after executing the render pass.
+   */
+  stencilStoreOp?: GPUStoreOp;
+  /**
+   * Indicates that the stencil component of {@link GPURenderPassDepthStencilAttachment#view}
+   * is read only.
+   */
+  stencilReadOnly?: boolean;
 }
 
 interface GPURenderPassDescriptor extends GPUObjectDescriptorBase {
@@ -1291,13 +1291,13 @@ interface GPUSamplerDescriptor extends GPUObjectDescriptorBase {
   //    * sampling a texture.
   //    */
   //   lodMaxClamp?: number;
-  //   /**
-  //    * When provided the sampler will be a comparison sampler with the specified
-  //    * {@link GPUCompareFunction}.
-  //    * Note: Comparison samplers may use filtering, but the sampling results will be
-  //    * implementation-dependent and may differ from the normal filtering rules.
-  //    */
-  //   compare?: GPUCompareFunction;
+  /**
+   * When provided the sampler will be a comparison sampler with the specified
+   * {@link GPUCompareFunction}.
+   * Note: Comparison samplers may use filtering, but the sampling results will be
+   * implementation-dependent and may differ from the normal filtering rules.
+   */
+  compare?: GPUCompareFunction;
   /**
    * Specifies the maximum anisotropy value clamp used by the sampler. Anisotropic filtering is
    * enabled when {@link GPUSamplerDescriptor#maxAnisotropy} is &gt; 1 and the implementation supports it.

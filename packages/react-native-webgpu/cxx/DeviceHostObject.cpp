@@ -226,9 +226,10 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         auto magFilter = WGPU_UTF8_OPT(desc, magFilter, "nearest");
         auto minFilter = WGPU_UTF8_OPT(desc, minFilter, "nearest");
         auto mipmapFilter = WGPU_UTF8_OPT(desc, mipmapFilter, "nearest");
-        auto addressModeU = WGPU_UTF8_OPT(desc, addressModeU, "repeat");
-        auto addressModeV = WGPU_UTF8_OPT(desc, addressModeV, "repeat");
-        auto addressModeW = WGPU_UTF8_OPT(desc, addressModeW, "repeat");
+        auto addressModeU = WGPU_UTF8_OPT(desc, addressModeU, "clamp-to-edge");
+        auto addressModeV = WGPU_UTF8_OPT(desc, addressModeV, "clamp-to-edge");
+        auto addressModeW = WGPU_UTF8_OPT(desc, addressModeW, "clamp-to-edge");
+        auto compare = WGPU_UTF8_OPT(desc, compare, "undefined");
         descriptor.label = label.data();
         descriptor.magFilter = StringToWGPUFilterMode(magFilter.data());
         descriptor.minFilter = StringToWGPUFilterMode(minFilter.data());
@@ -237,6 +238,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         descriptor.addressModeU = StringToWGPUAddressMode(addressModeU.data());
         descriptor.addressModeV = StringToWGPUAddressMode(addressModeV.data());
         descriptor.addressModeW = StringToWGPUAddressMode(addressModeW.data());
+        descriptor.compare = StringToWGPUCompareFunction(compare.data());
       }
       auto sampler = wgpuDeviceCreateSampler(getValue(), &descriptor);
       return Object::createFromHostObject(runtime,

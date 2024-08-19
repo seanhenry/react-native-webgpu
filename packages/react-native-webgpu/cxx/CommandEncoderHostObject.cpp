@@ -68,6 +68,18 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
         auto depthStoreOp = WGPU_UTF8_OPT(attachment, depthStoreOp, "undefined");
         depthStencilAttachment.depthStoreOp = StringToWGPUStoreOp(depthStoreOp.data());
 
+        depthStencilAttachment.depthReadOnly = WGPU_BOOL_OPT(attachment, depthReadOnly, false);
+
+        depthStencilAttachment.stencilClearValue = WGPU_NUMBER_OPT(attachment, stencilClearValue, uint32_t, 0);
+
+        auto stencilLoadOp = WGPU_UTF8_OPT(attachment, stencilLoadOp, "undefined");
+        depthStencilAttachment.stencilLoadOp = StringToWGPULoadOp(stencilLoadOp.data());
+
+        auto stencilStoreOp = WGPU_UTF8_OPT(attachment, stencilStoreOp, "undefined");
+        depthStencilAttachment.stencilStoreOp = StringToWGPUStoreOp(stencilStoreOp.data());
+
+        depthStencilAttachment.stencilReadOnly = WGPU_BOOL_OPT(attachment, stencilReadOnly, false);
+
         descriptor.depthStencilAttachment = &depthStencilAttachment;
       }
 

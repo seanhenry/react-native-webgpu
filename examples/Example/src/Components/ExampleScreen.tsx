@@ -20,6 +20,7 @@ import {ReversedZ} from '../WebGPUSamples/WebGPUFeatures/ReversedZ/ReversedZ.tsx
 import {RenderBundles} from '../WebGPUSamples/WebGPUFeatures/RenderBundles/RenderBundles.tsx';
 import {OcclusionQueries} from '../WebGPUSamples/WebGPUFeatures/OcclusionQueries/OcclusionQueries.tsx';
 import {NormalMap} from '../WebGPUSamples/GraphicsTechniques/NormalMap/NormalMap.tsx';
+import {ShadowMapping} from '../WebGPUSamples/GraphicsTechniques/ShadowMapping/ShadowMapping.tsx';
 
 export type Examples = 'WebGPUSamples' | 'Three';
 
@@ -45,6 +46,7 @@ export type Example =
   // GraphicsTechniques
   | 'Cameras'
   | 'NormalMap'
+  | 'ShadowMapping'
   // Three
   | 'HelloThree'
   | 'GLTFLoader';
@@ -71,6 +73,7 @@ const examples: Record<Example, ComponentType> = {
   // GraphicsTechniques
   Cameras,
   NormalMap,
+  ShadowMapping,
   // Three.js
   HelloThree,
   GLTFLoader,

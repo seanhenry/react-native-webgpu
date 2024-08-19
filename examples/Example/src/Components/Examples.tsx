@@ -61,6 +61,7 @@ const sections: Record<Examples, ListProps<Example>['sections']> = {
         {title: 'Cameras'},
         {title: 'NormalMap'},
         {title: 'ShadowMapping'},
+        {title: 'DeferredRendering'},
       ],
     },
   ],

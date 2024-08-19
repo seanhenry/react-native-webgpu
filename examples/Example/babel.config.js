@@ -3,5 +3,6 @@ module.exports = {
   plugins: [
     require('react-native-webgpu/babel-plugin-transform-wgsl'),
     ...require('react-native-webgpu-three/babel').plugins,
+    'react-native-reanimated/plugin',
   ],
 };

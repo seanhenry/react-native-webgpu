@@ -21,6 +21,7 @@ import {RenderBundles} from '../WebGPUSamples/WebGPUFeatures/RenderBundles/Rende
 import {OcclusionQueries} from '../WebGPUSamples/WebGPUFeatures/OcclusionQueries/OcclusionQueries.tsx';
 import {NormalMap} from '../WebGPUSamples/GraphicsTechniques/NormalMap/NormalMap.tsx';
 import {ShadowMapping} from '../WebGPUSamples/GraphicsTechniques/ShadowMapping/ShadowMapping.tsx';
+import {DeferredRendering} from '../WebGPUSamples/GraphicsTechniques/DeferredRendering/DeferredRendering.tsx';
 
 export type Examples = 'WebGPUSamples' | 'Three';
 
@@ -47,6 +48,7 @@ export type Example =
   | 'Cameras'
   | 'NormalMap'
   | 'ShadowMapping'
+  | 'DeferredRendering'
   // Three
   | 'HelloThree'
   | 'GLTFLoader';
@@ -74,6 +76,7 @@ const examples: Record<Example, ComponentType> = {
   Cameras,
   NormalMap,
   ShadowMapping,
+  DeferredRendering,
   // Three.js
   HelloThree,
   GLTFLoader,

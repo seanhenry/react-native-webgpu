@@ -9,7 +9,7 @@ globalThis.GPUBufferUsage = {
   STORAGE: 0x00000080,
   INDIRECT: 0x00000100,
   QUERY_RESOLVE: 0x00000200,
-}
+};
 
 globalThis.GPUTextureUsage = {
   COPY_SRC: 0x00000001,
@@ -17,13 +17,13 @@ globalThis.GPUTextureUsage = {
   TEXTURE_BINDING: 0x00000004,
   STORAGE_BINDING: 0x00000008,
   RENDER_ATTACHMENT: 0x00000010,
-}
+};
 
 globalThis.GPUShaderStage = {
   VERTEX: 0x00000001,
   FRAGMENT: 0x00000002,
   COMPUTE: 0x00000004,
-}
+};
 
 globalThis.GPUMapMode = {
   READ: 0x00000001,

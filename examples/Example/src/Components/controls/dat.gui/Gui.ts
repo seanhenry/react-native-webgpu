@@ -7,7 +7,7 @@ import {SwitchController} from './SwitchController';
 import {OptionsController} from './OptionsController';
 import {getId} from './incrementingId';
 import {StringController} from './StringController';
-import {NumberController} from './NumberController.ts';
+import {NumberController} from './NumberController';
 
 type GuiParams = {
   parent?: Gui;

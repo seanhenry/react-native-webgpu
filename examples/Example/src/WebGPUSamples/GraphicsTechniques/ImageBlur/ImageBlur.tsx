@@ -3,7 +3,7 @@ import fullscreenTexturedQuadWGSL from '../../shaders/fullscreenTexturedQuad.wgs
 import {Square} from '../../../Components/Square';
 import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
 import {globalStyles} from '../../../Components/globalStyles';
-import {useControls} from '../../../Components/controls/react/useControls.tsx';
+import {useControls} from '../../../Components/controls/react/useControls';
 
 export const ImageBlur = () => {
   const {gui, Controls} = useControls();

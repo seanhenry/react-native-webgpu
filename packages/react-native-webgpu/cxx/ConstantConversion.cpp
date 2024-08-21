@@ -636,3 +636,16 @@ const char *WGPUBufferMapStateToString(WGPUBufferMapState state) {
       return NULL;
   }
 }
+
+WGPUStorageTextureAccess StringToWGPUStorageTextureAccess(const char *str) {
+  if (strcmp(str, "write-only") == 0) {
+    return WGPUStorageTextureAccess_WriteOnly;
+  }
+  if (strcmp(str, "read-only") == 0) {
+    return WGPUStorageTextureAccess_ReadOnly;
+  }
+  if (strcmp(str, "read-write") == 0) {
+    return WGPUStorageTextureAccess_ReadWrite;
+  }
+  return WGPUStorageTextureAccess_Undefined;
+}

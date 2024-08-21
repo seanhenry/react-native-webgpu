@@ -4,7 +4,7 @@ import {Observable} from '../../../utils/observable';
 import {ControlBackground} from './ControlBackground';
 import {ControlLabel} from './ControlLabel';
 import {ControlInput} from './ControlInput';
-import {controlForegroundColor} from './controlsStyles.ts';
+import {controlForegroundColor} from './controlsStyles';
 
 type ControlSwitchProps = {
   onChange: (value: boolean) => void;

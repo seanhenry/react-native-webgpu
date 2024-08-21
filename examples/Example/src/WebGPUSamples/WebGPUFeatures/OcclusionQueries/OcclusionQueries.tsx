@@ -7,8 +7,8 @@ import {globalStyles} from '../../../Components/globalStyles';
 import {useRef} from 'react';
 import {TextInput} from 'react-native';
 import {useControls} from '../../../Components/controls/react/useControls';
-import {HudContainer} from '../../../Components/stats/HudContainer.tsx';
-import {HudText} from '../../../Components/stats/HudText.tsx';
+import {HudContainer} from '../../../Components/stats/HudContainer';
+import {HudText} from '../../../Components/stats/HudText';
 
 export const OcclusionQueries = () => {
   const {gui, Controls} = useControls();

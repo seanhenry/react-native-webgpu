@@ -1,5 +1,5 @@
 import {Button, ButtonProps} from 'react-native';
-import {controlForegroundColor} from './controlsStyles.ts';
+import {controlForegroundColor} from './controlsStyles';
 
 type ControlButtonProps = Pick<ButtonProps, 'title' | 'disabled' | 'onPress'>;
 

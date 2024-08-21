@@ -184,11 +184,7 @@ type GPUSamplerBindingType = 'filtering' | 'non-filtering' | 'comparison';
 //   | "decrement-clamp"
 //   | "increment-wrap"
 //   | "decrement-wrap";
-// type GPUStorageTextureAccess =
-//
-//   | "write-only"
-//   | "read-only"
-//   | "read-write";
+type GPUStorageTextureAccess = 'write-only' | 'read-only' | 'read-write';
 type GPUStoreOp = 'store' | 'discard';
 // type GPUTextureAspect =
 //
@@ -400,11 +396,11 @@ interface GPUBindGroupLayoutEntry {
    * is {@link GPUTextureView}.
    */
   texture?: GPUTextureBindingLayout;
-  //   /**
-  //    * When map/exist|provided, indicates the binding resource type for this {@link GPUBindGroupLayoutEntry}
-  //    * is {@link GPUTextureView}.
-  //    */
-  //   storageTexture?: GPUStorageTextureBindingLayout;
+  /**
+   * When map/exist|provided, indicates the binding resource type for this {@link GPUBindGroupLayoutEntry}
+   * is {@link GPUTextureView}.
+   */
+  storageTexture?: GPUStorageTextureBindingLayout;
   //   /**
   //    * When map/exist|provided, indicates the binding resource type for this {@link GPUBindGroupLayoutEntry}
   //    * is {@link GPUExternalTexture}.
@@ -1395,23 +1391,23 @@ interface GPUShaderModuleDescriptor extends GPUObjectDescriptorBase {
 //    */
 //   passOp?: GPUStencilOperation;
 // }
-//
-// interface GPUStorageTextureBindingLayout {
-//   /**
-//    * The access mode for this binding, indicating readability and writability.
-//    */
-//   access?: GPUStorageTextureAccess;
-//   /**
-//    * The required {@link GPUTextureViewDescriptor#format} of texture views bound to this binding.
-//    */
-//   format: GPUTextureFormat;
-//   /**
-//    * Indicates the required {@link GPUTextureViewDescriptor#dimension} for texture views bound to
-//    * this binding.
-//    */
-//   viewDimension?: GPUTextureViewDimension;
-// }
-//
+
+interface GPUStorageTextureBindingLayout {
+  /**
+   * The access mode for this binding, indicating readability and writability.
+   */
+  access?: GPUStorageTextureAccess;
+  /**
+   * The required {@link GPUTextureViewDescriptor#format} of texture views bound to this binding.
+   */
+  format: GPUTextureFormat;
+  /**
+   * Indicates the required {@link GPUTextureViewDescriptor#dimension} for texture views bound to
+   * this binding.
+   */
+  viewDimension?: GPUTextureViewDimension;
+}
+
 interface GPUTextureBindingLayout {
   /**
    * Indicates the type required for texture views bound to this binding.
@@ -2898,10 +2894,10 @@ interface GPUTexture extends GPUObjectBase {
    * The height of this {@link GPUTexture}.
    */
   readonly height: GPUIntegerCoordinateOut;
-  // /**
-  //  * The depth or layer count of this {@link GPUTexture}.
-  //  */
-  //   readonly depthOrArrayLayers: GPUIntegerCoordinateOut;
+  /**
+   * The depth or layer count of this {@link GPUTexture}.
+   */
+  readonly depthOrArrayLayers: GPUIntegerCoordinateOut;
   /**
    * The number of mip levels of this {@link GPUTexture}.
    */

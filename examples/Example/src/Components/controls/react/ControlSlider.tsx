@@ -17,11 +17,8 @@ import {
   formatSteppedNumber,
   lerpWithStep,
   normalizedBetween,
-} from '../sliderUtils.ts';
-import {
-  controlBackgroundColor,
-  controlForegroundColor,
-} from './controlsStyles.ts';
+} from '../sliderUtils';
+import {controlBackgroundColor, controlForegroundColor} from './controlsStyles';
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 

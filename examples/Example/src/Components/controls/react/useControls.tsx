@@ -1,6 +1,6 @@
 import {useRef} from 'react';
 import {ControlsContainer} from './ControlsContainer';
-import {ControlSlider} from './ControlSlider.tsx';
+import {ControlSlider} from './ControlSlider';
 import {Gui} from '../dat.gui/Gui';
 import {ControlComponent} from '../dat.gui/types';
 import {ControlSwitch} from './ControlSwitch';
@@ -8,7 +8,7 @@ import {ControlOptions} from './ControlOptions';
 import {ControlTextInput} from './ControlTextInput';
 import {ControlButton} from './ControlButton';
 import {ControlFolder} from './ControlFolder';
-import {ControlNumberInput} from './ControlNumberInput.tsx';
+import {ControlNumberInput} from './ControlNumberInput';
 
 export const useControls = () => {
   const gui = useRef(new Gui()).current;

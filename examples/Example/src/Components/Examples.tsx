@@ -8,7 +8,6 @@ import {
 import type {Routes} from '../types/navigationTypes';
 import type {Example, Examples} from './ExampleScreen';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ImageBlur} from '../WebGPUSamples/GraphicsTechniques/ImageBlur/ImageBlur.tsx';
 
 export function Examples() {
   const navigation = useNavigation<NavigationProp<Routes, 'example'>>();
@@ -64,6 +63,7 @@ const sections: Record<Examples, ListProps<Example>['sections']> = {
         {title: 'ShadowMapping'},
         {title: 'DeferredRendering'},
         {title: 'ImageBlur'},
+        {title: 'Cornell'},
       ],
     },
   ],

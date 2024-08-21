@@ -7,8 +7,8 @@ import spriteWGSL from './sprite.wgsl';
 import updateSpritesWGSL from './updateSprites.wgsl';
 import {TextInput} from 'react-native';
 import {useControls} from '../../../Components/controls/react/useControls';
-import {HudContainer} from '../../../Components/stats/HudContainer.tsx';
-import {HudText} from '../../../Components/stats/HudText.tsx';
+import {HudContainer} from '../../../Components/stats/HudContainer';
+import {HudText} from '../../../Components/stats/HudText';
 
 export const ComputeBoids = () => {
   const {gui, Controls} = useControls();

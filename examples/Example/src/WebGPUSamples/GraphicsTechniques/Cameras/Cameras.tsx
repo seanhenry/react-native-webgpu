@@ -16,8 +16,8 @@ import {createInputHandler, type InputHandlers} from './input';
 import {View} from 'react-native';
 import {Square} from '../../../Components/Square';
 import {useControls} from '../../../Components/controls/react/useControls';
-import {HudContainer} from '../../../Components/stats/HudContainer.tsx';
-import {HudLabel} from '../../../Components/stats/HudLabel.tsx';
+import {HudContainer} from '../../../Components/stats/HudContainer';
+import {HudLabel} from '../../../Components/stats/HudLabel';
 
 export const Cameras = () => {
   const inputHandlersRef = useRef<InputHandlers>({});

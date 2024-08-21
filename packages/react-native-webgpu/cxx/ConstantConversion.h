@@ -34,3 +34,4 @@ WGPUSamplerBindingType StringToWGPUSamplerBindingType(const char *str);
 WGPUTextureSampleType StringToWGPUTextureSampleType(const char *str);
 WGPUAddressMode StringToWGPUAddressMode(const char *str);
 const char *WGPUBufferMapStateToString(WGPUBufferMapState state);
+WGPUStorageTextureAccess StringToWGPUStorageTextureAccess(const char *str);

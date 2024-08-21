@@ -76,6 +76,10 @@ Value TextureHostObject::get(Runtime &runtime, const PropNameID &propName) {
     return String::createFromUtf8(runtime, WGPUTextureDimensionToString(dim));
   }
 
+  if (name == "depthOrArrayLayers") {
+    return Value((int)wgpuTextureGetDepthOrArrayLayers(_value));
+  }
+
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
   return Value::undefined();
@@ -83,5 +87,5 @@ Value TextureHostObject::get(Runtime &runtime, const PropNameID &propName) {
 
 std::vector<PropNameID> TextureHostObject::getPropertyNames(Runtime &runtime) {
   return PropNameID::names(runtime, "createView", "destroy", "width", "height", "label", "format", "mipLevelCount",
-                           "sampleCount", "usage");
+                           "sampleCount", "usage", "depthOrArrayLayers");
 }

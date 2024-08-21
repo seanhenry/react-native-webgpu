@@ -5,7 +5,7 @@ import {ControlBackground} from './ControlBackground';
 import {ControlLabel} from './ControlLabel';
 import {ControlInput} from './ControlInput';
 import {controlsStyles} from './controlsStyles';
-import {clamp} from '../sliderUtils.ts';
+import {clamp} from '../sliderUtils';
 
 type ControlNumberInputProps = {
   title: string;

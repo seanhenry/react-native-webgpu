@@ -289,6 +289,18 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
               .type = StringToWGPUSamplerBindingType(type.data()),
             };
           }
+          if (obj.hasProperty(runtime, "storageTexture")) {
+            auto storageTexture = WGPU_OBJ(obj, storageTexture);
+            auto formatStr = WGPU_UTF8(storageTexture, format);
+            auto accessStr = WGPU_UTF8_OPT(storageTexture, access, "undefined");
+            auto viewDimensionStr = WGPU_UTF8_OPT(storageTexture, viewDimension, "undefined");
+            entry.storageTexture = {
+              .nextInChain = nullptr,
+              .access = StringToWGPUStorageTextureAccess(accessStr.data()),
+              .format = StringToWGPUTextureFormat(formatStr),
+              .viewDimension = StringToWGPUTextureViewDimension(viewDimensionStr.data()),
+            };
+          }
           return entry;
         });
 

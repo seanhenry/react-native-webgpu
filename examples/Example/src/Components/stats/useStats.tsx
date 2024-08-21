@@ -1,5 +1,5 @@
-import {Text} from 'react-native';
 import {useRef, useState} from 'react';
+import {HudText} from './HudText';
 
 export const useStats = () => {
   const setTextRef = useRef((_text: string) => {});
@@ -34,7 +34,7 @@ export const useStats = () => {
   const Component = () => {
     const [text, setText] = useState('FPS:');
     setTextRef.current = setText;
-    return <Text>{text}</Text>;
+    return <HudText value={text} />;
   };
   Component.displayName = 'Stats';
   return {

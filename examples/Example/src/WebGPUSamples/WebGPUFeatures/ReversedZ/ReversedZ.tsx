@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import {mat4, Mat4, vec3} from 'wgpu-matrix';
-// import {GUI} from 'dat.gui';
-
 import vertexWGSL from './vertex.wgsl';
 import fragmentWGSL from './fragment.wgsl';
 import vertexDepthPrePassWGSL from './vertexDepthPrePass.wgsl';
@@ -9,11 +7,13 @@ import vertexTextureQuadWGSL from './vertexTextureQuad.wgsl';
 import fragmentTextureQuadWGSL from './fragmentTextureQuad.wgsl';
 import vertexPrecisionErrorPassWGSL from './vertexPrecisionErrorPass.wgsl';
 import fragmentPrecisionErrorPassWGSL from './fragmentPrecisionErrorPass.wgsl';
-import {CenterSquare} from '../../../Components/CenterSquare';
+import {Square} from '../../../Components/Square';
 import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
 import {globalStyles} from '../../../Components/globalStyles';
+import {useControls} from '../../../Components/controls/react/useControls';
 
 export const ReversedZ = () => {
+  const {gui, Controls} = useControls();
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
     requestAnimationFrame,
     navigator,
@@ -560,8 +560,8 @@ export const ReversedZ = () => {
     const settings = {
       mode: 'color',
     };
-    // const gui = new GUI();
-    // gui.add(settings, 'mode', ['color', 'precision-error', 'depth-texture']);
+    gui.add(settings, 'mode', ['color', 'precision-error', 'depth-texture']);
+    gui.draw();
 
     function frame() {
       const framebuffer = context.getCurrentTexture();
@@ -714,8 +714,14 @@ export const ReversedZ = () => {
   };
 
   return (
-    <CenterSquare>
-      <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
-    </CenterSquare>
+    <>
+      <Square>
+        <WebGpuView
+          onCreateSurface={onCreateSurface}
+          style={globalStyles.fill}
+        />
+      </Square>
+      <Controls />
+    </>
   );
 };

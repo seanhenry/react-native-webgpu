@@ -230,6 +230,8 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         auto addressModeV = WGPU_UTF8_OPT(desc, addressModeV, "clamp-to-edge");
         auto addressModeW = WGPU_UTF8_OPT(desc, addressModeW, "clamp-to-edge");
         auto compare = WGPU_UTF8_OPT(desc, compare, "undefined");
+        auto lodMinClamp = WGPU_NUMBER_OPT(desc, lodMinClamp, float, descriptor.lodMinClamp);
+        auto lodMaxClamp = WGPU_NUMBER_OPT(desc, lodMaxClamp, float, descriptor.lodMaxClamp);
         descriptor.label = label.data();
         descriptor.magFilter = StringToWGPUFilterMode(magFilter.data());
         descriptor.minFilter = StringToWGPUFilterMode(minFilter.data());
@@ -239,6 +241,8 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         descriptor.addressModeV = StringToWGPUAddressMode(addressModeV.data());
         descriptor.addressModeW = StringToWGPUAddressMode(addressModeW.data());
         descriptor.compare = StringToWGPUCompareFunction(compare.data());
+        descriptor.lodMinClamp = lodMinClamp;
+        descriptor.lodMaxClamp = lodMaxClamp;
       }
       auto sampler = wgpuDeviceCreateSampler(getValue(), &descriptor);
       return Object::createFromHostObject(runtime,

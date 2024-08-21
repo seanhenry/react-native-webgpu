@@ -3,7 +3,6 @@ import {globalStyles} from '../../../Components/globalStyles';
 import {useRef} from 'react';
 
 import {mat4, vec3} from 'wgpu-matrix';
-// import { GUI } from 'dat.gui';
 import {
   cubePositionOffset,
   cubeUVOffset,
@@ -14,11 +13,15 @@ import {
 import cubeWGSL from './cube.wgsl';
 import {ArcballCamera, WASDCamera} from './camera';
 import {createInputHandler, type InputHandlers} from './input';
-import {StyleSheet, Text, View} from 'react-native';
-import {CenterSquare} from '../../../Components/CenterSquare';
+import {View} from 'react-native';
+import {Square} from '../../../Components/Square';
+import {useControls} from '../../../Components/controls/react/useControls';
+import {HudContainer} from '../../../Components/stats/HudContainer.tsx';
+import {HudLabel} from '../../../Components/stats/HudLabel.tsx';
 
 export const Cameras = () => {
   const inputHandlersRef = useRef<InputHandlers>({});
+  const {gui, Controls} = useControls();
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
     context,
     navigator,
@@ -35,21 +38,20 @@ export const Cameras = () => {
       WASD: new WASDCamera({position: initialCameraPosition}),
     };
 
-    // const gui = new GUI();
-
     // GUI parameters
     const params: {type: 'arcball' | 'WASD'} = {
       type: 'arcball',
     };
 
     // Callback handler for camera mode
-    // let oldCameraType = params.type;
-    // gui.add(params, 'type', ['arcball', 'WASD']).onChange(() => {
-    //   // Copy the camera matrix from old to new
-    //   const newCameraType = params.type;
-    //   cameras[newCameraType].matrix = cameras[oldCameraType].matrix;
-    //   oldCameraType = newCameraType;
-    // });
+    let oldCameraType = params.type;
+    gui.add(params, 'type', ['arcball' /*, 'WASD'*/]).onChange(() => {
+      // Copy the camera matrix from old to new
+      const newCameraType = params.type;
+      cameras[newCameraType].matrix = cameras[oldCameraType].matrix;
+      oldCameraType = newCameraType;
+    });
+    gui.draw();
 
     const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter!.requestDevice();
@@ -258,8 +260,7 @@ export const Cameras = () => {
 
   return (
     <>
-      <Text style={styles.instructions}>Swipe the cube to rotate</Text>
-      <CenterSquare>
+      <Square>
         <View
           style={globalStyles.fill}
           pointerEvents="box-only"
@@ -272,14 +273,11 @@ export const Cameras = () => {
             style={globalStyles.fill}
           />
         </View>
-      </CenterSquare>
+      </Square>
+      <HudContainer>
+        <HudLabel text="Swipe the cube to rotate" />
+      </HudContainer>
+      <Controls />
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  instructions: {
-    marginTop: 8,
-    marginLeft: 8,
-  },
-});

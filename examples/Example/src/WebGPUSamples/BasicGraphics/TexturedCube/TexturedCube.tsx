@@ -11,7 +11,7 @@ import {
 
 import basicVertWGSL from '../../shaders/basic.vert.wgsl';
 import sampleTextureMixColorWGSL from './sampleTextureMixColor.frag.wgsl';
-import {CenterSquare} from '../../../Components/CenterSquare';
+import {Square} from '../../../Components/Square';
 import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
 import {globalStyles} from '../../../Components/globalStyles';
 
@@ -239,8 +239,8 @@ export const TexturedCube = () => {
     requestAnimationFrame(frame);
   };
   return (
-    <CenterSquare>
+    <Square>
       <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
-    </CenterSquare>
+    </Square>
   );
 };

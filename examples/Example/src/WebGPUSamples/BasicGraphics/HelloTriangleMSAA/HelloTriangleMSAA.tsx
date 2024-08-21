@@ -2,7 +2,7 @@
 import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
 import triangleVertWGSL from '../../shaders/triangle.vert.wgsl';
 import redFragWGSL from '../../shaders/red.frag.wgsl';
-import {CenterSquare} from '../../../Components/CenterSquare';
+import {Square} from '../../../Components/Square';
 import {globalStyles} from '../../../Components/globalStyles';
 
 export function HelloTriangleMSAA() {
@@ -95,8 +95,8 @@ export function HelloTriangleMSAA() {
     requestAnimationFrame(frame);
   };
   return (
-    <CenterSquare>
+    <Square>
       <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
-    </CenterSquare>
+    </Square>
   );
 }

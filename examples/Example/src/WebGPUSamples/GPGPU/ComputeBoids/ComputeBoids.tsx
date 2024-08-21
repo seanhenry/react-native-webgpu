@@ -1,4 +1,4 @@
-import {CenterSquare} from '../../../Components/CenterSquare';
+import {Square} from '../../../Components/Square';
 import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
 import {globalStyles} from '../../../Components/globalStyles';
 import {useRef} from 'react';
@@ -6,10 +6,12 @@ import {useRef} from 'react';
 import spriteWGSL from './sprite.wgsl';
 import updateSpritesWGSL from './updateSprites.wgsl';
 import {TextInput} from 'react-native';
-import {ControlsContainer} from '../../../Components/ControlsContainer.tsx';
-// import { GUI } from 'dat.gui';
+import {useControls} from '../../../Components/controls/react/useControls';
+import {HudContainer} from '../../../Components/stats/HudContainer.tsx';
+import {HudText} from '../../../Components/stats/HudText.tsx';
 
 export const ComputeBoids = () => {
+  const {gui, Controls} = useControls();
   const perfDisplayRef = useRef<TextInput | null>(null);
   const setText = (text: string) =>
     perfDisplayRef.current?.setNativeProps({text});
@@ -194,12 +196,12 @@ export const ComputeBoids = () => {
       );
     }
 
-    // const gui = new GUI();
     updateSimParams();
-    // Object.keys(simParams).forEach((k) => {
-    //   const key = k as keyof typeof simParams;
-    //   gui.add(simParams, key).onFinishChange(updateSimParams);
-    // });
+    Object.keys(simParams).forEach(k => {
+      const key = k as keyof typeof simParams;
+      gui.add(simParams, key).onFinishChange(updateSimParams);
+    });
+    gui.draw();
 
     const numParticles = 1500;
     const initialParticleData = new Float32Array(numParticles * 4);
@@ -354,15 +356,16 @@ spare readback buffers:    ${spareResultBuffers.length}`);
 
   return (
     <>
-      <CenterSquare>
+      <Square>
         <WebGpuView
           onCreateSurface={onCreateSurface}
           style={globalStyles.fill}
         />
-      </CenterSquare>
-      <ControlsContainer>
-        <TextInput ref={perfDisplayRef} editable={false} multiline />
-      </ControlsContainer>
+      </Square>
+      <HudContainer>
+        <HudText ref={perfDisplayRef} />
+      </HudContainer>
+      <Controls />
     </>
   );
 };

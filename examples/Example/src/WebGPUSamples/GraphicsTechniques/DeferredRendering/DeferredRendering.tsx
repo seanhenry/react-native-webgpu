@@ -1,9 +1,9 @@
-import {CenterSquare} from '../../../Components/CenterSquare.tsx';
+/* eslint-disable @typescript-eslint/no-shadow,no-lone-blocks */
+import {Square} from '../../../Components/Square';
 import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
-import {globalStyles} from '../../../Components/globalStyles.ts';
+import {globalStyles} from '../../../Components/globalStyles';
 
 import {mat4, vec3, vec4} from 'wgpu-matrix';
-// import { GUI } from 'dat.gui';
 import {mesh} from '../../meshes/stanfordDragon';
 
 import lightUpdate from './lightUpdate.wgsl';
@@ -12,14 +12,10 @@ import fragmentWriteGBuffers from './fragmentWriteGBuffers.wgsl';
 import vertexTextureQuad from './vertexTextureQuad.wgsl';
 import fragmentGBuffersDebugView from './fragmentGBuffersDebugView.wgsl';
 import fragmentDeferredRendering from './fragmentDeferredRendering.wgsl';
-import {ControlsContainer} from '../../../Components/ControlsContainer.tsx';
-import {CollapseMenu} from '../../../Components/CollapseMenu.tsx';
-import {Slider} from '../../../Components/Slider.tsx';
-import {useRef} from 'react';
+import {useControls} from '../../../Components/controls/react/useControls';
 
 export const DeferredRendering = () => {
-  const updateMode = useRef((_mode: string) => {});
-  const updateNumLights = useRef((_numLights: number) => {});
+  const {gui, Controls} = useControls();
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
     context,
     navigator,
@@ -324,29 +320,18 @@ export const DeferredRendering = () => {
       return buffer;
     })();
 
-    // const gui = new GUI();
-    // gui.add(settings, 'mode', ['rendering', 'gBuffers view']);
-    // gui
-    //   .add(settings, 'numLights', 1, kMaxNumLights)
-    //   .step(1)
-    //   .onChange(() => {
-    //     device.queue.writeBuffer(
-    //       configUniformBuffer,
-    //       0,
-    //       new Uint32Array([settings.numLights]),
-    //     );
-    //   });
-    updateMode.current = mode => {
-      settings.mode = mode;
-    };
-    updateNumLights.current = numLights => {
-      settings.numLights = numLights;
-      device.queue.writeBuffer(
-        configUniformBuffer,
-        0,
-        new Uint32Array([settings.numLights]),
-      );
-    };
+    gui.add(settings, 'mode', ['rendering', 'gBuffers view']);
+    gui
+      .add(settings, 'numLights', 1, kMaxNumLights)
+      .step(1)
+      .onChange(() => {
+        device.queue.writeBuffer(
+          configUniformBuffer,
+          0,
+          new Uint32Array([settings.numLights]),
+        );
+      });
+    gui.draw();
 
     const modelUniformBuffer = device.createBuffer({
       size: 4 * 16 * 2, // two 4x4 matrix
@@ -623,34 +608,13 @@ export const DeferredRendering = () => {
   };
   return (
     <>
-      <CenterSquare>
+      <Square>
         <WebGpuView
           onCreateSurface={onCreateSurface}
           style={globalStyles.fill}
         />
-      </CenterSquare>
-      <ControlsContainer>
-        <CollapseMenu
-          title="Mode"
-          actions={[
-            {
-              title: 'rendering',
-              onPress: () => updateMode.current('rendering'),
-            },
-            {
-              title: 'gBuffers view',
-              onPress: () => updateMode.current('gBuffers view'),
-            },
-          ]}
-        />
-        <Slider
-          min={1}
-          max={1024}
-          step={1}
-          initialValue={128}
-          onChange={numLights => updateNumLights.current(numLights)}
-        />
-      </ControlsContainer>
+      </Square>
+      <Controls />
     </>
   );
 };

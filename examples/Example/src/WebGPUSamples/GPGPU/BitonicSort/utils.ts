@@ -1,6 +1,7 @@
-// import type { GUI } from 'dat.gui';
 import fullscreenTexturedQuad from '../../shaders/fullscreenTexturedQuad.wgsl';
 import type {SurfaceBackedWebGPU, WGPUContext} from 'react-native-webgpu';
+import {useControls} from '../../../Components/controls/react/useControls';
+import {useStats} from '../../../Components/stats/useStats';
 
 type BindGroupBindingLayout = GPUBufferBindingLayout;
 //   | GPUTextureBindingLayout
@@ -85,9 +86,8 @@ export type ShaderKeyInterface<T extends string[]> = {
 export type SampleInitParams = {
   context: WGPUContext;
   navigator: SurfaceBackedWebGPU['navigator'];
-  // canvas: HTMLCanvasElement;
-  // gui?: GUI;
-  // stats?: Stats;
+  gui: ReturnType<typeof useControls>['gui'];
+  stats: ReturnType<typeof useStats>['stats'];
 };
 
 interface DeviceInitParms {
@@ -111,10 +111,7 @@ export type SampleInit = (params: SampleInitParams) => void;
 export const SampleInitFactoryWebGPU = async (
   callback: SampleInitCallback3D,
 ): Promise<SampleInit> => {
-  const init = async ({
-    context,
-    navigator /* canvas, gui, stats*/,
-  }: SampleInitParams) => {
+  const init = async ({context, navigator, gui, stats}: SampleInitParams) => {
     const adapter = await navigator.gpu.requestAdapter();
     const timestampQueryAvailable = adapter!.features.has('timestamp-query');
     let device: GPUDevice;
@@ -133,13 +130,12 @@ export const SampleInitFactoryWebGPU = async (
     });
 
     callback({
-      // canvas,
-      // gui,
+      gui,
       navigator,
       device,
       context,
       presentationFormat,
-      // stats,
+      stats,
       timestampQueryAvailable,
     });
   };

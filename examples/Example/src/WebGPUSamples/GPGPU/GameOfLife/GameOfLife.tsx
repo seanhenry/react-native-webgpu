@@ -1,13 +1,14 @@
-import {CenterSquare} from '../../../Components/CenterSquare';
+import {Square} from '../../../Components/Square';
 import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
 import {globalStyles} from '../../../Components/globalStyles';
 
-// import { GUI } from 'dat.gui';
 import computeWGSL from './compute.wgsl';
 import vertWGSL from './vert.wgsl';
 import fragWGSL from './frag.wgsl';
+import {useControls} from '../../../Components/controls/react/useControls';
 
 export const GameOfLife = () => {
+  const {gui, Controls} = useControls();
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
     context,
     navigator,
@@ -108,13 +109,15 @@ export const GameOfLife = () => {
     };
 
     function addGUI() {
-      // const gui = new GUI();
-      // gui.add(GameOptions, 'timestep', 1, 60, 1);
-      // gui.add(GameOptions, 'width', 16, 1024, 16).onFinishChange(resetGameData);
-      // gui.add(GameOptions, 'height', 16, 1024, 16).onFinishChange(resetGameData);
-      // gui
-      //   .add(GameOptions, 'workgroupSize', [4, 8, 16])
-      //   .onFinishChange(resetGameData);
+      gui.add(GameOptions, 'timestep', 1, 60, 1);
+      gui.add(GameOptions, 'width', 16, 1024, 16).onFinishChange(resetGameData);
+      gui
+        .add(GameOptions, 'height', 16, 1024, 16)
+        .onFinishChange(resetGameData);
+      gui
+        .add(GameOptions, 'workgroupSize', [4, 8, 16])
+        .onFinishChange(resetGameData);
+      gui.draw();
     }
 
     let wholeTime = 0,
@@ -284,8 +287,14 @@ export const GameOfLife = () => {
     })();
   };
   return (
-    <CenterSquare>
-      <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
-    </CenterSquare>
+    <>
+      <Square>
+        <WebGpuView
+          onCreateSurface={onCreateSurface}
+          style={globalStyles.fill}
+        />
+      </Square>
+      <Controls />
+    </>
   );
 };

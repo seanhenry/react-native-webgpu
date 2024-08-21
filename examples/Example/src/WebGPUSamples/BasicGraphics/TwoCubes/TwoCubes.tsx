@@ -1,5 +1,5 @@
 // https://webgpu.github.io/webgpu-samples/?sample=twoCubes
-import {CenterSquare} from '../../../Components/CenterSquare';
+import {Square} from '../../../Components/Square';
 import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
 
 import {mat4, vec3} from 'wgpu-matrix';
@@ -256,8 +256,8 @@ export const TwoCubes = () => {
     requestAnimationFrame(frame);
   };
   return (
-    <CenterSquare>
+    <Square>
       <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
-    </CenterSquare>
+    </Square>
   );
 };

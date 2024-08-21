@@ -584,9 +584,9 @@ type GPUCommandBufferDescriptor = GPUObjectDescriptorBase;
 type GPUCommandEncoderDescriptor = GPUObjectDescriptorBase;
 
 interface GPUComputePassDescriptor extends GPUObjectDescriptorBase {
-  //   /**
-  //    * Defines which timestamp values will be written for this pass, and where to write them to.
-  //    */
+  /**
+   * Defines which timestamp values will be written for this pass, and where to write them to.
+   */
   timestampWrites?: GPUComputePassTimestampWrites;
 }
 
@@ -1283,14 +1283,14 @@ interface GPUSamplerDescriptor extends GPUObjectDescriptorBase {
    * Specifies behavior for sampling between mipmap levels.
    */
   mipmapFilter?: GPUMipmapFilterMode;
-  //   /**
-  //    */
-  //   lodMinClamp?: number;
-  //   /**
-  //    * Specifies the minimum and maximum levels of detail, respectively, used internally when
-  //    * sampling a texture.
-  //    */
-  //   lodMaxClamp?: number;
+  /**
+   */
+  lodMinClamp?: number;
+  /**
+   * Specifies the minimum and maximum levels of detail, respectively, used internally when
+   * sampling a texture.
+   */
+  lodMaxClamp?: number;
   /**
    * When provided the sampler will be a comparison sampler with the specified
    * {@link GPUCompareFunction}.

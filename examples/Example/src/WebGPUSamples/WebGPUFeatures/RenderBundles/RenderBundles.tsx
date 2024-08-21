@@ -1,17 +1,14 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import {CenterSquare} from '../../../Components/CenterSquare';
+import {Square} from '../../../Components/Square';
 import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
 import {globalStyles} from '../../../Components/globalStyles';
 
 import {mat4, vec3} from 'wgpu-matrix';
-// import {GUI} from 'dat.gui';
 import {createSphereMesh, SphereLayout} from '../../meshes/sphere';
-// import Stats from 'stats.js';
 import meshWGSL from './mesh.wgsl';
-import {useRef} from 'react';
-import {Toggle} from '../../../Components/Toggle.tsx';
-import {useStats} from '../../../Components/Stats.tsx';
-import {ControlsContainer} from '../../../Components/ControlsContainer.tsx';
+import {useStats} from '../../../Components/stats/useStats';
+import {HudContainer} from '../../../Components/stats/HudContainer';
+import {useControls} from '../../../Components/controls/react/useControls';
 
 interface Renderable {
   vertices: GPUBuffer;
@@ -21,9 +18,7 @@ interface Renderable {
 }
 export const RenderBundles = () => {
   const {Stats, stats} = useStats();
-  const onUseRenderBundlesChangedRef = useRef(
-    (_useRenderBundles: boolean) => {},
-  );
+  const {gui, Controls} = useControls();
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
     createImageBitmap,
     context,
@@ -37,16 +32,13 @@ export const RenderBundles = () => {
       useRenderBundles: true,
       asteroidCount: 5000,
     };
-    onUseRenderBundlesChangedRef.current = useRenderBundles => {
-      settings.useRenderBundles = useRenderBundles;
-    };
-    // const gui = new GUI();
-    // gui.add(settings, 'useRenderBundles');
-    // gui.add(settings, 'asteroidCount', 1000, 10000, 1000).onChange(() => {
-    //   // If the content of the scene changes the render bundle must be recreated.
-    //   ensureEnoughAsteroids();
-    //   updateRenderBundle();
-    // });
+    gui.add(settings, 'useRenderBundles');
+    gui.add(settings, 'asteroidCount', 1000, 10000, 1000).onChange(() => {
+      // If the content of the scene changes the render bundle must be recreated.
+      ensureEnoughAsteroids();
+      updateRenderBundle();
+    });
+    gui.draw();
 
     const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
@@ -448,19 +440,16 @@ export const RenderBundles = () => {
   };
   return (
     <>
-      <CenterSquare>
+      <Square>
         <WebGpuView
           onCreateSurface={onCreateSurface}
           style={globalStyles.fill}
         />
-      </CenterSquare>
-      <ControlsContainer>
+      </Square>
+      <HudContainer>
         <Stats />
-        <Toggle
-          initialValue={true}
-          onChange={value => onUseRenderBundlesChangedRef.current(value)}
-        />
-      </ControlsContainer>
+      </HudContainer>
+      <Controls />
     </>
   );
 };

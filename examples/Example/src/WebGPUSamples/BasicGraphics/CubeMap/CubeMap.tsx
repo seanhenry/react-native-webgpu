@@ -1,6 +1,6 @@
 import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
 import {globalStyles} from '../../../Components/globalStyles';
-import {CenterSquare} from '../../../Components/CenterSquare';
+import {Square} from '../../../Components/Square';
 
 import {mat4, vec3} from 'wgpu-matrix';
 
@@ -268,8 +268,8 @@ export const CubeMap = () => {
   };
 
   return (
-    <CenterSquare>
+    <Square>
       <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
-    </CenterSquare>
+    </Square>
   );
 };

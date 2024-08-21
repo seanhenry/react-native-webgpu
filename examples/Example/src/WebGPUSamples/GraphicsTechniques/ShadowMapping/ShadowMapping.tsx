@@ -1,5 +1,5 @@
 /* eslint-disable no-lone-blocks,@typescript-eslint/no-shadow  */
-import {CenterSquare} from '../../../Components/CenterSquare';
+import {Square} from '../../../Components/Square';
 import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
 import {globalStyles} from '../../../Components/globalStyles';
 
@@ -397,8 +397,8 @@ export const ShadowMapping = () => {
     requestAnimationFrame(frame);
   };
   return (
-    <CenterSquare>
+    <Square>
       <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
-    </CenterSquare>
+    </Square>
   );
 };

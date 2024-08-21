@@ -1,14 +1,19 @@
 import {mat4} from 'wgpu-matrix';
-// import { GUI } from 'dat.gui';
-
 import texturedSquareWGSL from './texturedSquare.wgsl';
 import showTextureWGSL from './showTexture.wgsl';
 
 import {globalStyles} from '../../../Components/globalStyles';
 import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
-import {CenterSquare} from '../../../Components/CenterSquare';
+import {Square} from '../../../Components/Square';
+import {useRef} from 'react';
+import {useControls} from '../../../Components/controls/react/useControls';
 
 export const SamplerParameters = () => {
+  const {gui, Controls} = useControls();
+  const resetToInitial = useRef(() => {});
+  const checkeredFloor = useRef(() => {});
+  const smoothLinear = useRef(() => {});
+  const crunchyNearest = useRef(() => {});
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
     requestAnimationFrame,
     navigator,
@@ -73,90 +78,118 @@ export const SamplerParameters = () => {
     } as const;
     const samplerDescriptor: GPUSamplerDescriptor = {...kInitSamplerDescriptor};
 
-    // const gui = new GUI();
-    // {
-    //   const buttons = {
-    //     initial() {
-    //       Object.assign(config, kInitConfig);
-    //       Object.assign(samplerDescriptor, kInitSamplerDescriptor);
-    //       gui.updateDisplay();
-    //     },
-    //     checkerboard() {
-    //       Object.assign(config, {flangeLogSize: 10});
-    //       Object.assign(samplerDescriptor, {
-    //         addressModeU: 'repeat',
-    //         addressModeV: 'repeat',
-    //       });
-    //       gui.updateDisplay();
-    //     },
-    //     smooth() {
-    //       Object.assign(samplerDescriptor, {
-    //         magFilter: 'linear',
-    //         minFilter: 'linear',
-    //         mipmapFilter: 'linear',
-    //       });
-    //       gui.updateDisplay();
-    //     },
-    //     crunchy() {
-    //       Object.assign(samplerDescriptor, {
-    //         magFilter: 'nearest',
-    //         minFilter: 'nearest',
-    //         mipmapFilter: 'nearest',
-    //       });
-    //       gui.updateDisplay();
-    //     },
-    //   };
-    //   const presets = gui.addFolder('Presets');
-    //   presets.open();
-    //   presets.add(buttons, 'initial').name('reset to initial');
-    //   presets.add(buttons, 'checkerboard').name('checkered floor');
-    //   presets.add(buttons, 'smooth').name('smooth (linear)');
-    //   presets.add(buttons, 'crunchy').name('crunchy (nearest)');
-    //
-    //   const flangeFold = gui.addFolder('Plane settings');
-    //   flangeFold.open();
-    //   flangeFold.add(config, 'flangeLogSize', 0, 10.0, 0.1).name('size = 2**');
-    //   flangeFold.add(config, 'highlightFlange');
-    //   flangeFold.add(config, 'animation', 0, 0.5);
-    //
-    //   gui.width = 280;
-    //   {
-    //     const folder = gui.addFolder('GPUSamplerDescriptor');
-    //     folder.open();
-    //
-    //     const kAddressModes = ['clamp-to-edge', 'repeat', 'mirror-repeat'];
-    //     folder.add(samplerDescriptor, 'addressModeU', kAddressModes);
-    //     folder.add(samplerDescriptor, 'addressModeV', kAddressModes);
-    //
-    //     const kFilterModes = ['nearest', 'linear'];
-    //     folder.add(samplerDescriptor, 'magFilter', kFilterModes);
-    //     folder.add(samplerDescriptor, 'minFilter', kFilterModes);
-    //     const kMipmapFilterModes = ['nearest', 'linear'] as const;
-    //     folder.add(samplerDescriptor, 'mipmapFilter', kMipmapFilterModes);
-    //
-    //     const ctlMin = folder.add(samplerDescriptor, 'lodMinClamp', 0, 4, 0.1);
-    //     const ctlMax = folder.add(samplerDescriptor, 'lodMaxClamp', 0, 4, 0.1);
-    //     ctlMin.onChange((value: number) => {
-    //       if (samplerDescriptor.lodMaxClamp < value) {
-    //         ctlMax.setValue(value);
-    //       }
-    //     });
-    //     ctlMax.onChange((value: number) => {
-    //       if (samplerDescriptor.lodMinClamp > value) {
-    //         ctlMin.setValue(value);
-    //       }
-    //     });
-    //
-    //     {
-    //       const folder2 = folder.addFolder(
-    //         'maxAnisotropy (set only if all "linear")',
-    //       );
-    //       folder2.open();
-    //       const kMaxAnisotropy = 16;
-    //       folder2.add(samplerDescriptor, 'maxAnisotropy', 1, kMaxAnisotropy, 1);
-    //     }
-    //   }
-    // }
+    resetToInitial.current = () => {
+      Object.assign(config, kInitConfig);
+      Object.assign(samplerDescriptor, kInitSamplerDescriptor);
+    };
+    checkeredFloor.current = () => {
+      Object.assign(config, {flangeLogSize: 10});
+      Object.assign(samplerDescriptor, {
+        addressModeU: 'repeat',
+        addressModeV: 'repeat',
+      });
+    };
+    smoothLinear.current = () => {
+      Object.assign(samplerDescriptor, {
+        magFilter: 'linear',
+        minFilter: 'linear',
+        mipmapFilter: 'linear',
+      });
+    };
+    crunchyNearest.current = () => {
+      Object.assign(samplerDescriptor, {
+        magFilter: 'nearest',
+        minFilter: 'nearest',
+        mipmapFilter: 'nearest',
+      });
+    };
+    const buttons = {
+      initial() {
+        Object.assign(config, kInitConfig);
+        Object.assign(samplerDescriptor, kInitSamplerDescriptor);
+        gui.updateDisplay();
+      },
+      checkerboard() {
+        Object.assign(config, {flangeLogSize: 10});
+        Object.assign(samplerDescriptor, {
+          addressModeU: 'repeat',
+          addressModeV: 'repeat',
+        });
+        gui.updateDisplay();
+      },
+      smooth() {
+        Object.assign(samplerDescriptor, {
+          magFilter: 'linear',
+          minFilter: 'linear',
+          mipmapFilter: 'linear',
+        });
+        gui.updateDisplay();
+      },
+      crunchy() {
+        Object.assign(samplerDescriptor, {
+          magFilter: 'nearest',
+          minFilter: 'nearest',
+          mipmapFilter: 'nearest',
+        });
+        gui.updateDisplay();
+      },
+    };
+    const presets = gui.addFolder('Presets');
+    presets.open();
+    presets.add(buttons, 'initial').name('reset to initial');
+    presets.add(buttons, 'checkerboard').name('checkered floor');
+    presets.add(buttons, 'smooth').name('smooth (linear)');
+    presets.add(buttons, 'crunchy').name('crunchy (nearest)');
+
+    const flangeFold = gui.addFolder('Plane settings');
+    flangeFold.open();
+    flangeFold.add(config, 'flangeLogSize', 0, 10.0, 0.1).name('size = 2**');
+    flangeFold.add(config, 'highlightFlange');
+    flangeFold.add(config, 'animation', 0, 0.5);
+
+    {
+      const folder = gui.addFolder('GPUSamplerDescriptor');
+      folder.open();
+
+      const kAddressModes = ['clamp-to-edge', 'repeat', 'mirror-repeat'];
+      folder.add(samplerDescriptor, 'addressModeU', kAddressModes);
+      folder.add(samplerDescriptor, 'addressModeV', kAddressModes);
+
+      const kFilterModes = ['nearest', 'linear'];
+      folder.add(samplerDescriptor, 'magFilter', kFilterModes);
+      folder.add(samplerDescriptor, 'minFilter', kFilterModes);
+      const kMipmapFilterModes = ['nearest', 'linear'] as const;
+      folder.add(samplerDescriptor, 'mipmapFilter', kMipmapFilterModes);
+
+      const ctlMin = folder.add(samplerDescriptor, 'lodMinClamp', 0, 4, 0.1);
+      const ctlMax = folder.add(samplerDescriptor, 'lodMaxClamp', 0, 4, 0.1);
+      ctlMin.onChange((value: number) => {
+        if (
+          typeof samplerDescriptor.lodMaxClamp !== 'number' ||
+          samplerDescriptor.lodMaxClamp < value
+        ) {
+          ctlMax.setValue(value);
+        }
+      });
+      ctlMax.onChange((value: number) => {
+        if (
+          typeof samplerDescriptor.lodMinClamp !== 'number' ||
+          samplerDescriptor.lodMinClamp > value
+        ) {
+          ctlMin.setValue(value);
+        }
+      });
+
+      {
+        const folder2 = folder.addFolder(
+          'maxAnisotropy (set only if all "linear")',
+        );
+        folder2.open();
+        const kMaxAnisotropy = 16;
+        folder2.add(samplerDescriptor, 'maxAnisotropy', 1, kMaxAnisotropy, 1);
+      }
+    }
+    gui.draw();
 
     //
     // Canvas setup
@@ -167,7 +200,6 @@ export const SamplerParameters = () => {
     const kViewportGridSize = 4;
     const kViewportGridStride = Math.floor(kCanvasSize / kViewportGridSize);
     const kViewportSize = kViewportGridStride - 2;
-    console.log(kViewportSize);
 
     // The canvas buffer size is 200x200.
     // Compute a canvas CSS size such that there's an integer number of device
@@ -383,8 +415,14 @@ export const SamplerParameters = () => {
   };
 
   return (
-    <CenterSquare>
-      <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
-    </CenterSquare>
+    <>
+      <Square>
+        <WebGpuView
+          onCreateSurface={onCreateSurface}
+          style={globalStyles.fill}
+        />
+      </Square>
+      <Controls />
+    </>
   );
 };

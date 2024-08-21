@@ -6,9 +6,11 @@ import {ExampleScreen} from './src/Components/ExampleScreen';
 import {Appearance} from 'react-native';
 import {Root} from './src/Components/Root';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import Animated from 'react-native-reanimated';
 
 Appearance.setColorScheme('light');
 const Stack = createNativeStackNavigator<Routes>();
+Animated.addWhitelistedNativeProps({text: true});
 
 export default function App() {
   return (

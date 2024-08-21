@@ -1,15 +1,17 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-// import { GUI } from 'dat.gui';
 import {mat4} from 'wgpu-matrix';
 import solidColorLitWGSL from './solidColorLit.wgsl';
 import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
-import {CenterSquare} from '../../../Components/CenterSquare';
+import {Square} from '../../../Components/Square';
 import {globalStyles} from '../../../Components/globalStyles';
 import {useRef} from 'react';
 import {TextInput} from 'react-native';
-import {ControlsContainer} from '../../../Components/ControlsContainer.tsx';
+import {useControls} from '../../../Components/controls/react/useControls';
+import {HudContainer} from '../../../Components/stats/HudContainer.tsx';
+import {HudText} from '../../../Components/stats/HudText.tsx';
 
 export const OcclusionQueries = () => {
+  const {gui, Controls} = useControls();
   const perfDisplayRef = useRef<TextInput | null>(null);
   const setText = (text: string) =>
     perfDisplayRef.current?.setNativeProps({text});
@@ -21,8 +23,8 @@ export const OcclusionQueries = () => {
     const settings = {
       animate: true,
     };
-    // const gui = new GUI();
-    // gui.add(settings, 'animate');
+    gui.add(settings, 'animate');
+    gui.draw();
 
     type TypedArrayView =
       | Int8Array
@@ -363,15 +365,16 @@ export const OcclusionQueries = () => {
   };
   return (
     <>
-      <CenterSquare>
+      <Square>
         <WebGpuView
           onCreateSurface={onCreateSurface}
           style={globalStyles.fill}
         />
-      </CenterSquare>
-      <ControlsContainer>
-        <TextInput ref={perfDisplayRef} editable={false} multiline />
-      </ControlsContainer>
+      </Square>
+      <HudContainer>
+        <HudText ref={perfDisplayRef} />
+      </HudContainer>
+      <Controls />
     </>
   );
 };

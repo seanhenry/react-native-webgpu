@@ -1,8 +1,7 @@
-import {CenterSquare} from '../../../Components/CenterSquare';
+import {Square} from '../../../Components/Square';
 import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
 import {globalStyles} from '../../../Components/globalStyles';
 import {mat4, vec3} from 'wgpu-matrix';
-// import { GUI } from 'dat.gui';
 import normalMapWGSL from './normalMap.wgsl';
 import {createMeshRenderable} from '../../meshes/mesh';
 import {createBoxMeshWithTangents} from '../../meshes/box';
@@ -11,9 +10,7 @@ import {
   createBindGroupDescriptor,
   createTextureFromImage,
 } from './utils';
-import {useRef} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {CollapseMenu} from '../../../Components/CollapseMenu.tsx';
+import {useControls} from '../../../Components/controls/react/useControls';
 
 enum TextureAtlas {
   Spiral,
@@ -30,10 +27,7 @@ type BumpMode =
   | 'Steep Parallax';
 
 export const NormalMap = () => {
-  const onChangeTextureRef = useRef(
-    (_texture: keyof typeof TextureAtlas) => {},
-  );
-  const onChangeBumpModeRef = useRef((_bumpMode: BumpMode) => {});
+  const {gui, Controls} = useControls();
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
     navigator,
     context,
@@ -304,48 +298,44 @@ export const NormalMap = () => {
     );
 
     let currentSurfaceBindGroup = 0;
-    onChangeTextureRef.current = texture => {
-      settings.Texture = texture;
+    const onChangeTexture = (texture: keyof typeof TextureAtlas) => {
       currentSurfaceBindGroup = TextureAtlas[texture];
     };
-    onChangeBumpModeRef.current = bumpMode => {
-      settings['Bump Mode'] = bumpMode;
-    };
 
-    // const gui = new GUI();
-    // gui.add(settings, 'Bump Mode', [
-    //   'Albedo Texture',
-    //   'Normal Texture',
-    //   'Depth Texture',
-    //   'Normal Map',
-    //   'Parallax Scale',
-    //   'Steep Parallax',
-    // ]);
-    // gui
-    //   .add(settings, 'Texture', ['Spiral', 'Toybox', 'BrickWall'])
-    //   .onChange(onChangeTexture);
-    // const lightFolder = gui.addFolder('Light');
-    // const depthFolder = gui.addFolder('Depth');
-    // lightFolder.add(settings, 'Reset Light').onChange(() => {
-    //   lightPosXController.setValue(1.7);
-    //   lightPosYController.setValue(0.7);
-    //   lightPosZController.setValue(-1.9);
-    //   lightIntensityController.setValue(5.0);
-    // });
-    // const lightPosXController = lightFolder
-    //   .add(settings, 'lightPosX', -5, 5)
-    //   .step(0.1);
-    // const lightPosYController = lightFolder
-    //   .add(settings, 'lightPosY', -5, 5)
-    //   .step(0.1);
-    // const lightPosZController = lightFolder
-    //   .add(settings, 'lightPosZ', -5, 5)
-    //   .step(0.1);
-    // const lightIntensityController = lightFolder
-    //   .add(settings, 'lightIntensity', 0.0, 10)
-    //   .step(0.1);
-    // depthFolder.add(settings, 'depthScale', 0.0, 0.1).step(0.01);
-    // depthFolder.add(settings, 'depthLayers', 1, 32).step(1);
+    gui.add(settings, 'Bump Mode', [
+      'Albedo Texture',
+      'Normal Texture',
+      'Depth Texture',
+      'Normal Map',
+      'Parallax Scale',
+      'Steep Parallax',
+    ]);
+    gui
+      .add(settings, 'Texture', ['Spiral', 'Toybox', 'BrickWall'])
+      .onChange(onChangeTexture);
+    const lightFolder = gui.addFolder('Light');
+    const depthFolder = gui.addFolder('Depth');
+    lightFolder.add(settings, 'Reset Light').onChange(() => {
+      lightPosXController.setValue(1.7);
+      lightPosYController.setValue(0.7);
+      lightPosZController.setValue(-1.9);
+      lightIntensityController.setValue(5.0);
+    });
+    const lightPosXController = lightFolder
+      .add(settings, 'lightPosX', -5, 5)
+      .step(0.1);
+    const lightPosYController = lightFolder
+      .add(settings, 'lightPosY', -5, 5)
+      .step(0.1);
+    const lightPosZController = lightFolder
+      .add(settings, 'lightPosZ', -5, 5)
+      .step(0.1);
+    const lightIntensityController = lightFolder
+      .add(settings, 'lightIntensity', 0.0, 10)
+      .step(0.1);
+    depthFolder.add(settings, 'depthScale', 0.0, 0.1).step(0.01);
+    depthFolder.add(settings, 'depthLayers', 1, 32).step(1);
+    gui.draw();
 
     function frame() {
       const framebuffer = context.getCurrentTexture();
@@ -422,69 +412,13 @@ export const NormalMap = () => {
 
   return (
     <>
-      <CenterSquare>
+      <Square>
         <WebGpuView
           onCreateSurface={onCreateSurface}
           style={globalStyles.fill}
         />
-      </CenterSquare>
-      <View style={styles.controls}>
-        <CollapseMenu
-          title="Texture"
-          actions={[
-            {
-              title: 'Spiral',
-              onPress: () => onChangeTextureRef.current('Spiral'),
-            },
-            {
-              title: 'Toybox',
-              onPress: () => onChangeTextureRef.current('Toybox'),
-            },
-            {
-              title: 'BrickWall',
-              onPress: () => onChangeTextureRef.current('BrickWall'),
-            },
-          ]}
-        />
-        <CollapseMenu
-          title="Bump mode"
-          actions={[
-            {
-              title: 'Albedo Texture',
-              onPress: () => onChangeBumpModeRef.current('Albedo Texture'),
-            },
-            {
-              title: 'Normal Texture',
-              onPress: () => onChangeBumpModeRef.current('Normal Texture'),
-            },
-            {
-              title: 'Depth Texture',
-              onPress: () => onChangeBumpModeRef.current('Depth Texture'),
-            },
-            {
-              title: 'Normal Map',
-              onPress: () => onChangeBumpModeRef.current('Normal Map'),
-            },
-            {
-              title: 'Parallax Scale',
-              onPress: () => onChangeBumpModeRef.current('Parallax Scale'),
-            },
-            {
-              title: 'Steep Parallax',
-              onPress: () => onChangeBumpModeRef.current('Steep Parallax'),
-            },
-          ]}
-        />
-      </View>
+      </Square>
+      <Controls />
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  controls: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-  },
-});

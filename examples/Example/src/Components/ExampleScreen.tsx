@@ -16,12 +16,12 @@ import {Cameras} from '../WebGPUSamples/GraphicsTechniques/Cameras/Cameras';
 import {HelloThree} from '../Three/HelloThree/HelloThree';
 import {GLTFLoader} from '../Three/GLTFLoader/GLTFLoader';
 import {SamplerParameters} from '../WebGPUSamples/WebGPUFeatures/SamplerParameters/SamplerParameters';
-import {ReversedZ} from '../WebGPUSamples/WebGPUFeatures/ReversedZ/ReversedZ.tsx';
-import {RenderBundles} from '../WebGPUSamples/WebGPUFeatures/RenderBundles/RenderBundles.tsx';
-import {OcclusionQueries} from '../WebGPUSamples/WebGPUFeatures/OcclusionQueries/OcclusionQueries.tsx';
-import {NormalMap} from '../WebGPUSamples/GraphicsTechniques/NormalMap/NormalMap.tsx';
-import {ShadowMapping} from '../WebGPUSamples/GraphicsTechniques/ShadowMapping/ShadowMapping.tsx';
-import {DeferredRendering} from '../WebGPUSamples/GraphicsTechniques/DeferredRendering/DeferredRendering.tsx';
+import {ReversedZ} from '../WebGPUSamples/WebGPUFeatures/ReversedZ/ReversedZ';
+import {RenderBundles} from '../WebGPUSamples/WebGPUFeatures/RenderBundles/RenderBundles';
+import {OcclusionQueries} from '../WebGPUSamples/WebGPUFeatures/OcclusionQueries/OcclusionQueries';
+import {NormalMap} from '../WebGPUSamples/GraphicsTechniques/NormalMap/NormalMap';
+import {ShadowMapping} from '../WebGPUSamples/GraphicsTechniques/ShadowMapping/ShadowMapping';
+import {DeferredRendering} from '../WebGPUSamples/GraphicsTechniques/DeferredRendering/DeferredRendering';
 
 export type Examples = 'WebGPUSamples' | 'Three';
 

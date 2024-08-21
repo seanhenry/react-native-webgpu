@@ -12,7 +12,7 @@ import {
 import basicVertWGSL from '../../shaders/basic.vert.wgsl';
 import vertexPositionColorWGSL from '../../shaders/vertexPositionColor.frag.wgsl';
 import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
-import {CenterSquare} from '../../../Components/CenterSquare';
+import {Square} from '../../../Components/Square';
 import {globalStyles} from '../../../Components/globalStyles';
 
 export function RotatingCube() {
@@ -200,8 +200,8 @@ export function RotatingCube() {
   };
 
   return (
-    <CenterSquare>
+    <Square>
       <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
-    </CenterSquare>
+    </Square>
   );
 }

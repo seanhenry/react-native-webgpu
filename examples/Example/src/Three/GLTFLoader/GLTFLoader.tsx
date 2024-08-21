@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import {CenterSquare} from '../../Components/CenterSquare';
+import {Square} from '../../Components/Square';
 import {globalStyles} from '../../Components/globalStyles';
 import {ThreeWebGpuView, ThreeWebGpuViewProps} from 'react-native-webgpu-three';
 
@@ -9,10 +9,13 @@ import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
 import PMREMGenerator from 'three/addons/renderers/common/extras/PMREMGenerator.js';
 import {GLTFLoader as ThreeGTLFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {useState} from 'react';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
 
 const THREE_EXAMPLES_BASE_URL = 'https://threejs.org/examples';
 
 export const GLTFLoader = () => {
+  const [isLoading, setLoading] = useState(true);
   const onCreateSurface: ThreeWebGpuViewProps['onCreateSurface'] = async ({
     context,
     rendererParameters,
@@ -63,6 +66,7 @@ export const GLTFLoader = () => {
             `${THREE_EXAMPLES_BASE_URL}/models/gltf/DamagedHelmet/glTF/`,
           );
           loader.load('DamagedHelmet.gltf', function (gltf) {
+            setLoading(false);
             scene.add(gltf.scene);
 
             render();
@@ -92,11 +96,16 @@ export const GLTFLoader = () => {
     };
   };
   return (
-    <CenterSquare>
+    <Square>
       <ThreeWebGpuView
         onCreateSurface={onCreateSurface}
         style={globalStyles.fill}
       />
-    </CenterSquare>
+      {isLoading && (
+        <View style={[StyleSheet.absoluteFill, globalStyles.centerContents]}>
+          <ActivityIndicator />
+        </View>
+      )}
+    </Square>
   );
 };

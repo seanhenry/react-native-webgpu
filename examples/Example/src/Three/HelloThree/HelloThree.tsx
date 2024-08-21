@@ -1,4 +1,4 @@
-import {CenterSquare} from '../../Components/CenterSquare';
+import {Square} from '../../Components/Square';
 import {globalStyles} from '../../Components/globalStyles';
 import {ThreeWebGpuView, ThreeWebGpuViewProps} from 'react-native-webgpu-three';
 import * as THREE from 'three';
@@ -45,11 +45,11 @@ export const HelloThree = () => {
     };
   };
   return (
-    <CenterSquare>
+    <Square>
       <ThreeWebGpuView
         onCreateSurface={onCreateSurface}
         style={globalStyles.fill}
       />
-    </CenterSquare>
+    </Square>
   );
 };

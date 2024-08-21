@@ -1,5 +1,5 @@
 // https://webgpu.github.io/webgpu-samples/?sample=fractalCube
-import {CenterSquare} from '../../../Components/CenterSquare';
+import {Square} from '../../../Components/Square';
 import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
 import {globalStyles} from '../../../Components/globalStyles';
 import {mat4, vec3} from 'wgpu-matrix';
@@ -239,8 +239,8 @@ export const FractalCube = () => {
   };
 
   return (
-    <CenterSquare>
+    <Square>
       <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
-    </CenterSquare>
+    </Square>
   );
 };

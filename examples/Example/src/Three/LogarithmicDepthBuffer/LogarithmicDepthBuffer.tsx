@@ -3,7 +3,7 @@ import {globalStyles} from '../../Components/globalStyles';
 import {useStats} from '../../Components/stats/useStats';
 
 import * as THREE from 'three';
-import {Scene, Vector3} from 'three';
+import {Scene} from 'three';
 
 import {FontLoader} from 'three/addons/loaders/FontLoader.js';
 import {TextGeometry} from 'three/addons/geometries/TextGeometry.js';
@@ -30,10 +30,8 @@ export const LogarithmicDepthBuffer = () => {
     // 1 micrometer to 100 billion light years in one scene, with 1 unit = 1 meter?  preposterous!  and yet...
     const NEAR = 1e-6,
       FAR = 1e27;
-    let SCREEN_WIDTH = context.width;
-    let SCREEN_HEIGHT = context.height;
-    const screensplit = 0.25,
-      screensplit_right = 0;
+    const SCREEN_WIDTH = context.width;
+    const SCREEN_HEIGHT = context.height;
     const mouse = [0.5, 0.5];
     let zoompos = -100;
     const minzoomspeed = 0.015;
@@ -77,25 +75,6 @@ export const LogarithmicDepthBuffer = () => {
       };
     }
 
-    function updateRendererSizes() {
-      // Recalculate size for both renderers when screen size or split location changes
-
-      SCREEN_WIDTH = context.width;
-      SCREEN_HEIGHT = context.height;
-
-      object.renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-      object.camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
-      object.camera.updateProjectionMatrix();
-      object.camera.setViewOffset(
-        SCREEN_WIDTH,
-        SCREEN_HEIGHT,
-        SCREEN_WIDTH,
-        0,
-        SCREEN_WIDTH,
-        SCREEN_HEIGHT,
-      );
-    }
-
     function animate() {
       if (type === 'logzbuf') {
         stats.begin();
@@ -135,12 +114,7 @@ export const LogarithmicDepthBuffer = () => {
         Math.sin(0.25 * Math.PI * (mouse[1] - 0.5)) * zoom;
       object.camera.position.z =
         Math.cos(0.5 * Math.PI * (mouse[0] - 0.5)) * zoom;
-      object.camera.lookAt(new Vector3(-0.75 * zoom, 0, 0));
-
-      // Update renderer sizes if the split has changed
-      if (screensplit_right !== 1 - screensplit) {
-        updateRendererSizes();
-      }
+      object.camera.lookAt(scene?.position);
 
       object.renderer.render(object.scene, object.camera);
 

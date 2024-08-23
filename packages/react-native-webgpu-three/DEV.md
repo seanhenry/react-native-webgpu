@@ -80,3 +80,10 @@ See: `src/nodeBuilderPatch.js`
 
 Solution: Add patch to produce `20` instead of `i32( 20.0 )`  
 See: `src/constNodePatch.js`
+
+### Cannot read property 'addEventListener' of undefined
+
+`TextureLoader` tries to use HTML img to load images (via `ImageLoader`).
+
+Solution: Use document proxy to return `Image` class. Image is loaded and picked up in `QueueHostObject.copyExternalImageToTexture`
+See: `src/index.js`, `src/Image.js`, `QueueHostObject.cpp`

@@ -29,3 +29,11 @@ globalThis.GPUMapMode = {
   READ: 0x00000001,
   WRITE: 0x00000002,
 };
+
+globalThis.GPUColorWrite = {
+  RED: 0x00000001,
+  GREEN: 0x00000002,
+  BLUE: 0x00000004,
+  ALPHA: 0x00000008,
+  ALL: 0x0000000f, // RED | GREEN | BLUE | ALPHA
+};

@@ -114,7 +114,7 @@ WGPUFragmentState wgpu::makeGPUFragmentState(Runtime &runtime, AutoReleasePool *
       auto format = WGPU_UTF8(target, format);
       return (const WGPUColorTargetState){
         .format = StringToWGPUTextureFormat(format),
-        .writeMask = WGPUColorWriteMask_All,
+        .writeMask = WGPU_NUMBER_OPT(target, writeMask, WGPUColorWriteMaskFlags, WGPUColorWriteMask_All),
       };
     });
   auto sharedTargets = std::make_shared<std::vector<WGPUColorTargetState>>(targets);

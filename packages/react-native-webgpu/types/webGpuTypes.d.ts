@@ -570,10 +570,10 @@ interface GPUColorTargetState {
   //    * color target.
   //    */
   //   blend?: GPUBlendState;
-  //   /**
-  //    * Bitmask controlling which channels are are written to when drawing to this color target.
-  //    */
-  //   writeMask?: GPUColorWriteFlags;
+  /**
+   * Bitmask controlling which channels are are written to when drawing to this color target.
+   */
+  writeMask?: GPUColorWriteFlags;
 }
 //
 type GPUCommandBufferDescriptor = GPUObjectDescriptorBase;
@@ -3001,13 +3001,13 @@ declare var GPUBufferUsage: {
   readonly QUERY_RESOLVE: GPUFlagsConstant;
 };
 
-// declare var GPUColorWrite: {
-//   readonly RED: GPUFlagsConstant;
-//   readonly GREEN: GPUFlagsConstant;
-//   readonly BLUE: GPUFlagsConstant;
-//   readonly ALPHA: GPUFlagsConstant;
-//   readonly ALL: GPUFlagsConstant;
-// };
+declare var GPUColorWrite: {
+  readonly RED: GPUFlagsConstant;
+  readonly GREEN: GPUFlagsConstant;
+  readonly BLUE: GPUFlagsConstant;
+  readonly ALPHA: GPUFlagsConstant;
+  readonly ALL: GPUFlagsConstant;
+};
 
 declare var GPUMapMode: {
   readonly READ: GPUFlagsConstant;

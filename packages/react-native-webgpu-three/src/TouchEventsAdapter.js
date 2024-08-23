@@ -1,21 +1,20 @@
-import { EventDispatcher } from 'three';
-import { debugLogging } from './debugLogging';
+import {EventDispatcher} from 'three';
+import {debugLogging} from './debugLogging';
 
 export class TouchEventsAdapter extends EventDispatcher {
-
   constructor(events) {
     super();
-    events.current.onTouchStart = (e) => {
-      this.dispatchEvent(this.makeEventProxy('pointerdown', e))
+    events.current.onTouchStart = e => {
+      this.dispatchEvent(this.makeEventProxy('pointerdown', e));
     };
-    events.current.onTouchCancel = (e) => {
-      this.dispatchEvent(this.makeEventProxy('pointercancel', e))
+    events.current.onTouchCancel = e => {
+      this.dispatchEvent(this.makeEventProxy('pointercancel', e));
     };
-    events.current.onTouchMove = (e) => {
-      this.dispatchEvent(this.makeEventProxy('pointermove', e))
+    events.current.onTouchMove = e => {
+      this.dispatchEvent(this.makeEventProxy('pointermove', e));
     };
-    events.current.onTouchEnd = (e) => {
-      this.dispatchEvent(this.makeEventProxy('pointerup', e))
+    events.current.onTouchEnd = e => {
+      this.dispatchEvent(this.makeEventProxy('pointerup', e));
     };
   }
 
@@ -31,10 +30,17 @@ export class TouchEventsAdapter extends EventDispatcher {
         } else if (propName === 'pageX') {
           return event.nativeEvent.pageX;
         } else if (propName === 'pageY') {
+          return event.nativeEvent.pageY;
+        } else if (propName === 'clientX') {
+          return event.nativeEvent.locationX;
+        } else if (propName === 'clientY') {
           return event.nativeEvent.locationY;
         }
         if (debugLogging) {
-          console.log('>> [react-native-webgpu-three] TouchEventsAdapter proxy get:', propName?.description ?? propName);
+          console.log(
+            '>> [react-native-webgpu-three] TouchEventsAdapter proxy get:',
+            propName?.description ?? propName,
+          );
         }
         return Reflect.get(target, propName, receiver);
       },

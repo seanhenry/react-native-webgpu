@@ -5,6 +5,7 @@ Coming soon. A [WebGPU](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_
 Interested in this project? Star it in GitHub to show your support.
 
 Other projects:
+
 - [react-native-webgpu-three](../react-native-webgpu-three)
 
 ## Contents
@@ -42,7 +43,7 @@ cd ..
 
 ```javascript
 // src/index.js
-import 'react-native-webgpu'
+import 'react-native-webgpu';
 ```
 
 - Add plugin to `babel.config.js` to support `.wgsl` files
@@ -50,9 +51,7 @@ import 'react-native-webgpu'
 ```javascript
 // babel.config.js
 modules.exports = {
-  plugins: [
-    require('react-native-webgpu/babel-plugin-transform-wgsl'),
-  ],
+  plugins: [require('react-native-webgpu/babel-plugin-transform-wgsl')],
 };
 ```
 
@@ -74,7 +73,7 @@ const config = {
 
 - TypeScript only, add global types to `tsconfig.json`
 
-```json 
+```json
 {
   "include": [
     "node_modules/react-native-webgpu/types/webGpuTypes.d.ts",
@@ -164,9 +163,10 @@ function frame() {
   // TODO: We need to tell the surface to present itself onscreen
   requestAnimationFrame(frame);
 }
-// TODO: Use `requestAnimationFrame` from `react-native-webgpu` so it is called in sync with the screen refresh rate, and automatically cancels on unmount 
+// TODO: Use `requestAnimationFrame` from `react-native-webgpu` so it is called in sync with the screen refresh rate, and automatically cancels on unmount
 requestAnimationFrame(frame);
 ```
+
 </details>
 
 Here is a working (TypeScript) example. It has `FIXED:` comments to show where the changes were made.
@@ -197,7 +197,7 @@ export function HelloTriangle() {
     const pipeline = device.createRenderPipeline({
       layout: 'auto',
       vertex: {
-        // FIXED: The shader function in `triangleVertWGSL` is called `main` so that's our entry point 
+        // FIXED: The shader function in `triangleVertWGSL` is called `main` so that's our entry point
         entryPoint: 'main',
         module: device.createShaderModule({
           code: triangleVertWGSL,
@@ -258,5 +258,5 @@ export function HelloTriangle() {
   return <WebGpuView onCreateSurface={onCreateSurface} style={{flex: 1}} />;
 }
 ```
-</details>
 
+</details>

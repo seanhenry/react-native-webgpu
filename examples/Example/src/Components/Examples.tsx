@@ -70,13 +70,20 @@ const sections: Record<Examples, ListProps<Example>['sections']> = {
   Three: [
     {
       title: 'Three.js',
-      data: [
-        {title: 'HelloThree'},
-        {title: 'GLTFLoader'},
-        {title: 'LogarithmicDepthBuffer'},
-        {title: 'Clearcoat'},
-        {title: 'Clipping'},
-      ],
+      data: [{title: 'HelloThree'}, {title: 'Clearcoat'}, {title: 'Clipping'}],
+    },
+    {
+      title: 'Camera',
+      data: [{title: 'LogarithmicDepthBuffer'}],
+    },
+
+    {
+      title: 'Compute',
+      data: [{title: 'ComputeGeometry'}, {title: 'ComputeParticles'}],
+    },
+    {
+      title: 'Loader',
+      data: [{title: 'GLTFLoader'}],
     },
   ],
 };

@@ -44,7 +44,7 @@ cd ..
 
 ```javascript
 // src/index.js
-import 'react-native-webgpu-three'
+import 'react-native-webgpu-three';
 ```
 
 - Add the plugins to `babel.config.js`
@@ -52,9 +52,7 @@ import 'react-native-webgpu-three'
 ```javascript
 // babel.config.js
 modules.exports = {
-  plugins: [
-    ...require('react-native-webgpu-three/babel').plugins,
-  ],
+  plugins: [...require('react-native-webgpu-three/babel').plugins],
 };
 ```
 
@@ -64,11 +62,13 @@ modules.exports = {
 // metro.config.js
 module.exports = {
   resolver: {
-    resolveRequest: require('react-native-webgpu-three/metro').resolver.resolveRequest,
+    resolveRequest: require('react-native-webgpu-three/metro').resolver
+      .resolveRequest,
     unstable_enablePackageExports: true,
   },
 };
 ```
+
 </details>
 
 ## Converting a three project
@@ -78,35 +78,35 @@ There are a few small changes you will need to make to get your scene working. B
 ```javascript
 import * as THREE from 'three';
 
-const width = window.innerWidth, height = window.innerHeight; // TODO: Replace web api
+const width = window.innerWidth,
+  height = window.innerHeight; // TODO: Replace web api
 
 // init
 
-const camera = new THREE.PerspectiveCamera( 70, width / height, 0.01, 10 );
+const camera = new THREE.PerspectiveCamera(70, width / height, 0.01, 10);
 camera.position.z = 1;
 
 const scene = new THREE.Scene();
 
-const geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
+const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
 const material = new THREE.MeshNormalMaterial();
 
-const mesh = new THREE.Mesh( geometry, material );
-scene.add( mesh );
+const mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
 
-const renderer = new THREE.WebGLRenderer( { antialias: true } ); // TODO: Use WebGPURenderer
-renderer.setSize( width, height );
-renderer.setAnimationLoop( animate ); // TODO: Cancel animation loop on unmount
-document.body.appendChild( renderer.domElement ); // TODO: Remove web api
+const renderer = new THREE.WebGLRenderer({antialias: true}); // TODO: Use WebGPURenderer
+renderer.setSize(width, height);
+renderer.setAnimationLoop(animate); // TODO: Cancel animation loop on unmount
+document.body.appendChild(renderer.domElement); // TODO: Remove web api
 
 // animation
 
-function animate( time ) {
+function animate(time) {
+  mesh.rotation.x = time / 2000;
+  mesh.rotation.y = time / 1000;
 
-	mesh.rotation.x = time / 2000;
-	mesh.rotation.y = time / 1000;
-
-	renderer.render( scene, camera );
-    // TODO: We need to tell the surface to present itself onscreen
+  renderer.render(scene, camera);
+  // TODO: We need to tell the surface to present itself onscreen
 }
 ```
 
@@ -163,4 +163,3 @@ export const HelloThree = () => {
   return <ThreeWebGpuView onCreateSurface={onCreateSurface} style={{flex: 1}} />;
 };
 ```
-

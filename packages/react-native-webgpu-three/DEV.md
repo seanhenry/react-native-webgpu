@@ -6,7 +6,7 @@ This file outlines the steps taken to make `three` compatible.
 
 ## v0.166.1
 
-### (0, _$$_REQUIRE(_dependencyMap[5(...)tribute)('faceIndex')).normalize is not a function ... 
+### (0, \_$$\_REQUIRE(\_dependencyMap[5(...)tribute)('faceIndex')).normalize is not a function ...
 
 `three/examples/jsm/renderers/common/extras/PMREMGenerator.js:79-80` tries to access functions before they have been added.
 
@@ -31,10 +31,11 @@ See: `src/examples/jsm/capabilities/WebGPU.js` and `metro/index.js`
 
 `three` uses `exports` in `package.json` to point `three/addons/*` to `three/examples/jsm/*`. Metro has [experimental support](https://metrobundler.dev/docs/package-exports/) for package exports but we can work around it.
 
-Solution: 
+Solution:
+
 - Use `metro.config.js` to point `three/addons/*` to the correct directory.
 - Add `unstable_enablePackageExports: true` to `metro.config.js`
-See `metro/index.js`
+  See `metro/index.js`
 
 ### Texture format on Android is wrong
 
@@ -48,11 +49,12 @@ TODO: can we solve this in a better way so `GPUTextureFormat.BGRA8Unorm` can sti
 
 `WebGPURenderer` accesses web apis unless we provide the appropriate params: `context`, `canvas` and `device`.
 
-Solution: 
+Solution:
+
 - Provide the context
 - Create a device and pass it in
 - Use a `Proxy` to act as the canvas and return `width` and `height`
-See: `rendererParams` in `src/ThreeWebGpuView.js`
+  See: `rendererParams` in `src/ThreeWebGpuView.js`
 
 ### setAnimationLoop
 

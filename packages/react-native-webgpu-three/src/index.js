@@ -1,39 +1,39 @@
-import "three/examples/jsm/nodes/math/MathNode";
-import "./nodeBuilderPatch";
-import "./constNodePatch";
-import "fast-text-encoding";
-import { makeLoggingProxy } from "./debugLogging";
-import { Image } from "./Image";
+import 'three/examples/jsm/nodes/math/MathNode';
+import './nodeBuilderPatch';
+import './constNodePatch';
+import 'fast-text-encoding';
+import {makeLoggingProxy} from './debugLogging';
+import {Image} from './Image';
 
-export { ThreeWebGpuView } from "./ThreeWebGpuView";
-export { enableDebugLogging } from "./debugLogging";
+export {ThreeWebGpuView} from './ThreeWebGpuView';
+export {enableDebugLogging} from './debugLogging';
 
 global.document = makeLoggingProxy(
   {
     createElementNS: makeLoggingProxy(
       (ns, name) => {
-        if (name === "img") {
+        if (name === 'img') {
           return new Image();
         }
       },
-      ["document", "createElementNS"],
+      ['document', 'createElementNS'],
     ),
     addEventListener: makeLoggingProxy(() => {}, [
-      "document",
-      "addEventListener",
+      'document',
+      'addEventListener',
     ]),
   },
-  ["document"],
+  ['document'],
 );
 
 // GLTFLoader.js:2589
 global.navigator = makeLoggingProxy(
   {
-    userAgent: "ReactNative",
+    userAgent: 'ReactNative',
     scheduling: undefined,
   },
-  ["navigator"],
+  ['navigator'],
 );
 
 // CacheNode.js:26
-global.parent = makeLoggingProxy({}, ["parent"]);
+global.parent = makeLoggingProxy({}, ['parent']);

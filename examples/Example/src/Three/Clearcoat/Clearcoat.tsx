@@ -12,6 +12,7 @@ import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 import {THREE_EXAMPLES_BASE_URL} from '../threeConstants';
 import PMREMGenerator from 'three/addons/renderers/common/extras/PMREMGenerator.js';
 import {HDRCubeTextureLoader} from 'three/examples/jsm/loaders/HDRCubeTextureLoader.js';
+import {HudContainer} from '../../Components/stats/HudContainer';
 
 export const Clearcoat = () => {
   const {stats, Stats} = useStats();
@@ -226,7 +227,9 @@ export const Clearcoat = () => {
           style={globalStyles.fill}
         />
       </Square>
-      <Stats />
+      <HudContainer>
+        <Stats />
+      </HudContainer>
     </>
   );
 };

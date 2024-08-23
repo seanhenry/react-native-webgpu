@@ -10,6 +10,7 @@ import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 import {MeshPhongNodeMaterial} from 'three/examples/jsm/nodes/materials/Materials.js';
 import {useStats} from '../../Components/stats/useStats';
 import {useControls} from '../../Components/controls/react/useControls';
+import {HudContainer} from '../../Components/stats/HudContainer';
 
 export const Clipping = () => {
   const {stats, Stats} = useStats();
@@ -225,7 +226,9 @@ export const Clipping = () => {
           style={globalStyles.fill}
         />
       </Square>
-      <Stats />
+      <HudContainer>
+        <Stats />
+      </HudContainer>
       <Controls />
     </>
   );

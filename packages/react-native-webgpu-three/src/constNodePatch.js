@@ -1,13 +1,11 @@
-import ConstNode from 'three/examples/jsm/nodes/core/ConstNode'
+import ConstNode from 'three/examples/jsm/nodes/core/ConstNode';
 
-ConstNode.prototype.generate = function( builder, output ) {
+ConstNode.prototype.generate = function (builder, output) {
+  const type = this.getNodeType(builder);
 
-  const type = this.getNodeType( builder );
-
-  if (type === 'float' && output === 'int') {
-    return `${Math.round(parseFloat(this.generateConst( builder )))}`
+  if (type === 'float' && ['int', 'uint'].includes(output)) {
+    return `${Math.round(parseFloat(this.generateConst(builder)))}`;
   }
 
-  return builder.format( this.generateConst( builder ), type, output );
-
-}
+  return builder.format(this.generateConst(builder), type, output);
+};

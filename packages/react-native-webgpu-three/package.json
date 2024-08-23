@@ -34,6 +34,7 @@
   "devDependencies": {
     "@babel/plugin-transform-export-namespace-from": "^7.24.7",
     "fast-text-encoding": "^1.0.6",
+    "prettier": "^3.3.3",
     "react-native-webgpu": "workspace:*"
   }
 }

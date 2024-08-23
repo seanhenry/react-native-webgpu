@@ -27,6 +27,8 @@ import {Cornell} from '../WebGPUSamples/GraphicsTechniques/Cornell/Cornell';
 import {LogarithmicDepthBuffer} from '../Three/LogarithmicDepthBuffer/LogarithmicDepthBuffer';
 import {Clearcoat} from '../Three/Clearcoat/Clearcoat';
 import {Clipping} from '../Three/Clipping/Clipping';
+import {ComputeGeometry} from '../Three/ComputeGeometry/ComputeGeometry';
+import {ComputeParticles} from '../Three/ComputeParticles/ComputeParticles';
 
 export type Examples = 'WebGPUSamples' | 'Three';
 
@@ -58,10 +60,15 @@ export type Example =
   | 'Cornell'
   // Three
   | 'HelloThree'
-  | 'GLTFLoader'
-  | 'LogarithmicDepthBuffer'
   | 'Clearcoat'
-  | 'Clipping';
+  | 'Clipping'
+  // Camera
+  | 'LogarithmicDepthBuffer'
+  // Compute
+  | 'ComputeGeometry'
+  | 'ComputeParticles'
+  // Loader
+  | 'GLTFLoader';
 
 const examples: Record<Example, ComponentType> = {
   // BasicGraphics
@@ -91,10 +98,15 @@ const examples: Record<Example, ComponentType> = {
   Cornell,
   // Three.js
   HelloThree,
-  GLTFLoader,
-  LogarithmicDepthBuffer,
   Clearcoat,
   Clipping,
+  // Camera
+  LogarithmicDepthBuffer,
+  // Compute
+  ComputeGeometry,
+  ComputeParticles,
+  // Loader
+  GLTFLoader,
 };
 
 export function ExampleScreen() {

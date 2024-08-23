@@ -67,11 +67,11 @@ typedef struct SurfaceObjCWrapper {
 }
 
 - (BOOL)hasNonZeroSize {
-  return self.frame.size.width > 0 && self.frame.size.height > 0;
+  return CGRectGetWidth(self.metalLayer.frame) > 0 && CGRectGetHeight(self.metalLayer.frame) > 0;
 }
 
 - (void)createSurface {
-  if (self->wrapper.surface != nullptr && [self hasNonZeroSize]) {
+  if (self->wrapper.surface != nullptr || ![self hasNonZeroSize]) {
     return;
   }
   struct WGPUSurfaceDescriptorFromMetalLayer descriptorFromMetalLayer = {

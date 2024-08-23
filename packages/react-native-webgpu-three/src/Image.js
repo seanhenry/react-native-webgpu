@@ -1,4 +1,4 @@
-import { EventDispatcher } from "three";
+import {EventDispatcher} from 'three';
 
 export class Image extends EventDispatcher {
   constructor() {
@@ -7,12 +7,12 @@ export class Image extends EventDispatcher {
   }
   set src(src) {
     reactNativeWebGPU
-      .createImageBitmap({ uri: src })
-      .then((image) => {
+      .createImageBitmap({uri: src})
+      .then(image => {
         this._threeImageBitmap = image;
-        this.dispatchEvent({ type: "load" });
+        this.dispatchEvent({type: 'load'});
       })
-      .catch(() => this.dispatchEvent({ type: "error" }));
+      .catch(() => this.dispatchEvent({type: 'error'}));
   }
 
   get data() {

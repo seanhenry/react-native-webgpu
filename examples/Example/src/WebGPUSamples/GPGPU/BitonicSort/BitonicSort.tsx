@@ -9,6 +9,7 @@ import {NaiveBitonicCompute} from './bitonicCompute';
 import {useControls} from '../../../Components/controls/react/useControls';
 import {useStats} from '../../../Components/stats/useStats';
 import atomicToZero from './atomicToZero.wgsl';
+import {HudContainer} from '../../../Components/stats/HudContainer';
 
 export const BitonicSort = () => {
   const {gui, Controls} = useControls();
@@ -956,7 +957,9 @@ export const BitonicSort = () => {
         />
       </Square>
       <Controls />
-      <Stats />
+      <HudContainer>
+        <Stats />
+      </HudContainer>
     </>
   );
 };

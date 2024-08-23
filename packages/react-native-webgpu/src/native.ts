@@ -10,40 +10,43 @@ import {
 
 const LINKING_ERROR =
   `The package 'react-native-webgpu' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: '- You have run \'pod install\'\n', default: '' }) +
+  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n';
 
-export type OnCreateSurfaceEvent = NativeSyntheticEvent<{ uuid: string } | {error: string}>;
+export type OnCreateSurfaceEvent = NativeSyntheticEvent<
+  { uuid: string } | { error: string }
+>;
 export type WGPUWebGPUViewProps = ViewProps & {
   onCreateSurface(event: OnCreateSurfaceEvent): void;
-}
+};
 
-export const WGPUWebGPUView = requireNativeComponent<WGPUWebGPUViewProps>('WGPUWebGPUView')
-const webGpuJsi = NativeModules.WGPUJsi
+export const WGPUWebGPUView =
+  requireNativeComponent<WGPUWebGPUViewProps>('WGPUWebGPUView');
+const webGpuJsi = NativeModules.WGPUJsi;
 
 if (!webGpuJsi) {
-  throw new Error(LINKING_ERROR)
+  throw new Error(LINKING_ERROR);
 }
 
 if (!WGPUWebGPUView) {
-  throw new Error(LINKING_ERROR)
+  throw new Error(LINKING_ERROR);
 }
 
 if (!webGpuJsi.install()) {
-  throw new Error("Failed to install JSI");
+  throw new Error('Failed to install JSI');
 }
 
 function createImageBitmap(source: ImageSourcePropType) {
-  const resolvedSource = Image.resolveAssetSource(source)
+  const resolvedSource = Image.resolveAssetSource(source);
   return __reactNativeWebGPU.createImageBitmap(resolvedSource);
 }
 
 globalThis.reactNativeWebGPU = new Proxy(__reactNativeWebGPU, {
-  get: function(target, prop, receiver) {
+  get: function (target, prop, receiver) {
     if (prop === 'createImageBitmap') {
       return createImageBitmap;
     }
     return Reflect.get(target, prop, receiver);
-  }
+  },
 });

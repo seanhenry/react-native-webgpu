@@ -75,6 +75,7 @@ const sections: Record<Examples, ListProps<Example>['sections']> = {
         {title: 'GLTFLoader'},
         {title: 'LogarithmicDepthBuffer'},
         {title: 'Clearcoat'},
+        {title: 'Clipping'},
       ],
     },
   ],

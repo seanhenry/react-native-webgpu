@@ -26,6 +26,7 @@ import {ImageBlur} from '../WebGPUSamples/GraphicsTechniques/ImageBlur/ImageBlur
 import {Cornell} from '../WebGPUSamples/GraphicsTechniques/Cornell/Cornell';
 import {LogarithmicDepthBuffer} from '../Three/LogarithmicDepthBuffer/LogarithmicDepthBuffer';
 import {Clearcoat} from '../Three/Clearcoat/Clearcoat';
+import {Clipping} from '../Three/Clipping/Clipping';
 
 export type Examples = 'WebGPUSamples' | 'Three';
 
@@ -59,7 +60,8 @@ export type Example =
   | 'HelloThree'
   | 'GLTFLoader'
   | 'LogarithmicDepthBuffer'
-  | 'Clearcoat';
+  | 'Clearcoat'
+  | 'Clipping';
 
 const examples: Record<Example, ComponentType> = {
   // BasicGraphics
@@ -92,6 +94,7 @@ const examples: Record<Example, ComponentType> = {
   GLTFLoader,
   LogarithmicDepthBuffer,
   Clearcoat,
+  Clipping,
 };
 
 export function ExampleScreen() {

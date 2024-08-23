@@ -3,7 +3,7 @@ import {globalStyles} from '../../Components/globalStyles';
 import {ThreeWebGpuView, ThreeWebGpuViewProps} from 'react-native-webgpu-three';
 
 import * as THREE from 'three';
-import {Camera, Group, Mesh, Scene, Texture} from 'three';
+import {Camera, Group, Mesh, Scene} from 'three';
 
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
@@ -18,7 +18,6 @@ export const Clearcoat = () => {
   const onCreateSurface: ThreeWebGpuViewProps['onCreateSurface'] = ({
     context,
     rendererParameters,
-    createImageBitmap,
   }) => {
     let camera: Camera, scene: Scene, renderer: WebGPURenderer;
 

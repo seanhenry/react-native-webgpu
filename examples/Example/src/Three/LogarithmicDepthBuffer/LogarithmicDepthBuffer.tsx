@@ -52,6 +52,7 @@ export const LogarithmicDepthBuffer = () => {
       object = await initView(scene!, type === 'logzbuf');
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     async function initView(scene: Scene, logDepthBuf: boolean) {
       const camera = new THREE.PerspectiveCamera(
         50,

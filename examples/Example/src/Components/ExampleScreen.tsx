@@ -24,6 +24,7 @@ import {ShadowMapping} from '../WebGPUSamples/GraphicsTechniques/ShadowMapping/S
 import {DeferredRendering} from '../WebGPUSamples/GraphicsTechniques/DeferredRendering/DeferredRendering';
 import {ImageBlur} from '../WebGPUSamples/GraphicsTechniques/ImageBlur/ImageBlur';
 import {Cornell} from '../WebGPUSamples/GraphicsTechniques/Cornell/Cornell';
+import {LogarithmicDepthBuffer} from '../Three/LogarithmicDepthBuffer/LogarithmicDepthBuffer';
 
 export type Examples = 'WebGPUSamples' | 'Three';
 
@@ -55,7 +56,8 @@ export type Example =
   | 'Cornell'
   // Three
   | 'HelloThree'
-  | 'GLTFLoader';
+  | 'GLTFLoader'
+  | 'LogarithmicDepthBuffer';
 
 const examples: Record<Example, ComponentType> = {
   // BasicGraphics
@@ -86,6 +88,7 @@ const examples: Record<Example, ComponentType> = {
   // Three.js
   HelloThree,
   GLTFLoader,
+  LogarithmicDepthBuffer,
 };
 
 export function ExampleScreen() {

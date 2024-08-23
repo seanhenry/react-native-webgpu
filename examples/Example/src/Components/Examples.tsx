@@ -70,7 +70,11 @@ const sections: Record<Examples, ListProps<Example>['sections']> = {
   Three: [
     {
       title: 'Three.js',
-      data: [{title: 'HelloThree'}, {title: 'GLTFLoader'}],
+      data: [
+        {title: 'HelloThree'},
+        {title: 'GLTFLoader'},
+        {title: 'LogarithmicDepthBuffer'},
+      ],
     },
   ],
 };

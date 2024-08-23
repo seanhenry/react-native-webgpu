@@ -1,4 +1,5 @@
 #import "WGPUWebGPUView.h"
+#import <React/RCTBridgeConstants.h>
 #include <memory>
 #include "JSIInstance.h"
 #include "Surface.h"
@@ -26,8 +27,23 @@ typedef struct SurfaceObjCWrapper {
   self = [super initWithFrame:frame];
   if (self != nil) {
     _uuid = [[NSUUID UUID] UUIDString];
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onJSReload)
+                                               name:RCTBridgeWillReloadNotification
+                                             object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onJSReload)
+                                               name:RCTBridgeFastRefreshNotification
+                                             object:nil];
   }
   return self;
+}
+
+- (void)onJSReload {
+  [self deleteSurface];
+  if (self.window != nil) {
+    [self createSurface];
+  }
 }
 
 - (void)willMoveToWindow:(UIWindow *)newWindow {
@@ -43,7 +59,21 @@ typedef struct SurfaceObjCWrapper {
   }
 }
 
+- (void)layoutSubviews {
+  [super layoutSubviews];
+  if (self.window != nil) {
+    [self createSurface];
+  }
+}
+
+- (BOOL)hasNonZeroSize {
+  return self.frame.size.width > 0 && self.frame.size.height > 0;
+}
+
 - (void)createSurface {
+  if (self->wrapper.surface != nullptr && [self hasNonZeroSize]) {
+    return;
+  }
   struct WGPUSurfaceDescriptorFromMetalLayer descriptorFromMetalLayer = {
     .chain =
       (const WGPUChainedStruct){

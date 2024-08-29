@@ -861,13 +861,13 @@ interface GPUImageDataLayout {
    * Required if there are multiple block rows (i.e. the copy height or depth is more than one block).
    */
   bytesPerRow?: GPUSize32;
-  // /**
-  //  * Number of block rows per single image of the texture.
-  //  * {@link GPUImageDataLayout#rowsPerImage} &times;
-  //  * {@link GPUImageDataLayout#bytesPerRow} is the stride, in bytes, between the beginning of each image of data and the subsequent image.
-  //  * Required if there are multiple images (i.e. the copy depth is more than one).
-  //  */
-  // rowsPerImage?: GPUSize32;
+  /**
+   * Number of block rows per single image of the texture.
+   * {@link GPUImageDataLayout#rowsPerImage} &times;
+   * {@link GPUImageDataLayout#bytesPerRow} is the stride, in bytes, between the beginning of each image of data and the subsequent image.
+   * Required if there are multiple images (i.e. the copy depth is more than one).
+   */
+  rowsPerImage?: GPUSize32;
 }
 
 interface GPUMultisampleState {

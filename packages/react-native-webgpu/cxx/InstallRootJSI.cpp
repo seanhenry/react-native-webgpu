@@ -3,6 +3,7 @@
 #include <sstream>
 
 #include "AdapterHostObject.h"
+#include "Compression.h"
 #include "ConstantConversion.h"
 #include "ContextHostObject.h"
 #include "CreateImageBitmap.h"
@@ -124,6 +125,7 @@ void wgpu::installRootJSI(
   });
 
   auto webgpu = Object(runtime);
+  webgpu.setProperty(runtime, "inflate", inflate(runtime));
   webgpu.setProperty(runtime, "createImageBitmap", createImageBitmap(runtime));
   webgpu.setProperty(runtime, "getSurfaceBackedWebGPU", std::move(getSurfaceBackedWebGPU));
   webgpu.setProperty(runtime, "getHeadlessWebGPU", std::move(getHeadlessWebGPU));

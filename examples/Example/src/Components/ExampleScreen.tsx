@@ -30,6 +30,7 @@ import {Clipping} from '../Three/Clipping/Clipping';
 import {ComputeGeometry} from '../Three/ComputeGeometry/ComputeGeometry';
 import {ComputeParticles} from '../Three/ComputeParticles/ComputeParticles';
 import {FlakesTexture} from '../InHouse/FlakesTexture';
+import {VolumeRendering} from '../WebGPUSamples/GraphicsTechniques/VolumeRendering/VolumeRendering';
 
 export type Examples = 'WebGPUSamples' | 'Three' | 'InHouse';
 
@@ -59,6 +60,7 @@ export type Example =
   | 'DeferredRendering'
   | 'ImageBlur'
   | 'Cornell'
+  | 'VolumeRendering'
   // Three
   | 'HelloThree'
   | 'Clearcoat'
@@ -99,6 +101,7 @@ const examples: Record<Example, ComponentType> = {
   DeferredRendering,
   ImageBlur,
   Cornell,
+  VolumeRendering,
   // Three.js
   HelloThree,
   Clearcoat,

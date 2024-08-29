@@ -150,6 +150,16 @@ class OwnedMutableBuffer : public MutableBuffer {
   size_t _size;
 };
 
+class OwnedVectorMutableBuffer : public MutableBuffer {
+ public:
+  OwnedVectorMutableBuffer(std::vector<uint8_t> vec) : _vec(vec) {}
+  size_t size() const override { return _vec.size(); }
+  uint8_t *data() override { return _vec.data(); }
+
+ private:
+  std::vector<uint8_t> _vec;
+};
+
 inline ArrayBuffer createUnownedArrayBuffer(Runtime &runtime, void *bytes, size_t size) {
   auto buffer = std::make_shared<UnownedMutableBuffer>(bytes, size);
   return ArrayBuffer(runtime, buffer);
@@ -157,6 +167,11 @@ inline ArrayBuffer createUnownedArrayBuffer(Runtime &runtime, void *bytes, size_
 
 inline ArrayBuffer createOwnedArrayBuffer(Runtime &runtime, void *bytes, size_t size) {
   auto buffer = std::make_shared<OwnedMutableBuffer>(bytes, size);
+  return ArrayBuffer(runtime, buffer);
+}
+
+inline ArrayBuffer createOwnedVectorArrayBuffer(Runtime &runtime, std::vector<uint8_t> &&vec) {
+  auto buffer = std::make_shared<OwnedVectorMutableBuffer>(std::move(vec));
   return ArrayBuffer(runtime, buffer);
 }
 

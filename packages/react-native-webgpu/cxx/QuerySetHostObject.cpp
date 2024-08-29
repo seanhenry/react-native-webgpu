@@ -16,6 +16,7 @@ Value QuerySetHostObject::get(Runtime &runtime, const PropNameID &propName) {
     return WGPU_FUNC_FROM_HOST_FUNC(destroy, 0, [this]) {
       WGPU_LOG_FUNC_ARGS(destroy);
       wgpuQuerySetDestroy(_value);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
   }

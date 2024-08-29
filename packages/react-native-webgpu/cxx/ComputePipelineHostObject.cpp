@@ -17,6 +17,7 @@ Value ComputePipelineHostObject::get(Runtime &runtime, const PropNameID &propNam
       WGPU_LOG_FUNC_ARGS(getBindGroupLayout);
       auto index = (uint32_t)arguments[0].asNumber();
       auto layout = wgpuComputePipelineGetBindGroupLayout(_value, index);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Object::createFromHostObject(runtime, std::make_shared<BindGroupLayoutHostObject>(layout, _context, ""));
     });
   }

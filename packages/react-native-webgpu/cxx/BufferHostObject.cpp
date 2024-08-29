@@ -27,6 +27,7 @@ Value BufferHostObject::get(Runtime &runtime, const PropNameID &propName) {
       auto offset = (size_t)count > 0 ? arguments[0].asNumber() : 0;
       auto size = (size_t)count > 1 ? arguments[1].asNumber() : wgpuBufferGetSize(_value) - offset;
       auto range = wgpuBufferGetMappedRange(_value, offset, size);
+      _context->getErrorHandler()->throwPendingJSIError();
       return createUnownedArrayBuffer(runtime, range, size);
     });
   }

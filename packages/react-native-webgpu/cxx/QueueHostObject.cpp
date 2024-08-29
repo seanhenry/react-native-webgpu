@@ -26,6 +26,7 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
           return item.asObject(runtime).asHostObject<CommandBufferHostObject>(runtime)->getValue();
         });
       wgpuQueueSubmit(_value, commands.size(), commands.data());
+      _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
   }
@@ -39,6 +40,7 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
       auto dataOffset = count > 3 ? (size_t)arguments[3].asNumber() : 0;
       auto size = count > 4 ? (size_t)arguments[4].asNumber() : (data.size(runtime) - dataOffset);
       wgpuQueueWriteBuffer(_value, buffer, bufferOffset, data.data(runtime) + dataOffset, size);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
   }
@@ -90,6 +92,7 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
       auto copySize = makeGPUExtent3D(runtime, arguments[2].asObject(runtime));
 
       wgpuQueueWriteTexture(_value, &copyTexture, data, dataSize, &dataLayout, &copySize);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
   }
@@ -104,6 +107,7 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
       auto writeSize = makeGPUExtent3D(runtime, arguments[3].asObject(runtime));
       auto dataLayout = makeWGPUTextureDataLayout(runtime, dataLayoutIn, &writeSize);
       wgpuQueueWriteTexture(_value, &copyTexture, data.data(runtime), data.size(runtime), &dataLayout, &writeSize);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
   }

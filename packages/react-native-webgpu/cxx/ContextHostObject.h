@@ -16,6 +16,7 @@ class ContextHostObject : public HostObject {
   std::vector<PropNameID> getPropertyNames(Runtime &runtime) override;
   Value get(Runtime &runtime, const PropNameID &name) override;
   inline bool isSurfaceConfigured() { return _configuredContext != nullptr; }
+  void throwPendingJSIError();
 
  private:
   std::shared_ptr<Surface> _surface;

@@ -91,6 +91,7 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
       }
 
       auto encoder = wgpuCommandEncoderBeginRenderPass(_value, &descriptor);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Object::createFromHostObject(
         runtime, std::make_shared<RenderPassEncoderHostObject>(encoder, _context, std::move(label)));
     });
@@ -108,6 +109,7 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
       auto sourceCopyTexture = makeWGPUImageCopyTexture(runtime, std::move(source));
       auto destCopyTexture = makeWGPUImageCopyTexture(runtime, std::move(destination));
       wgpuCommandEncoderCopyTextureToTexture(_value, &sourceCopyTexture, &destCopyTexture, &copySize);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
   }
@@ -134,6 +136,7 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
         }
       }
       auto encoder = wgpuCommandEncoderBeginComputePass(_value, &descriptor);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Object::createFromHostObject(
         runtime, std::make_shared<ComputePassEncoderHostObject>(encoder, _context, std::move(label)));
     });
@@ -148,6 +151,7 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
       auto destinationOffset = (uint64_t)arguments[3].asNumber();
       auto size = (uint64_t)arguments[4].asNumber();
       wgpuCommandEncoderCopyBufferToBuffer(_value, source, sourceOffset, destination, destinationOffset, size);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
   }
@@ -162,6 +166,7 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
       auto sourceCopyTexture = makeWGPUImageCopyTexture(runtime, std::move(source));
       auto destCopyBuffer = makeWGPUImageCopyBuffer(runtime, destination, &copySize);
       wgpuCommandEncoderCopyTextureToBuffer(_value, &sourceCopyTexture, &destCopyBuffer, &copySize);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
   }
@@ -175,6 +180,7 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
       auto destination = arguments[3].asObject(runtime).asHostObject<BufferHostObject>(runtime)->getValue();
       auto destinationOffset = (uint64_t)arguments[4].asNumber();
       wgpuCommandEncoderResolveQuerySet(_value, querySet, firstQuery, queryCount, destination, destinationOffset);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
   }

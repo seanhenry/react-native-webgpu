@@ -25,6 +25,7 @@ Value ComputePassEncoderHostObject::get(Runtime &runtime, const PropNameID &prop
       uint32_t y = count > 1 ? (uint32_t)arguments[1].asNumber() : 1;
       uint32_t z = count > 2 ? (uint32_t)arguments[2].asNumber() : 1;
       wgpuComputePassEncoderDispatchWorkgroups(_value, x, y, z);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
   }
@@ -35,6 +36,7 @@ Value ComputePassEncoderHostObject::get(Runtime &runtime, const PropNameID &prop
       wgpuComputePassEncoderEnd(_value);
       // https://github.com/gfx-rs/wgpu-native/issues/412
       release();
+      _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
   }

@@ -6,6 +6,7 @@
 
 #include "ConstantConversion.h"
 #include "DeviceHostObject.h"
+#include "ErrorHandler.h"
 #include "WGPUContext.h"
 #include "WGPUConversions.h"
 #include "WGPUJsiUtils.h"
@@ -13,10 +14,12 @@
 using namespace facebook::jsi;
 using namespace wgpu;
 
+static void wgpuErrorCallback(WGPUErrorType type, char const *message, void *userdata);
 static void wgpuHandleRequestDevice(WGPURequestDeviceStatus status, WGPUDevice device, char const *message,
                                     void *userdata);
 typedef struct HandleRequestDeviceUserData {
   std::shared_ptr<AdapterWrapper> adapter;
+  std::shared_ptr<ErrorHandler> errorHandler;
 } HandleRequestDeviceUserData;
 
 Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
@@ -33,16 +36,23 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
       }
       auto promise = new Promise<HandleRequestDeviceUserData>(runtime);
       return promise->jsPromise([this, promise, sharedObj]() {
+        auto errorHandler = std::make_shared<ErrorHandler>();
         promise->data = (const HandleRequestDeviceUserData){
           .adapter = _adapter,
+          .errorHandler = errorHandler,
+        };
+        std::vector<WGPUFeatureName> requiredFeatures;
+        WGPUDeviceDescriptor descriptor = {nullptr};
+        descriptor.uncapturedErrorCallbackInfo = {
+          .nextInChain = nullptr,
+          .callback = wgpuErrorCallback,
+          .userdata = errorHandler.get(),
         };
 
         if (sharedObj != nullptr) {
           auto &runtime = promise->runtime;
           auto obj = std::move(*sharedObj.get());
-          WGPUDeviceDescriptor descriptor = {0};
 
-          std::vector<WGPUFeatureName> requiredFeatures;
           if (obj.hasProperty(runtime, "requiredFeatures")) {
             auto requiredFeaturesIn = obj.getPropertyAsObject(runtime, "requiredFeatures").asArray(runtime);
             requiredFeatures = jsiArrayToVector<WGPUFeatureName>(runtime, std::move(requiredFeaturesIn),
@@ -53,11 +63,8 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
             descriptor.requiredFeatures = requiredFeatures.data();
             descriptor.requiredFeatureCount = requiredFeatures.size();
           }
-
-          wgpuAdapterRequestDevice(_adapter->_adapter, &descriptor, wgpuHandleRequestDevice, promise);
-        } else {
-          wgpuAdapterRequestDevice(_adapter->_adapter, NULL, wgpuHandleRequestDevice, promise);
         }
+        wgpuAdapterRequestDevice(_adapter->_adapter, &descriptor, wgpuHandleRequestDevice, promise);
       });
     });
   }
@@ -85,6 +92,12 @@ std::vector<PropNameID> AdapterHostObject::getPropertyNames(Runtime &runtime) {
   return PropNameID::names(runtime, "requestDevice", "features", "limits");
 }
 
+static void wgpuErrorCallback(WGPUErrorType type, char const *message, void *userdata) {
+  // ErrorHandler is retained in WGPUContext so will survive as long as the device, and therefore this callback
+  auto errorHandler = (ErrorHandler *)userdata;
+  errorHandler->pushError(type, message);
+}
+
 static void wgpuHandleRequestDevice(WGPURequestDeviceStatus status, WGPUDevice device, char const *message,
                                     void *userdata) {
   auto promise = (Promise<HandleRequestDeviceUserData> *)userdata;
@@ -92,7 +105,7 @@ static void wgpuHandleRequestDevice(WGPURequestDeviceStatus status, WGPUDevice d
 
   if (status == WGPURequestDeviceStatus_Success) {
     auto deviceWrapper = std::make_shared<DeviceWrapper>(device);
-    auto context = std::make_shared<WGPUContext>(promise->data.adapter, deviceWrapper);
+    auto context = std::make_shared<WGPUContext>(promise->data.adapter, deviceWrapper, promise->data.errorHandler);
     auto deviceHostObject =
       Object::createFromHostObject(runtime, std::make_shared<DeviceHostObject>(deviceWrapper, context));
     promise->resolve(std::move(deviceHostObject));

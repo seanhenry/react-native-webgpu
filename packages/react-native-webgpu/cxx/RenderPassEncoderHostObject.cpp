@@ -31,6 +31,7 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
       wgpuRenderPassEncoderEnd(this->_value);
       // https://github.com/gfx-rs/wgpu-native/issues/412
       release();
+      _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
   }
@@ -49,6 +50,7 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
       auto minDepth = (float)arguments[4].asNumber();
       auto maxDepth = (float)arguments[5].asNumber();
       wgpuRenderPassEncoderSetViewport(_value, x, y, width, height, minDepth, maxDepth);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
   }
@@ -62,6 +64,7 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
           return value.asObject(runtime).asHostObject<RenderBundleHostObject>(runtime)->getValue();
         });
       wgpuRenderPassEncoderExecuteBundles(_value, bundles.size(), bundles.data());
+      _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
   }
@@ -71,6 +74,7 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
       WGPU_LOG_FUNC_ARGS(beginOcclusionQuery);
       auto queryIndex = arguments[0].asNumber();
       wgpuRenderPassEncoderBeginOcclusionQuery(_value, queryIndex);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
   }
@@ -79,6 +83,7 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
     return WGPU_FUNC_FROM_HOST_FUNC(endOcclusionQuery, 0, [this]) {
       WGPU_LOG_FUNC_ARGS(beginOcclusionQuery);
       wgpuRenderPassEncoderEndOcclusionQuery(_value);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
   }

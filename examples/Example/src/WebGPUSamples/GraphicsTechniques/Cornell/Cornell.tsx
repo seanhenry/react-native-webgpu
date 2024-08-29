@@ -61,15 +61,18 @@ export const Cornell = () => {
 
     // Issue 2: context.getCurrentTexture() STORAGE_BINDING not supported
     // so we create our own texture instead.
-    const copyTexture = device.createTexture({
-      label: 'framebuffer',
-      size: [context.width, context.height],
-      format: presentationFormat,
-      usage:
-        GPUTextureUsage.RENDER_ATTACHMENT |
-        GPUTextureUsage.STORAGE_BINDING |
-        GPUTextureUsage.COPY_SRC,
-    });
+    let copyTexture: GPUTexture;
+    if (needsWorkaround) {
+      copyTexture = device.createTexture({
+        label: 'framebuffer',
+        size: [context.width, context.height],
+        format: presentationFormat,
+        usage:
+          GPUTextureUsage.RENDER_ATTACHMENT |
+          GPUTextureUsage.STORAGE_BINDING |
+          GPUTextureUsage.COPY_SRC,
+      });
+    }
 
     const framebuffer = device.createTexture({
       label: 'framebuffer',

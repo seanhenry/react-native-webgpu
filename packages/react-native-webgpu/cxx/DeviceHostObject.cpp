@@ -83,6 +83,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
       descriptor.multisample = multisample;
 
       auto pipeline = wgpuDeviceCreateRenderPipeline(getValue(), &descriptor);
+      _context->getErrorHandler()->throwPendingJSIError();
 
       return Object::createFromHostObject(
         runtime, std::make_shared<RenderPipelineHostObject>(pipeline, _context, std::move(label)));
@@ -104,6 +105,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         .compute = makeWGPUProgrammableStageDescriptor(runtime, &autoReleasePool, WGPU_OBJ(options, compute)),
       };
       auto pipeline = wgpuDeviceCreateComputePipeline(getValue(), &descriptor);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Object::createFromHostObject(
         runtime, std::make_shared<ComputePipelineHostObject>(pipeline, _context, std::move(label)));
     });
@@ -131,6 +133,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
       descriptor.nextInChain = (const WGPUChainedStruct *)&desc;
 
       auto shader = wgpuDeviceCreateShaderModule(getValue(), &descriptor);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Object::createFromHostObject(runtime,
                                           std::make_shared<ShaderModuleHostObject>(shader, _context, std::move(label)));
     });
@@ -148,6 +151,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         .label = label.data(),
       };
       auto command_encoder = wgpuDeviceCreateCommandEncoder(getValue(), &descriptor);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Object::createFromHostObject(
         runtime, std::make_shared<CommandEncoderHostObject>(command_encoder, _context, std::move(label)));
     });
@@ -170,6 +174,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         .mappedAtCreation = WGPU_BOOL_OPT(desc, mappedAtCreation, false),
       };
       auto buffer = wgpuDeviceCreateBuffer(getValue(), &descriptor);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Object::createFromHostObject(runtime,
                                           std::make_shared<BufferHostObject>(buffer, _context, std::move(label)));
     });
@@ -190,6 +195,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
       descriptor.dimension = StringToWGPUTextureDimension(dimension.data());
       descriptor.mipLevelCount = WGPU_NUMBER_OPT(desc, mipLevelCount, uint32_t, descriptor.mipLevelCount);
       auto texture = wgpuDeviceCreateTexture(getValue(), &descriptor);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Object::createFromHostObject(
         runtime, std::make_shared<TextureHostObject>(texture, _context, std::move(label), false));
     });
@@ -221,6 +227,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
       };
 
       auto bindGroup = wgpuDeviceCreateBindGroup(getValue(), &descriptor);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Object::createFromHostObject(runtime,
                                           std::make_shared<BindGroupHostObject>(bindGroup, _context, std::move(label)));
     });
@@ -256,6 +263,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         descriptor.lodMaxClamp = lodMaxClamp;
       }
       auto sampler = wgpuDeviceCreateSampler(getValue(), &descriptor);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Object::createFromHostObject(runtime,
                                           std::make_shared<SamplerHostObject>(sampler, _context, std::move(label)));
     });
@@ -322,6 +330,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         .entries = entries.data(),
       };
       auto layout = wgpuDeviceCreateBindGroupLayout(getValue(), &descriptor);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Object::createFromHostObject(
         runtime, std::make_shared<BindGroupLayoutHostObject>(layout, _context, std::move(label)));
     });
@@ -343,6 +352,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         .bindGroupLayouts = layouts.data(),
       };
       auto layout = wgpuDeviceCreatePipelineLayout(getValue(), &descriptor);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Object::createFromHostObject(
         runtime, std::make_shared<PipelineLayoutHostObject>(layout, _context, std::move(label)));
     });
@@ -375,6 +385,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         .count = WGPU_NUMBER(desc, count, uint32_t),
       };
       auto querySet = wgpuDeviceCreateQuerySet(getValue(), &descriptor);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Object::createFromHostObject(
         runtime, std::make_shared<QuerySetHostObject>(querySet, _context, std::move(std::move(label))));
     });
@@ -402,6 +413,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         .stencilReadOnly = WGPU_BOOL_OPT(obj, depthReadOnly, false),
       };
       auto encoder = wgpuDeviceCreateRenderBundleEncoder(getValue(), &descriptor);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Object::createFromHostObject(
         runtime, std::make_shared<RenderBundleEncoderHostObject>(encoder, _context, std::move(label)));
     });

@@ -36,7 +36,6 @@ Value ShaderModuleHostObject::get(Runtime &runtime, const PropNameID &propName) 
 
   WGPU_LOG_GET_PROP;
 
-  // Not supported on iOS
   if (name == "getCompilationInfo") {
     return WGPU_FUNC_FROM_HOST_FUNC(getCompilationInfo, 0, [this]) {
       WGPU_LOG_FUNC_ARGS(getCompilationInfo);

@@ -28,6 +28,7 @@ Value TextureHostObject::get(Runtime &runtime, const PropNameID &propName) {
       } else {
         view = wgpuTextureCreateView(_value, NULL);
       }
+      _context->getErrorHandler()->throwPendingJSIError();
 
       return Object::createFromHostObject(runtime,
                                           std::make_shared<TextureViewHostObject>(view, _context, std::move(label)));
@@ -38,6 +39,7 @@ Value TextureHostObject::get(Runtime &runtime, const PropNameID &propName) {
     return WGPU_FUNC_FROM_HOST_FUNC(destroy, 0, [this]) {
       WGPU_LOG_FUNC_ARGS(destroy);
       wgpuTextureDestroy(_value);
+      _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
   }

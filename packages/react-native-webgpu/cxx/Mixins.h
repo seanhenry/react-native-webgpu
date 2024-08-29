@@ -13,6 +13,7 @@
       WGPU_LOG_FUNC_ARGS(setPipeline);                                                  \
       auto pipeline = arguments[0].asObject(runtime).asHostObject<__pipeline>(runtime); \
       __func(_value, pipeline->getValue());                                             \
+      _context->getErrorHandler()->throwPendingJSIError();                              \
       return Value::undefined();                                                        \
     });                                                                                 \
   }
@@ -26,6 +27,7 @@
       auto offset = count > 2 ? arguments[2].asNumber() : 0;                                            \
       auto size = count > 3 ? arguments[3].asNumber() : wgpuBufferGetSize(buffer) - offset;             \
       __func(_value, buffer, StringToWGPUIndexFormat(format.data()), offset, size);                     \
+      _context->getErrorHandler()->throwPendingJSIError();                                              \
       return Value::undefined();                                                                        \
     });                                                                                                 \
   }
@@ -45,6 +47,7 @@
                   : buffer != nullptr ? wgpuBufferGetSize(buffer) - offset                      \
                                       : 0;                                                      \
       __func(_value, slot, buffer, offset, size);                                               \
+      _context->getErrorHandler()->throwPendingJSIError();                                      \
       return Value::undefined();                                                                \
     });                                                                                         \
   }
@@ -58,6 +61,7 @@
       auto firstVertex = (uint32_t)count > 2 ? arguments[2].asNumber() : 0;         \
       auto firstInstance = (uint32_t)count > 3 ? arguments[3].asNumber() : 0;       \
       __func(this->_value, vertexCount, instanceCount, firstVertex, firstInstance); \
+      _context->getErrorHandler()->throwPendingJSIError();                          \
       return Value::undefined();                                                    \
     });                                                                             \
   }
@@ -72,6 +76,7 @@
       auto baseVertex = count > 3 ? (uint32_t)arguments[3].asNumber() : 0;              \
       auto firstInstance = count > 4 ? (uint32_t)arguments[4].asNumber() : 0;           \
       __func(_value, indexCount, instanceCount, firstIndex, baseVertex, firstInstance); \
+      _context->getErrorHandler()->throwPendingJSIError();                              \
       return Value::undefined();                                                        \
     });                                                                                 \
   }
@@ -93,6 +98,7 @@
         bindGroup = groupIn->getValue();                                                          \
       }                                                                                           \
       __func(_value, index, bindGroup, 0, NULL);                                                  \
+      _context->getErrorHandler()->throwPendingJSIError();                                        \
       return Value::undefined();                                                                  \
     });                                                                                           \
   }
@@ -114,6 +120,7 @@
         .label = label.data(),                                                                                      \
       };                                                                                                            \
       auto buffer = __func(_value, &descriptor);                                                                    \
+      _context->getErrorHandler()->throwPendingJSIError();                                                          \
       return Object::createFromHostObject(runtime, std::make_shared<__return>(buffer, _context, std::move(label))); \
     });                                                                                                             \
   }

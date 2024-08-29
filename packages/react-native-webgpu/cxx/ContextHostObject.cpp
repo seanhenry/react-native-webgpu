@@ -31,6 +31,7 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
       }
       WGPUSurfaceTexture texture;
       wgpuSurfaceGetCurrentTexture(_surface->getWGPUSurface(), &texture);
+      throwPendingJSIError();
       if (texture.status == WGPUSurfaceGetCurrentTextureStatus_Success) {
         _texture = texture.texture;
         // [Surface texture note 2] isSurfaceTexture = true so TextHostObject does not
@@ -57,6 +58,7 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
         wgpuSurfacePresent(_surface->getWGPUSurface());
         wgpuTextureRelease(_texture);
         _texture = nullptr;
+        throwPendingJSIError();
         return Value::undefined();
       }
       jsLog(runtime, "warn",
@@ -112,6 +114,7 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
       };
       wgpuSurfaceConfigure(_surface->getWGPUSurface(), &config);
       _configuredContext = device->getContext();
+      throwPendingJSIError();
       _surface->createTimer();
 
       return Value::undefined();
@@ -127,6 +130,7 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
       }
       _surface->invalidateTimer();
       wgpuSurfaceUnconfigure(_surface->getWGPUSurface());
+      throwPendingJSIError();
       _configuredContext = nullptr;
       return Value::undefined();
     });
@@ -157,6 +161,7 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
       result.setProperty(runtime, PropNameID::forAscii(runtime, "alphaModes"), std::move(alphaModes));
 
       wgpuSurfaceCapabilitiesFreeMembers(capabilities);
+
       return std::move(result);
     });
   }
@@ -189,4 +194,10 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
 std::vector<PropNameID> ContextHostObject::getPropertyNames(Runtime &runtime) {
   return PropNameID::names(runtime, "presentSurface", "configure", "surfaceCapabilities", "getCurrentTexture", "width",
                            "height", "destroy", "scale", "pointWidth", "pointHeight");
+}
+
+void ContextHostObject::throwPendingJSIError() {
+  if (_configuredContext != nullptr) {
+    _configuredContext->getErrorHandler()->throwPendingJSIError();
+  }
 }

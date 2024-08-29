@@ -60,9 +60,11 @@ export const WebGpuView = ({
             ...webGPU,
             createImageBitmap: reactNativeWebGPU.createImageBitmap,
           })
-        ).then((fn) => {
-          onDeleteSurfaceRef.current = fn ?? null;
-        });
+        )
+          .then((fn) => {
+            onDeleteSurfaceRef.current = fn ?? null;
+          })
+          .catch(rethrowError);
       } else {
         onErrorRef.current
           ? onErrorRef.current(new Error(nativeEvent.error))
@@ -92,3 +94,10 @@ const styles = StyleSheet.create({
     height: '100%',
   },
 });
+
+const rethrowError = (error: unknown) => {
+  setTimeout(() => {
+    // Throwing error outside promise to get red screen
+    throw error;
+  }, 0);
+};

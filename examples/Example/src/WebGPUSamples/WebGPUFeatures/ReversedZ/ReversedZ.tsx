@@ -82,7 +82,7 @@ export const ReversedZ = () => {
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: 'premultiplied',
+      alphaMode: 'auto',
     });
 
     const verticesBuffer = device.createBuffer({

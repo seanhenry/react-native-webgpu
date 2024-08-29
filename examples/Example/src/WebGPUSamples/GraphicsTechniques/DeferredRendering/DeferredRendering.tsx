@@ -33,7 +33,7 @@ export const DeferredRendering = () => {
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: 'premultiplied',
+      alphaMode: 'auto',
     });
 
     // Create the model vertex buffer.

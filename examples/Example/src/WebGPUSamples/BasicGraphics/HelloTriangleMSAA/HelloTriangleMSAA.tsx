@@ -20,7 +20,7 @@ export function HelloTriangleMSAA() {
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: 'premultiplied',
+      alphaMode: 'auto',
     });
 
     const sampleCount = 4;

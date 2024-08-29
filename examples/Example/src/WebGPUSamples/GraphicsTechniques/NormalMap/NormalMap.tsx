@@ -42,7 +42,7 @@ export const NormalMap = () => {
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: 'premultiplied',
+      alphaMode: 'auto',
     });
 
     interface GUISettings {

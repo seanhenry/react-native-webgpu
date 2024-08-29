@@ -45,7 +45,7 @@ export const RenderBundles = () => {
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: 'premultiplied',
+      alphaMode: 'auto',
     });
 
     const shaderModule = device.createShaderModule({

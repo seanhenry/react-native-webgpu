@@ -126,7 +126,7 @@ export const SampleInitFactoryWebGPU = async (
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: 'premultiplied',
+      alphaMode: 'auto',
     });
 
     callback({

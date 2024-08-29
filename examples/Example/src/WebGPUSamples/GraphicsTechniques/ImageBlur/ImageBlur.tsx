@@ -25,7 +25,7 @@ export const ImageBlur = () => {
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: 'premultiplied',
+      alphaMode: 'auto',
     });
 
     const blurPipeline = device.createComputePipeline({

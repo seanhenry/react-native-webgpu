@@ -87,7 +87,8 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
         throw JSError(runtime, "Surface had 0 alpha modes");
       }
 
-      auto isAlphaModeValid = cArrayContains(capabilities.alphaModes, capabilities.alphaModeCount, alphaMode);
+      auto isAlphaModeValid = alphaMode == WGPUCompositeAlphaMode_Auto ||
+                              cArrayContains(capabilities.alphaModes, capabilities.alphaModeCount, alphaMode);
       if (!isAlphaModeValid) {
         alphaMode = capabilities.alphaModes[0];
         jsLog(runtime, "warn",

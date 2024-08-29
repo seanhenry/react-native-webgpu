@@ -22,7 +22,7 @@ export const GameOfLife = () => {
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: 'premultiplied',
+      alphaMode: 'auto',
     });
 
     const GameOptions = {

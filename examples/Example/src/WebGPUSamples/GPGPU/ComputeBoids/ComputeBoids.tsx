@@ -39,7 +39,7 @@ export const ComputeBoids = () => {
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: 'premultiplied',
+      alphaMode: 'auto',
     });
 
     const spriteShaderModule = device.createShaderModule({code: spriteWGSL});

@@ -63,7 +63,7 @@ export const Cornell = () => {
       device,
       format: presentationFormat,
       usage: surfaceUsage,
-      alphaMode: 'premultiplied',
+      alphaMode: 'auto',
     });
 
     // Issue 3: context.getCurrentTexture() STORAGE_BINDING not supported

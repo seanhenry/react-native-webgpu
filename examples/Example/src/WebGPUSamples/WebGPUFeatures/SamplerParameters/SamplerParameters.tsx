@@ -219,7 +219,7 @@ export const SamplerParameters = () => {
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: 'premultiplied',
+      alphaMode: 'auto',
     });
 
     //

@@ -31,7 +31,7 @@ export const TwoCubes = () => {
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: 'premultiplied',
+      alphaMode: 'auto',
     });
 
     // Create a vertex buffer from the cube data.

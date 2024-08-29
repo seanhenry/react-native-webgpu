@@ -29,7 +29,7 @@ export const InstancedCube = () => {
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: 'premultiplied',
+      alphaMode: 'auto',
     });
 
     // Create a vertex buffer from the cube data.

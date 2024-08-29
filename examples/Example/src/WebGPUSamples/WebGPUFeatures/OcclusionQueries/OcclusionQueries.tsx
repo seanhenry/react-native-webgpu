@@ -53,7 +53,7 @@ export const OcclusionQueries = () => {
     context.configure({
       device,
       format: presentationFormat,
-      alphaMode: 'premultiplied',
+      alphaMode: 'auto',
     });
     const depthFormat = 'depth24plus';
 

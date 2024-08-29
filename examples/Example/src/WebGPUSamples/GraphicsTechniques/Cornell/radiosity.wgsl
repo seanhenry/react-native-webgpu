@@ -90,7 +90,8 @@ fn accumulate(uv : vec2f, quad : u32, color : vec3f) {
 fn accumulation_base_index(coord : vec2u, quad : u32) -> u32 {
   let dims = textureDimensions(lightmap);
   let c = min(vec2u(dims) - 1, coord);
-  return 3 * (c.x + dims.x * c.y + dims.x * dims.y * quad);
+  let len = arrayLength(&accumulation);
+  return min(len - 3, 3 * (c.x + dims.x * c.y + dims.x * dims.y * quad));
 }
 
 // Returns a new Ray at a random point on the light, in a random downwards

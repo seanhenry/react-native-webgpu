@@ -14,9 +14,15 @@ class ComputePassEncoderHostObject : public HostObject {
   explicit ComputePassEncoderHostObject(WGPUComputePassEncoder value, std::shared_ptr<WGPUContext> context,
                                         std::string label)
     : _value(value), _context(context), _label(label) {}
-  ~ComputePassEncoderHostObject() { wgpuComputePassEncoderRelease(_value); }
+  ~ComputePassEncoderHostObject() { release(); }
   std::vector<PropNameID> getPropertyNames(Runtime &runtime) override;
   Value get(Runtime &runtime, const PropNameID &name) override;
+  void release() {
+    if (_value != nullptr) {
+      wgpuComputePassEncoderRelease(_value);
+      _value = nullptr;
+    }
+  }
 
  private:
   WGPUComputePassEncoder _value;

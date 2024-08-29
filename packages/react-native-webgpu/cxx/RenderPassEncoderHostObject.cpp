@@ -29,6 +29,8 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
     return WGPU_FUNC_FROM_HOST_FUNC(end, 0, [this]) {
       WGPU_LOG_FUNC_ARGS(end);
       wgpuRenderPassEncoderEnd(this->_value);
+      // https://github.com/gfx-rs/wgpu-native/issues/412
+      release();
       return Value::undefined();
     });
   }

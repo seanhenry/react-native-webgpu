@@ -59,6 +59,8 @@ export CARGO_BUILD_TARGET=i686-linux-android
 rustup target add $CARGO_BUILD_TARGET
 cargo build --release
 
+rm -rf tmp-lib
+
 popd
 
 function mv_lib {

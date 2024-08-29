@@ -33,6 +33,8 @@ Value ComputePassEncoderHostObject::get(Runtime &runtime, const PropNameID &prop
     return WGPU_FUNC_FROM_HOST_FUNC(end, 0, [this]) {
       WGPU_LOG_FUNC_ARGS(end);
       wgpuComputePassEncoderEnd(_value);
+      // https://github.com/gfx-rs/wgpu-native/issues/412
+      release();
       return Value::undefined();
     });
   }

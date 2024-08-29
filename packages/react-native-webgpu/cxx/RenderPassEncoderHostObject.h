@@ -14,9 +14,15 @@ class RenderPassEncoderHostObject : public HostObject {
   explicit RenderPassEncoderHostObject(WGPURenderPassEncoder value, std::shared_ptr<WGPUContext> context,
                                        std::string label)
     : _value(value), _context(context), _label(label) {}
-  ~RenderPassEncoderHostObject() { wgpuRenderPassEncoderRelease(_value); }
+  ~RenderPassEncoderHostObject() { release(); }
   std::vector<PropNameID> getPropertyNames(Runtime &runtime) override;
   Value get(Runtime &runtime, const PropNameID &name) override;
+  void release() {
+    if (_value != nullptr) {
+      wgpuRenderPassEncoderRelease(_value);
+      _value = nullptr;
+    }
+  }
 
  private:
   WGPURenderPassEncoder _value;

@@ -9,6 +9,12 @@
 #include "Surface.h"
 #include "WGPUJsiUtils.h"
 
+#ifdef ANDROID
+const char *defaultTextureFormat = "rgba8unorm-srgb";
+#else
+const char *defaultTextureFormat = "bgra8unorm-srgb";
+#endif
+
 using namespace facebook::jsi;
 
 static void wgpuHandleRequestAdapter(WGPURequestAdapterStatus status, WGPUAdapter adapter, char const *message,
@@ -32,13 +38,13 @@ void wgpu::installRootJSI(
 
     result.setProperty(runtime, "context",
                        Object::createFromHostObject(runtime, std::make_shared<ContextHostObject>(surface)));
-        result.setProperty(runtime, "requestAnimationFrame", WGPU_FUNC_FROM_HOST_FUNC(requestAnimationFrame, 1, [surface]) {
+    result.setProperty(runtime, "requestAnimationFrame", WGPU_FUNC_FROM_HOST_FUNC(requestAnimationFrame, 1, [surface]) {
       surface->requestAnimationFrame(arguments[0].asObject(runtime).asFunction(runtime));
       return Value::undefined();
-        }));
+    }));
 
-        auto gpu = Object(runtime);
-        gpu.setProperty(runtime, "requestAdapter", WGPU_FUNC_FROM_HOST_FUNC(requestAdapter, 1, [surface]) {
+    auto gpu = Object(runtime);
+    gpu.setProperty(runtime, "requestAdapter", WGPU_FUNC_FROM_HOST_FUNC(requestAdapter, 1, [surface]) {
       auto promise = new Promise<HandleRequestAdapterData>(runtime);
       return promise->jsPromise([promise, surface]() {
         promise->data = {
@@ -54,29 +60,31 @@ void wgpu::installRootJSI(
 
         wgpuInstanceRequestAdapter(surface->getWGPUInstance(), &adapterOptions, wgpuHandleRequestAdapter, promise);
       });
-        }));
-        gpu.setProperty(runtime, "getPreferredCanvasFormat", WGPU_FUNC_FROM_HOST_FUNC(getPreferredCanvasFormat, 0, [surface]) {
+    }));
+    gpu.setProperty(runtime, "getPreferredCanvasFormat", WGPU_FUNC_FROM_HOST_FUNC(getPreferredCanvasFormat, 0, [surface]) {
       auto adapter = surface->getUnownedWGPUAdapter().lock();
       if (adapter == nullptr) {
         jsLog(runtime, "warn",
               {"Adapter not found. Call navigator.gpu.requestAdapter before "
                "navigator.gpu.getPreferredCanvasFormat"});
-#ifdef ANDROID
-        return String::createFromUtf8(runtime, "rgba8unorm-srgb");
-#else
-        return String::createFromUtf8(runtime, "bgra8unorm-srgb");
-#endif
+
+        return String::createFromUtf8(runtime, defaultTextureFormat);
       }
-      auto format = wgpuSurfaceGetPreferredFormat(surface->getWGPUSurface(), adapter->_adapter);
-      return String::createFromUtf8(runtime, WGPUTextureFormatToString(format));
-        }));
+      WGPUSurfaceCapabilities caps = {nullptr};
+      wgpuSurfaceGetCapabilities(surface->getWGPUSurface(), adapter->_adapter, &caps);
+      if (caps.formatCount == 0) {
+        jsLog(runtime, "warn", {"Surface capabilities didn't return any supported texture formats"});
+        return String::createFromUtf8(runtime, defaultTextureFormat);
+      }
+      return String::createFromUtf8(runtime, WGPUTextureFormatToString(caps.formats[0]));
+    }));
 
-        auto navigator = Object(runtime);
-        navigator.setProperty(runtime, "gpu", std::move(gpu));
+    auto navigator = Object(runtime);
+    navigator.setProperty(runtime, "gpu", std::move(gpu));
 
-        result.setProperty(runtime, "navigator", std::move(navigator));
+    result.setProperty(runtime, "navigator", std::move(navigator));
 
-        return std::move(result);
+    return std::move(result);
   });
 
   auto getHeadlessWebGPU = WGPU_FUNC_FROM_HOST_FUNC(getWebGPUForHeadless, 0, []) {
@@ -85,7 +93,7 @@ void wgpu::installRootJSI(
     auto result = Object(runtime);
 
     auto gpu = Object(runtime);
-        gpu.setProperty(runtime, "requestAdapter", WGPU_FUNC_FROM_HOST_FUNC(requestAdapter, 1, []) {
+    gpu.setProperty(runtime, "requestAdapter", WGPU_FUNC_FROM_HOST_FUNC(requestAdapter, 1, []) {
       auto promise = new Promise<HandleRequestAdapterData>(runtime);
       return promise->jsPromise([promise]() {
         auto instance = wgpuCreateInstance(nullptr);
@@ -106,13 +114,13 @@ void wgpu::installRootJSI(
 
         wgpuInstanceRequestAdapter(instance, &adapterOptions, wgpuHandleRequestAdapter, promise);
       });
-        }));
-        auto navigator = Object(runtime);
-        navigator.setProperty(runtime, "gpu", std::move(gpu));
+    }));
+    auto navigator = Object(runtime);
+    navigator.setProperty(runtime, "gpu", std::move(gpu));
 
-        result.setProperty(runtime, "navigator", std::move(navigator));
+    result.setProperty(runtime, "navigator", std::move(navigator));
 
-        return std::move(result);
+    return std::move(result);
   });
 
   auto webgpu = Object(runtime);

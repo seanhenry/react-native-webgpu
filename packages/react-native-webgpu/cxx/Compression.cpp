@@ -1,9 +1,5 @@
 #include "Compression.h"
 
-#include <assert.h>
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
 #include <zlib.h>
 
 #include "WGPUJsiUtils.h"
@@ -49,6 +45,8 @@ int inf(uint8_t *data, size_t size, std::vector<uint8_t> &bufferOut) {
       case Z_MEM_ERROR:
         (void)inflateEnd(&strm);
         return ret;
+      default:
+        break;
     }
     lastOut = strm.avail_out;
   } while (strm.avail_in > 0);
@@ -69,6 +67,6 @@ Value wgpu::inflate(Runtime &runtime) {
     if (result == Z_OK) {
       return createOwnedVectorArrayBuffer(runtime, std::move(out));
     }
-    throw new JSINativeException("Failed to inflate array buffer");
+    throw JSINativeException("Failed to inflate array buffer");
   });
 }

@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 find_package(fbjni REQUIRED CONFIG)
 find_package(ReactAndroid REQUIRED CONFIG)
+find_library(zlib z)
 
 file(GLOB SHARED_SOURCE "${CMAKE_SOURCE_DIR}/../cxx/*.cpp")
 file(GLOB ANDROID_SOURCE "${CMAKE_SOURCE_DIR}/../cxx/android/*.cpp")
@@ -31,4 +32,5 @@ target_link_libraries(
         android
         ReactAndroid::reactnativejni
         fbjni::fbjni
-        log)
+        log
+        z)

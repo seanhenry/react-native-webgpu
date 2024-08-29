@@ -42,8 +42,8 @@ const char *WGPUTextureFormatToString(WGPUTextureFormat format) {
     map[WGPUTextureFormat_RGBA16Uint] = "rgba16uint";
     map[WGPUTextureFormat_RGBA16Sint] = "rgba16sint";
     map[WGPUTextureFormat_RGBA16Float] = "rgba16float";
-    map[WGPUTextureFormat_RGBA32Float] = "rgba32float≈";
-    map[WGPUTextureFormat_RGBA32Uint] = "rgba32float";
+    map[WGPUTextureFormat_RGBA32Float] = "rgba32float";
+    map[WGPUTextureFormat_RGBA32Uint] = "rgba32uint";
     map[WGPUTextureFormat_RGBA32Sint] = "rgba32sint";
     map[WGPUTextureFormat_Stencil8] = "stencil8";
     map[WGPUTextureFormat_Depth16Unorm] = "depth16unorm";
@@ -146,8 +146,8 @@ WGPUTextureFormat StringToWGPUTextureFormat(std::string &format) {
     map["rgba16uint"] = WGPUTextureFormat_RGBA16Uint;
     map["rgba16sint"] = WGPUTextureFormat_RGBA16Sint;
     map["rgba16float"] = WGPUTextureFormat_RGBA16Float;
-    map["rgba32float≈"] = WGPUTextureFormat_RGBA32Float;
-    map["rgba32float"] = WGPUTextureFormat_RGBA32Uint;
+    map["rgba32float"] = WGPUTextureFormat_RGBA32Float;
+    map["rgba32uint"] = WGPUTextureFormat_RGBA32Uint;
     map["rgba32sint"] = WGPUTextureFormat_RGBA32Sint;
     map["stencil8"] = WGPUTextureFormat_Stencil8;
     map["depth16unorm"] = WGPUTextureFormat_Depth16Unorm;

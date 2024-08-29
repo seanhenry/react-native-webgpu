@@ -25,6 +25,7 @@ export interface WGPUContext
 export interface WGPUSurfaceCapabilities {
   formats: GPUTextureFormat[];
   alphaModes: GPUCanvasAlphaMode[];
+  usages: GPUTextureUsageFlags;
 }
 
 export interface ImageBitmap {

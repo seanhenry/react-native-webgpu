@@ -159,6 +159,7 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
       auto result = Object(runtime);
       result.setProperty(runtime, PropNameID::forAscii(runtime, "formats"), std::move(formats));
       result.setProperty(runtime, PropNameID::forAscii(runtime, "alphaModes"), std::move(alphaModes));
+      result.setProperty(runtime, PropNameID::forAscii(runtime, "usages"), Value((int)capabilities.usages));
 
       wgpuSurfaceCapabilitiesFreeMembers(capabilities);
 

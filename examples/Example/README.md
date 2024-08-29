@@ -6,16 +6,24 @@ You can run the examples using the instructions below.
 
 ```bash
 git clone https://github.com/seanhenry/react-native-webgpu.git
-cd react-native-webgpu/examples/Example
 ```
 
-2. Install JavaScript dependencies
+2. Compile react-native-webgpu
 
 ```bash
+cd packages/react-native-webgpu
+yarn tsc
+cd ../..
+```
+
+3. Install JavaScript dependencies
+
+```bash
+cd react-native-webgpu/examples/Example
 yarn
 ```
 
-3. Download WebGPU dependencies
+4. Download WebGPU dependencies
 
 ```bash
 wget https://github.com/seanhenry/react-native-webgpu/releases/download/v0.0.0/Bin+Headers.zip
@@ -29,7 +37,7 @@ unzip Bin+Headers.zip -d ../../packages/react-native-webgpu
 - Unzip and move the `bin` and `include` folders to `../../packages/react-native-webgpu`
 </details>
 
-4. Install pods (iOS only)
+5. Install pods (iOS only)
 
 ```bash
 cd ios
@@ -37,7 +45,7 @@ pod install
 cd ..
 ```
 
-5. Build and run
+6. Build and run
 
 ```bash
 yarn ios

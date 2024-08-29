@@ -17,14 +17,18 @@ export const Cornell = () => {
     requestAnimationFrame,
   }) => {
     const adapter = await navigator.gpu.requestAdapter();
-    const needsWorkaround = true;
-    // const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+    const surfaceCapabilities = context.surfaceCapabilities(adapter!);
+    const needsWorkaround =
+      (surfaceCapabilities.usages & GPUTextureUsage.STORAGE_BINDING) === 0;
+    if (needsWorkaround) {
+      console.warn(
+        ">> STORAGE_BINDING isn't supported on surface texture, using workaround",
+      );
+    }
     // Issue 1: xxx-srgb cannot have STORAGE_BINGING so don't use that
-    const presentationFormat = needsWorkaround
-      ? context
-          .surfaceCapabilities(adapter!)
-          .formats.find(format => !format.endsWith('-srgb'))!
-      : navigator.gpu.getPreferredCanvasFormat();
+    const presentationFormat = navigator.gpu
+      .getPreferredCanvasFormat()
+      .replace(/-srgb$/, '') as GPUTextureFormat;
     const requiredFeatures: GPUFeatureName[] =
       presentationFormat === 'bgra8unorm' ? ['bgra8unorm-storage'] : [];
 
@@ -49,17 +53,20 @@ export const Cornell = () => {
     gui.add(params, 'rotateCamera' /*, true*/);
     gui.draw();
 
+    let surfaceUsage =
+      GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST;
+    // Issue 2: If STORAGE_BINDING is not supported, don't request it
+    if (!needsWorkaround) {
+      surfaceUsage |= GPUTextureUsage.STORAGE_BINDING;
+    }
     context.configure({
       device,
       format: presentationFormat,
-      usage:
-        GPUTextureUsage.RENDER_ATTACHMENT |
-        GPUTextureUsage.STORAGE_BINDING |
-        GPUTextureUsage.COPY_DST,
+      usage: surfaceUsage,
       alphaMode: 'premultiplied',
     });
 
-    // Issue 2: context.getCurrentTexture() STORAGE_BINDING not supported
+    // Issue 3: context.getCurrentTexture() STORAGE_BINDING not supported
     // so we create our own texture instead.
     let copyTexture: GPUTexture;
     if (needsWorkaround) {
@@ -130,8 +137,8 @@ export const Cornell = () => {
       tonemapper.run(commandEncoder);
 
       if (needsWorkaround) {
-        // Issue 3: Since canvasTexture is no longer our copy destination, we
-        // copy is as a final step.
+        // Issue 4: Since canvasTexture is no longer our copy destination, we
+        // copy it as a final step.
         commandEncoder.copyTextureToTexture(
           {texture: copyTexture},
           {texture: canvasTexture},

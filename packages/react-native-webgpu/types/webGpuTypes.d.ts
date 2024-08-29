@@ -732,15 +732,14 @@ interface GPUFragmentState extends GPUProgrammableStage {
    */
   targets: Iterable<GPUColorTargetState | null>;
 }
-//
-// interface GPUImageCopyBuffer
-//   extends GPUImageDataLayout {
-//   /**
-//    * A buffer which either contains image data to be copied or will store the image data being
-//    * copied, depending on the method it is being passed to.
-//    */
-//   buffer: GPUBuffer;
-// }
+
+interface GPUImageCopyBuffer extends GPUImageDataLayout {
+  /**
+   * A buffer which either contains image data to be copied or will store the image data being
+   * copied, depending on the method it is being passed to.
+   */
+  buffer: GPUBuffer;
+}
 
 interface GPUImageCopyExternalImage {
   /**
@@ -2035,18 +2034,18 @@ interface GPUCommandEncoder
   //     destination: GPUImageCopyTexture,
   //     copySize: GPUExtent3DStrict
   //   ): undefined;
-  //   /**
-  //    * Encode a command into the {@link GPUCommandEncoder} that copies data from a sub-region of one or
-  //    * multiple continuous texture subresources to a sub-region of a {@link GPUBuffer}.
-  //    * @param source - Combined with `copySize`, defines the region of the source texture subresources.
-  //    * @param destination - Combined with `copySize`, defines the region of the destination buffer.
-  //    * 	`copySize`:
-  //    */
-  //   copyTextureToBuffer(
-  //     source: GPUImageCopyTexture,
-  //     destination: GPUImageCopyBuffer,
-  //     copySize: GPUExtent3DStrict
-  //   ): undefined;
+  /**
+   * Encode a command into the {@link GPUCommandEncoder} that copies data from a sub-region of one or
+   * multiple continuous texture subresources to a sub-region of a {@link GPUBuffer}.
+   * @param source - Combined with `copySize`, defines the region of the source texture subresources.
+   * @param destination - Combined with `copySize`, defines the region of the destination buffer.
+   * 	`copySize`:
+   */
+  copyTextureToBuffer(
+    source: GPUImageCopyTexture,
+    destination: GPUImageCopyBuffer,
+    copySize: GPUExtent3DStrict
+  ): undefined;
   /**
    * Encode a command into the {@link GPUCommandEncoder} that copies data from a sub-region of one
    * or multiple contiguous texture subresources to another sub-region of one or

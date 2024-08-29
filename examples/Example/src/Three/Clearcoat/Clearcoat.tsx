@@ -3,7 +3,7 @@ import {globalStyles} from '../../Components/globalStyles';
 import {ThreeWebGpuView, ThreeWebGpuViewProps} from 'react-native-webgpu-three';
 
 import * as THREE from 'three';
-import {Camera, Group, Mesh, Scene} from 'three';
+import {Camera, Group, Mesh, Scene, Texture} from 'three';
 
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
@@ -13,12 +13,14 @@ import {THREE_EXAMPLES_BASE_URL} from '../threeConstants';
 import PMREMGenerator from 'three/addons/renderers/common/extras/PMREMGenerator.js';
 import {HDRCubeTextureLoader} from 'three/examples/jsm/loaders/HDRCubeTextureLoader.js';
 import {HudContainer} from '../../Components/stats/HudContainer';
+import {FlakesTextureGenerator} from '../../utils/FlakesTextureGenerator';
 
 export const Clearcoat = () => {
   const {stats, Stats} = useStats();
   const onCreateSurface: ThreeWebGpuViewProps['onCreateSurface'] = ({
     context,
     rendererParameters,
+    device,
   }) => {
     let camera: Camera, scene: Scene, renderer: WebGPURenderer;
 
@@ -71,12 +73,19 @@ export const Clearcoat = () => {
               `${THREE_EXAMPLES_BASE_URL}/textures/water/Water_1_M_Normal.jpg`,
             );
 
-            // const normalMap3 = new THREE.CanvasTexture(new FlakesTexture());
-            // normalMap3.wrapS = THREE.RepeatWrapping;
-            // normalMap3.wrapT = THREE.RepeatWrapping;
-            // normalMap3.repeat.x = 10;
-            // normalMap3.repeat.y = 6;
-            // normalMap3.anisotropy = 16;
+            const normalMap3 = new Texture();
+            normalMap3.wrapS = THREE.RepeatWrapping;
+            normalMap3.wrapT = THREE.RepeatWrapping;
+            normalMap3.repeat.x = 10;
+            normalMap3.repeat.y = 6;
+            normalMap3.anisotropy = 16;
+
+            const flakesTexture = new FlakesTextureGenerator(device, 512);
+            flakesTexture.generate();
+            flakesTexture.copyToImageData().then(imageData => {
+              normalMap3.image = imageData;
+              normalMap3.needsUpdate = true;
+            });
 
             const normalMap4 = textureLoader.load(
               `${THREE_EXAMPLES_BASE_URL}/textures/golfball.jpg`,
@@ -94,7 +103,7 @@ export const Clearcoat = () => {
               metalness: 0.9,
               roughness: 0.5,
               color: 0x0000ff,
-              // normalMap: normalMap3,
+              normalMap: normalMap3,
               normalScale: new THREE.Vector2(0.15, 0.15),
             });
             let mesh = new THREE.Mesh(geometry, material);

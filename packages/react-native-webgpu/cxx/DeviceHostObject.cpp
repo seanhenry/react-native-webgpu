@@ -44,13 +44,24 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
                     ? WGPU_HOST_OBJ(options, layout, PipelineLayoutHostObject)->getValue()
                     : nullptr,
         .vertex = vertex,
-        .primitive = {nullptr},
+        .primitive =
+          {
+            .nextInChain = nullptr,
+            .topology = WGPUPrimitiveTopology_TriangleList,
+            .stripIndexFormat = WGPUIndexFormat_Undefined,
+            .frontFace = WGPUFrontFace_CCW,
+            .cullMode = WGPUCullMode_None,
+          },
         .depthStencil = nullptr,
         .multisample = {nullptr},
         .fragment = nullptr,
       };
       if (options.hasProperty(runtime, "primitive")) {
-        descriptor.primitive = makeWGPUPrimitiveState(runtime, WGPU_OBJ(options, primitive));
+        auto primitive = WGPU_OBJ(options, primitive);
+        auto topology = WGPU_UTF8_OPT(primitive, topology, "triangle-list");
+        descriptor.primitive.topology = StringToWGPUPrimitiveTopology(topology.data());
+        auto cullMode = WGPU_UTF8_OPT(primitive, cullMode, "none");
+        descriptor.primitive.cullMode = StringToWGPUCullMode(cullMode.data());
       }
       WGPUDepthStencilState depthStencil;
       if (options.hasProperty(runtime, "depthStencil")) {

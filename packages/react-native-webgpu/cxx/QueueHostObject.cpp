@@ -51,24 +51,35 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
       auto source = sourceParam.getPropertyAsObject(runtime, "source");
 
       WGPUTextureDataLayout dataLayout = {0};
-      void *data = NULL;
+      void *data = nullptr;
       size_t dataSize = 0;
-      std::shared_ptr<ImageBitmapHostObject> imageBitmap;
+      uint32_t width = 0;
+      uint32_t height = 0;
       // TODO: Support other sources
       if (source.isHostObject<ImageBitmapHostObject>(runtime)) {
-        imageBitmap = source.asHostObject<ImageBitmapHostObject>(runtime);
+        auto imageBitmap = source.asHostObject<ImageBitmapHostObject>(runtime);
+        data = imageBitmap->_data;
+        dataSize = imageBitmap->_size;
+        width = imageBitmap->_width;
+        height = imageBitmap->_height;
       } else if (WGPU_HAS_PROP(source, _threeImageBitmap) &&
                  WGPU_OBJ(source, _threeImageBitmap).isHostObject<ImageBitmapHostObject>(runtime)) {
-        imageBitmap = WGPU_HOST_OBJ(source, _threeImageBitmap, ImageBitmapHostObject);
+        auto imageBitmap = WGPU_HOST_OBJ(source, _threeImageBitmap, ImageBitmapHostObject);
+        data = imageBitmap->_data;
+        dataSize = imageBitmap->_size;
+        width = imageBitmap->_width;
+        height = imageBitmap->_height;
+      } else if (WGPU_HAS_PROP(source, data)) {  // ImageData
+        auto rgbaArray = WGPU_OBJ(source, data);
+        auto arrayBuffer = rgbaArray.getPropertyAsObject(runtime, "buffer").getArrayBuffer(runtime);
+        data = arrayBuffer.data(runtime);
+        dataSize = arrayBuffer.size(runtime);
+        width = WGPU_NUMBER(source, width, uint32_t);
+        height = WGPU_NUMBER(source, height, uint32_t);
       }
-      if (imageBitmap == nullptr) {
-        throw JSError(runtime, "Only supports ImageBitmap");
+      if (data == nullptr) {
+        throw JSError(runtime, "Only supports ImageBitmap and ImageData");
       }
-      data = imageBitmap->_data;
-      dataSize = imageBitmap->_size;
-
-      auto width = imageBitmap->_width;
-      auto height = imageBitmap->_height;
       uint32_t bytesPerPixel = dataSize / (width * height);
       dataLayout.rowsPerImage = height;
       dataLayout.bytesPerRow = width * bytesPerPixel;
@@ -89,8 +100,9 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
       auto destination = arguments[0].asObject(runtime);
       auto copyTexture = makeWGPUImageCopyTexture(runtime, std::move(destination));
       auto data = getArrayBufferFromArrayBufferLike(runtime, arguments[1].asObject(runtime));
+      auto dataLayoutIn = arguments[2].asObject(runtime);
       auto writeSize = makeGPUExtent3D(runtime, arguments[3].asObject(runtime));
-      auto dataLayout = makeWGPUTextureDataLayout(runtime, arguments[2].asObject(runtime), &writeSize);
+      auto dataLayout = makeWGPUTextureDataLayout(runtime, dataLayoutIn, &writeSize);
       wgpuQueueWriteTexture(_value, &copyTexture, data.data(runtime), data.size(runtime), &dataLayout, &writeSize);
       return Value::undefined();
     });

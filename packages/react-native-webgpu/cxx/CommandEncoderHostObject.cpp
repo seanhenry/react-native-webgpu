@@ -152,6 +152,20 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
     });
   }
 
+  if (name == "copyTextureToBuffer") {
+    return WGPU_FUNC_FROM_HOST_FUNC(copyTextureToBuffer, 3, [this]) {
+      WGPU_LOG_FUNC_ARGS(copyTextureToBuffer);
+      auto source = arguments[0].asObject(runtime);
+      auto destination = arguments[1].asObject(runtime);
+      auto copySize = makeGPUExtent3D(runtime, arguments[2].asObject(runtime));
+
+      auto sourceCopyTexture = makeWGPUImageCopyTexture(runtime, std::move(source));
+      auto destCopyBuffer = makeWGPUImageCopyBuffer(runtime, destination, &copySize);
+      wgpuCommandEncoderCopyTextureToBuffer(_value, &sourceCopyTexture, &destCopyBuffer, &copySize);
+      return Value::undefined();
+    });
+  }
+
   if (name == "resolveQuerySet") {
     return WGPU_FUNC_FROM_HOST_FUNC(resolveQuerySet, 5, [this]) {
       WGPU_LOG_FUNC_ARGS(resolveQuerySet);
@@ -176,5 +190,5 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
 
 std::vector<PropNameID> CommandEncoderHostObject::getPropertyNames(Runtime &runtime) {
   return PropNameID::names(runtime, "beginRenderPass", "finish", "copyTextureToTexture", "beginComputePass",
-                           "copyBufferToBuffer", "resolveQuerySet", "label");
+                           "copyTextureToBuffer", "copyBufferToBuffer", "resolveQuerySet", "label");
 }

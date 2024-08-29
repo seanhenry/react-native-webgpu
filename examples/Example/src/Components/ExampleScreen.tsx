@@ -29,8 +29,9 @@ import {Clearcoat} from '../Three/Clearcoat/Clearcoat';
 import {Clipping} from '../Three/Clipping/Clipping';
 import {ComputeGeometry} from '../Three/ComputeGeometry/ComputeGeometry';
 import {ComputeParticles} from '../Three/ComputeParticles/ComputeParticles';
+import {FlakesTexture} from '../InHouse/FlakesTexture';
 
-export type Examples = 'WebGPUSamples' | 'Three';
+export type Examples = 'WebGPUSamples' | 'Three' | 'InHouse';
 
 export type Example =
   // BasicGraphics
@@ -68,7 +69,9 @@ export type Example =
   | 'ComputeGeometry'
   | 'ComputeParticles'
   // Loader
-  | 'GLTFLoader';
+  | 'GLTFLoader'
+  // InHouse
+  | 'FlakesTexture';
 
 const examples: Record<Example, ComponentType> = {
   // BasicGraphics
@@ -107,6 +110,8 @@ const examples: Record<Example, ComponentType> = {
   ComputeParticles,
   // Loader
   GLTFLoader,
+  // InHouse
+  FlakesTexture,
 };
 
 export function ExampleScreen() {

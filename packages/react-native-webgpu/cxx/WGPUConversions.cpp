@@ -25,15 +25,6 @@ WGPUDepthStencilState wgpu::makeWGPUDepthStencilState(Runtime &runtime, Object o
   };
 }
 
-WGPUPrimitiveState wgpu::makeWGPUPrimitiveState(Runtime &runtime, Object obj) {
-  WGPUPrimitiveState state = {nullptr};
-  auto topology = WGPU_UTF8_OPT(obj, topology, "point-list");
-  state.topology = StringToWGPUPrimitiveTopology(topology.data());
-  auto cullMode = WGPU_UTF8_OPT(obj, cullMode, "none");
-  state.cullMode = StringToWGPUCullMode(cullMode.data());
-  return state;
-}
-
 WGPUVertexAttribute wgpu::makeWGPUVertexAttribute(Runtime &runtime, Value value) {
   auto obj = value.asObject(runtime);
   auto format = WGPU_UTF8(obj, format);
@@ -226,6 +217,16 @@ WGPUImageCopyTexture wgpu::makeWGPUImageCopyTexture(Runtime &runtime, Object obj
   return textureOut;
 }
 
+WGPUImageCopyBuffer wgpu::makeWGPUImageCopyBuffer(Runtime &runtime, Object &obj, WGPUExtent3D *extent) {
+  auto bufferIn = WGPU_HOST_OBJ(obj, buffer, BufferHostObject)->getValue();
+  WGPUImageCopyBuffer bufferOut = {
+    .nextInChain = nullptr,
+    .layout = makeWGPUTextureDataLayout(runtime, obj, extent),
+    .buffer = bufferIn,
+  };
+  return bufferOut;
+}
+
 WGPUOrigin3D wgpu::makeWGPUOrigin3D(Runtime &runtime, Object obj) {
   WGPUOrigin3D origin = {0};
   if (obj.isArray(runtime)) {
@@ -312,7 +313,7 @@ WGPURenderPassTimestampWrites wgpu::makeWGPURenderPassTimestampWrites(Runtime &r
   };
 }
 
-WGPUTextureDataLayout wgpu::makeWGPUTextureDataLayout(Runtime &runtime, Object obj, WGPUExtent3D *extent) {
+WGPUTextureDataLayout wgpu::makeWGPUTextureDataLayout(Runtime &runtime, Object &obj, WGPUExtent3D *extent) {
   return {
     .nextInChain = nullptr,
     .offset = WGPU_NUMBER_OPT(obj, offset, uint64_t, 0),

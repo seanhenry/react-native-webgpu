@@ -15,7 +15,11 @@ export function Root() {
       sections={[
         {
           title: 'Examples',
-          data: [{title: 'WebGPUSamples'}, {title: 'Three'}],
+          data: [
+            {title: 'WebGPUSamples'},
+            {title: 'Three'},
+            {title: 'InHouse'},
+          ],
         },
       ]}
     />

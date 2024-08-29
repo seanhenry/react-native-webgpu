@@ -1,5 +1,4 @@
-//override shadowDepthTextureSize: f32 = 1024.0;
-const shadowDepthTextureSize: f32 = 1024.0;
+override shadowDepthTextureSize: f32 = 1024.0;
 
 struct Scene {
   lightViewProjMatrix : mat4x4f,

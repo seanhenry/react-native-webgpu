@@ -2,10 +2,8 @@
 @group(0) @binding(1) var gBufferAlbedo: texture_2d<f32>;
 @group(0) @binding(2) var gBufferDepth: texture_depth_2d;
 
-//override canvasSizeWidth: f32;
-//override canvasSizeHeight: f32;
-const canvasSizeWidth: f32 = {{canvasSizeWidth}};
-const canvasSizeHeight: f32 = {{canvasSizeHeight}};
+override canvasSizeWidth: f32;
+override canvasSizeHeight: f32;
 
 @fragment
 fn main(

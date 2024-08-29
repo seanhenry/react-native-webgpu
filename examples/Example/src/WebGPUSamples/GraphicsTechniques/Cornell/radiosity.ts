@@ -160,6 +160,7 @@ export default class Radiosity {
         module: mod,
         entryPoint: 'accumulation_to_lightmap',
         constants: {
+          PhotonEnergy: this.kPhotonEnergy,
           AccumulationToLightmapWorkgroupSizeX:
             this.kAccumulationToLightmapWorkgroupSizeX,
           AccumulationToLightmapWorkgroupSizeY:

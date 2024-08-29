@@ -14,10 +14,8 @@ struct Varying {
   @location(0) uv: vec2f,
 }
 
-//override kTextureBaseSize: f32;
-//override kViewportSize: f32;
-const kTextureBaseSize: f32 = 16.0;
-const kViewportSize: f32 = 48.0;
+override kTextureBaseSize: f32;
+override kViewportSize: f32;
 
 @vertex
 fn vmain(

@@ -30,8 +30,7 @@ struct Uniforms {
 const PhotonsPerWorkgroup : u32 = 256;
 
 // Maximum value that can be added to the accumulation buffer from a single photon
-//override PhotonEnergy : f32;
-const PhotonEnergy : f32 = 100000.0;
+override PhotonEnergy : f32;
 
 // Number of bounces of each photon
 const PhotonBounces = 4;

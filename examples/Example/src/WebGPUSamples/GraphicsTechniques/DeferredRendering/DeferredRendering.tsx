@@ -221,10 +221,7 @@ export const DeferredRendering = () => {
       fragment: {
         entryPoint: 'main',
         module: device.createShaderModule({
-          // TODO: fix when naga supports override keyword
-          code: fragmentGBuffersDebugView
-            .replace('{{canvasSizeWidth}}', `${context.width}`)
-            .replace('{{canvasSizeHeight}}', `${context.height}`),
+          code: fragmentGBuffersDebugView,
         }),
         targets: [
           {

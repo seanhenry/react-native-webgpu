@@ -314,6 +314,7 @@ export const SamplerParameters = () => {
         entryPoint: 'fmain',
         module: texturedSquareModule,
         targets: [{format: presentationFormat}],
+        constants: {kTextureBaseSize, kViewportSize},
       },
       primitive: {topology: 'triangle-list'},
     });

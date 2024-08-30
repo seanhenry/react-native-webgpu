@@ -88,5 +88,7 @@ const sections: Record<Examples, ListProps<Example>['sections']> = {
       data: [{title: 'GLTFLoader'}],
     },
   ],
-  InHouse: [{title: 'InHouse', data: [{title: 'FlakesTexture'}]}],
+  InHouse: [
+    {title: 'InHouse', data: [{title: 'FlakesTexture'}, {title: 'Video'}]},
+  ],
 };

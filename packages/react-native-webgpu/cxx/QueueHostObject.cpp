@@ -5,6 +5,7 @@
 #include "CommandBufferHostObject.h"
 #include "ImageBitmapHostObject.h"
 #include "TextureHostObject.h"
+#include "VideoPlayer.h"
 #include "WGPUContext.h"
 #include "WGPUConversions.h"
 #include "WGPUDefaults.h"
@@ -52,11 +53,15 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
     return WGPU_FUNC_FROM_HOST_FUNC(copyExternalImageToTexture, 3, [this]) {
       WGPU_LOG_FUNC_ARGS(copyExternalImageToTexture);
       auto sourceParam = arguments[0].asObject(runtime);
-
       auto source = sourceParam.getPropertyAsObject(runtime, "source");
+      auto flipY = WGPU_BOOL_OPT(sourceParam, flipY, false);
 
-      WGPUTextureDataLayout dataLayout = {0};
-      void *data = nullptr;
+      auto destination = arguments[1].asObject(runtime);
+      auto copyTexture = makeWGPUImageCopyTexture(runtime, std::move(destination));
+
+      auto copySize = makeGPUExtent3D(runtime, arguments[2].asObject(runtime));
+
+      uint8_t *data = nullptr;
       size_t dataSize = 0;
       uint32_t width = 0;
       uint32_t height = 0;
@@ -81,21 +86,41 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
         dataSize = arrayBuffer.size(runtime);
         width = WGPU_NUMBER(source, width, uint32_t);
         height = WGPU_NUMBER(source, height, uint32_t);
+      } else if ((WGPU_BOOL_OPT(source, __isCopyExternalImageToTextureCompatible, false))) {
+        auto arrayBuffer = WGPU_OBJ(source, arrayBuffer).getArrayBuffer(runtime);
+        data = arrayBuffer.data(runtime);
+        dataSize = arrayBuffer.size(runtime);
+        width = WGPU_NUMBER(source, width, uint32_t);
+        height = WGPU_NUMBER(source, height, uint32_t);
       }
       if (data == nullptr) {
-        throw JSError(runtime, "Only supports ImageBitmap and ImageData");
+        throw JSINativeException("Only supports ImageBitmap and ImageData");
       }
       uint32_t bytesPerPixel = dataSize / (width * height);
-      dataLayout.rowsPerImage = height;
-      dataLayout.bytesPerRow = width * bytesPerPixel;
+      uint32_t bytesPerRow = width * bytesPerPixel;
+      WGPUTextureDataLayout dataLayout = {
+        .nextInChain = nullptr,
+        .offset = 0,
+        .bytesPerRow = bytesPerRow,
+        .rowsPerImage = height,
+      };
 
-      auto destination = arguments[1].asObject(runtime);
-      auto copyTexture = makeWGPUImageCopyTexture(runtime, std::move(destination));
+      uint8_t *flipped = nullptr;
+      if (flipY) {
+        flipped = (uint8_t *)malloc(dataSize);
+        for (auto y = 0; y < height; y++) {
+          auto flippedIndex = (height - y - 1) * bytesPerRow;
+          auto originalIndex = y * bytesPerRow;
+          memcpy(flipped + flippedIndex, data + originalIndex, bytesPerRow);
+        }
+      }
 
-      auto copySize = makeGPUExtent3D(runtime, arguments[2].asObject(runtime));
-
-      wgpuQueueWriteTexture(_value, &copyTexture, data, dataSize, &dataLayout, &copySize);
+      wgpuQueueWriteTexture(_value, &copyTexture, flipped ?: data, dataSize, &dataLayout, &copySize);
       _context->getErrorHandler()->throwPendingJSIError();
+
+      if (flipped) {
+        free(flipped);
+      }
       return Value::undefined();
     });
   }

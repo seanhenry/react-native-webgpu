@@ -108,7 +108,7 @@ const char *WGPUTextureFormatToString(WGPUTextureFormat format) {
 
 WGPUTextureFormat StringToWGPUTextureFormat(const std::string &format) {
   static std::unordered_map<std::string, WGPUTextureFormat> map;
-  if (map.size() == 0) {
+  if (map.empty()) {
     map["r8unorm"] = WGPUTextureFormat_R8Unorm;
     map["r8snorm"] = WGPUTextureFormat_R8Snorm;
     map["r8uint"] = WGPUTextureFormat_R8Uint;
@@ -206,6 +206,9 @@ WGPUTextureFormat StringToWGPUTextureFormat(const std::string &format) {
     map["astc-12x12-unorm-srgb"] = WGPUTextureFormat_ASTC12x12UnormSrgb;
     map["undefined"] = WGPUTextureFormat_Undefined;
   }
+  if (map.find(format) == map.end()) {
+    throw JSINativeException("Unsupported texture format: " + format);
+  }
   return map.at(format);
 }
 
@@ -282,7 +285,7 @@ WGPUStoreOp StringToWGPUStoreOp(const std::string &str) {
 
 WGPUVertexFormat StringToWGPUVertexFormat(const std::string &str) {
   static std::unordered_map<std::string, WGPUVertexFormat> map;
-  if (map.size() == 0) {
+  if (map.empty()) {
     map["uint8x2"] = WGPUVertexFormat_Uint8x2;
     map["uint8x4"] = WGPUVertexFormat_Uint8x4;
     map["sint8x2"] = WGPUVertexFormat_Sint8x2;
@@ -313,7 +316,9 @@ WGPUVertexFormat StringToWGPUVertexFormat(const std::string &str) {
     map["sint32x2"] = WGPUVertexFormat_Sint32x2;
     map["sint32x3"] = WGPUVertexFormat_Sint32x3;
     map["sint32x4"] = WGPUVertexFormat_Sint32x4;
-    // map["unorm10-10-10-2";] = WGPUVertexFormat_Unorm;
+  }
+  if (map.find(str) == map.end()) {
+    throw JSINativeException("Unsupported vertex format: " + str);
   }
   return map[str];
 }

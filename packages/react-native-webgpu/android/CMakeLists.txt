@@ -33,4 +33,5 @@ target_link_libraries(
         ReactAndroid::reactnativejni
         fbjni::fbjni
         log
-        z)
+        z
+        mediandk)

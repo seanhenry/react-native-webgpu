@@ -9,6 +9,7 @@
 #include "CreateImageBitmap.h"
 #include "Promise.h"
 #include "Surface.h"
+#include "VideoPlayer.h"
 #include "WGPUJsiUtils.h"
 
 #ifdef ANDROID
@@ -126,10 +127,13 @@ void wgpu::installRootJSI(
   });
 
   auto webgpu = Object(runtime);
-  webgpu.setProperty(runtime, "inflate", inflate(runtime));
   webgpu.setProperty(runtime, "createImageBitmap", createImageBitmap(runtime));
   webgpu.setProperty(runtime, "getSurfaceBackedWebGPU", std::move(getSurfaceBackedWebGPU));
   webgpu.setProperty(runtime, "getHeadlessWebGPU", std::move(getHeadlessWebGPU));
+  auto experimental = Object(runtime);
+  experimental.setProperty(runtime, "inflate", inflate(runtime));
+  experimental.setProperty(runtime, "makeVideoPlayer", VideoPlayer::factory(runtime));
+  webgpu.setProperty(runtime, "experimental", std::move(experimental));
 
   runtime.global().setProperty(runtime, "__reactNativeWebGPU", std::move(webgpu));
 }

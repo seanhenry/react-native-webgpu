@@ -32,6 +32,7 @@ import {ComputeParticles} from '../Three/ComputeParticles/ComputeParticles';
 import {FlakesTexture} from '../InHouse/FlakesTexture';
 import {VolumeRendering} from '../WebGPUSamples/GraphicsTechniques/VolumeRendering/VolumeRendering';
 import {SkinnedMesh} from '../WebGPUSamples/GraphicsTechniques/SkinnedMesh/SkinnedMesh';
+import {Video} from '../InHouse/Video';
 
 export type Examples = 'WebGPUSamples' | 'Three' | 'InHouse';
 
@@ -75,7 +76,8 @@ export type Example =
   // Loader
   | 'GLTFLoader'
   // InHouse
-  | 'FlakesTexture';
+  | 'FlakesTexture'
+  | 'Video';
 
 const examples: Record<Example, ComponentType> = {
   // BasicGraphics
@@ -118,6 +120,7 @@ const examples: Record<Example, ComponentType> = {
   GLTFLoader,
   // InHouse
   FlakesTexture,
+  Video,
 };
 
 export function ExampleScreen() {

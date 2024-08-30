@@ -5,6 +5,7 @@ import {Square} from '../../../Components/Square';
 import {mat4} from 'wgpu-matrix';
 import volumeWGSL from './volume.wgsl';
 import {useControls} from '../../../Components/controls/react/useControls';
+import {WEB_GPU_SAMPLES_BASE_URL} from '../../../utils/constants';
 
 export const VolumeRendering = () => {
   const {gui, Controls} = useControls();
@@ -93,7 +94,7 @@ export const VolumeRendering = () => {
       const blocksHigh = Math.ceil(height / blockLength);
       const bytesPerRow = blocksWide * bytesPerBlock;
       const response = await fetch(
-        'https://webgpu.github.io/webgpu-samples/assets/img/volume/t1_icbm_normal_1mm_pn0_rf0_180x216x180_uint8_1x1.bin-gz',
+        `${WEB_GPU_SAMPLES_BASE_URL}/assets/img/volume/t1_icbm_normal_1mm_pn0_rf0_180x216x180_uint8_1x1.bin-gz`,
       );
       const arrayBuffer = await response.arrayBuffer();
       const decompressed = reactNativeWebGPU.inflate(arrayBuffer);

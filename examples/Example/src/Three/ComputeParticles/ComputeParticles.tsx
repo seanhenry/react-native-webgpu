@@ -30,7 +30,7 @@ import {HudContainer} from '../../Components/stats/HudContainer';
 import {HudText} from '../../Components/stats/HudText';
 import {useRef} from 'react';
 import {TextInput} from 'react-native';
-import {THREE_EXAMPLES_BASE_URL} from '../threeConstants';
+import {THREE_EXAMPLES_BASE_URL} from '../../utils/constants';
 
 export const ComputeParticles = () => {
   const {gui, Controls} = useControls();

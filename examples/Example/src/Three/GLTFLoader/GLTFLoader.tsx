@@ -11,7 +11,7 @@ import PMREMGenerator from 'three/addons/renderers/common/extras/PMREMGenerator.
 import {GLTFLoader as ThreeGTLFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {useState} from 'react';
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
-import {THREE_EXAMPLES_BASE_URL} from '../threeConstants';
+import {THREE_EXAMPLES_BASE_URL} from '../../utils/constants';
 
 export const GLTFLoader = () => {
   const [isLoading, setLoading] = useState(true);

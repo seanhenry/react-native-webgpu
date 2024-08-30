@@ -20,7 +20,7 @@ import {Camera, Mesh, Scene} from 'three';
 import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 import StorageBufferAttribute from 'three/examples/jsm/renderers/common/StorageBufferAttribute.js';
 import {ComputeNode} from 'three/examples/jsm/nodes/Nodes.js';
-import {THREE_EXAMPLES_BASE_URL} from '../threeConstants';
+import {THREE_EXAMPLES_BASE_URL} from '../../utils/constants';
 
 export const ComputeGeometry = () => {
   const onCreateSurface: ThreeWebGpuViewProps['onCreateSurface'] = ({

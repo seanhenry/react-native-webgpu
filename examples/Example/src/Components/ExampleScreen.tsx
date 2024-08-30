@@ -31,6 +31,7 @@ import {ComputeGeometry} from '../Three/ComputeGeometry/ComputeGeometry';
 import {ComputeParticles} from '../Three/ComputeParticles/ComputeParticles';
 import {FlakesTexture} from '../InHouse/FlakesTexture';
 import {VolumeRendering} from '../WebGPUSamples/GraphicsTechniques/VolumeRendering/VolumeRendering';
+import {SkinnedMesh} from '../WebGPUSamples/GraphicsTechniques/SkinnedMesh/SkinnedMesh';
 
 export type Examples = 'WebGPUSamples' | 'Three' | 'InHouse';
 
@@ -60,6 +61,7 @@ export type Example =
   | 'DeferredRendering'
   | 'ImageBlur'
   | 'Cornell'
+  | 'SkinnedMesh'
   | 'VolumeRendering'
   // Three
   | 'HelloThree'
@@ -101,6 +103,7 @@ const examples: Record<Example, ComponentType> = {
   DeferredRendering,
   ImageBlur,
   Cornell,
+  SkinnedMesh,
   VolumeRendering,
   // Three.js
   HelloThree,

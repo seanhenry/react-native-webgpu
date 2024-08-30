@@ -1,5 +1,6 @@
 #include "QueueHostObject.h"
 
+#include "ArrayBufferUtils.h"
 #include "BufferHostObject.h"
 #include "CommandBufferHostObject.h"
 #include "ImageBitmapHostObject.h"
@@ -36,10 +37,12 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
       WGPU_LOG_FUNC_ARGS(writeBuffer);
       auto buffer = arguments[0].asObject(runtime).asHostObject<BufferHostObject>(runtime)->getValue();
       auto bufferOffset = (uint64_t)arguments[1].asNumber();
-      auto data = getArrayBufferFromArrayBufferLike(runtime, arguments[2].asObject(runtime));
+      auto data = getArrayBufferViewFromArrayBufferLike(runtime, arguments[2].asObject(runtime));
       auto dataOffset = count > 3 ? (size_t)arguments[3].asNumber() : 0;
-      auto size = count > 4 ? (size_t)arguments[4].asNumber() : (data.size(runtime) - dataOffset);
-      wgpuQueueWriteBuffer(_value, buffer, bufferOffset, data.data(runtime) + dataOffset, size);
+      auto size = count > 4 ? (size_t)arguments[4].asNumber() : (data.byteLength - dataOffset);
+
+      auto dataPtr = data.arrayBuffer.data(runtime) + data.byteOffset + dataOffset;
+      wgpuQueueWriteBuffer(_value, buffer, bufferOffset, dataPtr, size);
       _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });
@@ -102,11 +105,13 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
       WGPU_LOG_FUNC_ARGS(writeTexture);
       auto destination = arguments[0].asObject(runtime);
       auto copyTexture = makeWGPUImageCopyTexture(runtime, std::move(destination));
-      auto data = getArrayBufferFromArrayBufferLike(runtime, arguments[1].asObject(runtime));
+      auto data = getArrayBufferViewFromArrayBufferLike(runtime, arguments[1].asObject(runtime));
       auto dataLayoutIn = arguments[2].asObject(runtime);
       auto writeSize = makeGPUExtent3D(runtime, arguments[3].asObject(runtime));
-      auto dataLayout = makeWGPUTextureDataLayout(runtime, dataLayoutIn, &writeSize);
-      wgpuQueueWriteTexture(_value, &copyTexture, data.data(runtime), data.size(runtime), &dataLayout, &writeSize);
+      auto dataLayout = makeWGPUTextureDataLayout(runtime, dataLayoutIn, writeSize);
+
+      auto dataPtr = data.arrayBuffer.data(runtime) + data.byteOffset;
+      wgpuQueueWriteTexture(_value, &copyTexture, dataPtr, data.byteLength, &dataLayout, &writeSize);
       _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();
     });

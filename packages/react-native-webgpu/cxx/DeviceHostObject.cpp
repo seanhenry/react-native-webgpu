@@ -62,6 +62,8 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         descriptor.primitive.topology = StringToWGPUPrimitiveTopology(topology.data());
         auto cullMode = WGPU_UTF8_OPT(primitive, cullMode, "none");
         descriptor.primitive.cullMode = StringToWGPUCullMode(cullMode.data());
+        auto stripIndexFormat = WGPU_UTF8_OPT(primitive, stripIndexFormat, "undefined");
+        descriptor.primitive.stripIndexFormat = StringToWGPUIndexFormat(stripIndexFormat);
       }
       WGPUDepthStencilState depthStencil;
       if (options.hasProperty(runtime, "depthStencil")) {

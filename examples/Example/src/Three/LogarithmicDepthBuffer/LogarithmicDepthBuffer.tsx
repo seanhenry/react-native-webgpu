@@ -8,7 +8,7 @@ import {Scene} from 'three';
 import {FontLoader} from 'three/addons/loaders/FontLoader.js';
 import {TextGeometry} from 'three/addons/geometries/TextGeometry.js';
 import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-import {THREE_EXAMPLES_BASE_URL} from '../threeConstants';
+import {THREE_EXAMPLES_BASE_URL} from '../../utils/constants';
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {HudContainer} from '../../Components/stats/HudContainer';
 import {useEffect, useState} from 'react';

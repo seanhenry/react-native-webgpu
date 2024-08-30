@@ -2,6 +2,7 @@
 
 #include <zlib.h>
 
+#include "ArrayBufferUtils.h"
 #include "WGPUJsiUtils.h"
 
 #if defined(MSDOS) || defined(OS2) || defined(WIN32) || defined(__CYGWIN__)
@@ -60,10 +61,10 @@ int inf(uint8_t *data, size_t size, std::vector<uint8_t> &bufferOut) {
 }
 
 Value wgpu::inflate(Runtime &runtime) {
-  return WGPU_FUNC_FROM_HOST_FUNC(unzip, 1, []) {
+  return WGPU_FUNC_FROM_HOST_FUNC(inflate, 1, []) {
     auto arrayBuffer = arguments[0].asObject(runtime).getArrayBuffer(runtime);
     std::vector<uint8_t> out;
-    auto result = inf(arrayBuffer.data(runtime), arrayBuffer.length(runtime), out);
+    auto result = inf(arrayBuffer.data(runtime), arrayBuffer.size(runtime), out);
     if (result == Z_OK) {
       return createOwnedVectorArrayBuffer(runtime, std::move(out));
     }

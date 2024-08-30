@@ -74,11 +74,11 @@ WGPUTextureViewDescriptor wgpu::makeDefaultWGPUTextureViewDescriptor(Runtime &ru
                                                                      WGPUTexture texture) {
   auto arrayLayerCount = WGPU_NUMBER_OPT(desc, arrayLayerCount, uint32_t, 0);
   auto aspectStr = WGPU_UTF8_OPT(desc, aspect, "all");
-  auto aspect = StringToWGPUTextureAspect(aspectStr.data());
+  auto aspect = StringToWGPUTextureAspect(aspectStr);
   auto baseArrayLayer = WGPU_NUMBER_OPT(desc, baseArrayLayer, uint32_t, 0);
   auto baseMipLevel = WGPU_NUMBER_OPT(desc, baseMipLevel, uint32_t, 0);
   auto dimensionStr = WGPU_UTF8_OPT(desc, dimension, "undefined");
-  auto dimension = StringToWGPUTextureViewDimension(dimensionStr.data());
+  auto dimension = StringToWGPUTextureViewDimension(dimensionStr);
   auto mipLevelCount =
     WGPU_NUMBER_OPT(desc, mipLevelCount, uint32_t, wgpuTextureGetMipLevelCount(texture) - baseMipLevel);
   auto format = WGPUTextureFormat_Undefined;

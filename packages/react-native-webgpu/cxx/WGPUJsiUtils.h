@@ -1,9 +1,10 @@
 #pragma once
 
 #include <jsi/jsi.h>
+
 #include <iostream>
 #include <sstream>
-#include "AutoReleasePool.h"
+
 #include "WGPULog.h"
 #include "webgpu.h"
 
@@ -84,95 +85,8 @@ Array cArrayToJsi(Runtime &runtime, T *array, size_t size, Transform transform) 
   return result;
 }
 
-template <typename T>
-class Promise {
- public:
-  explicit Promise(Runtime &runtime) : runtime(runtime) {}
-  Value jsPromise(std::function<void()> &&fn);
-  void resolve(Value value) { _resolve->call(runtime, std::move(value)); }
-  void reject(Value value) { _reject->call(runtime, std::move(value)); }
-  Runtime &runtime;
-  T data;
-
- private:
-  std::shared_ptr<Function> _resolve;
-  std::shared_ptr<Function> _reject;
-};
-
-template <typename T>
-Value Promise<T>::jsPromise(std::function<void()> &&fn) {
-  auto promiseCallbackFn = WGPU_FUNC_FROM_HOST_FUNC(promiseCallbackFn, 2, [ this, fn = std::move(fn) ]) {
-    _resolve = std::make_shared<Function>(arguments[0].asObject(runtime).asFunction(runtime));
-    _reject = std::make_shared<Function>(arguments[1].asObject(runtime).asFunction(runtime));
-    fn();
-    return Value::undefined();
-  });
-
-  return runtime.global()
-    .getProperty(runtime, "Promise")
-    .asObject(runtime)
-    .asFunction(runtime)
-    .callAsConstructor(runtime, promiseCallbackFn);
-}
-
-// TODO: remove
-inline std::shared_ptr<std::string> getUTF8(Runtime &runtime, AutoReleasePool *pool, Value value) {
-  auto str = std::make_shared<std::string>(value.asString(runtime).utf8(runtime));
-  pool->add(str);
-  return str;
-}
-
-inline bool isArray(Runtime &runtime, Value *value) {
-  return value->isObject() && value->asObject(runtime).isArray(runtime);
-}
-
-class UnownedMutableBuffer : public MutableBuffer {
- public:
-  UnownedMutableBuffer(void *data, size_t size) : _data(data), _size(size) {}
-  ~UnownedMutableBuffer() {}
-  size_t size() const override { return _size; }
-  uint8_t *data() override { return (uint8_t *)_data; }
-
- private:
-  void *_data;
-  size_t _size;
-};
-
-class OwnedMutableBuffer : public MutableBuffer {
- public:
-  OwnedMutableBuffer(void *data, size_t size) : _data(data), _size(size) {}
-  ~OwnedMutableBuffer() { free(_data); }
-  size_t size() const override { return _size; }
-  uint8_t *data() override { return (uint8_t *)_data; }
-
- private:
-  void *_data;
-  size_t _size;
-};
-
-class OwnedVectorMutableBuffer : public MutableBuffer {
- public:
-  OwnedVectorMutableBuffer(std::vector<uint8_t> vec) : _vec(vec) {}
-  size_t size() const override { return _vec.size(); }
-  uint8_t *data() override { return _vec.data(); }
-
- private:
-  std::vector<uint8_t> _vec;
-};
-
-inline ArrayBuffer createUnownedArrayBuffer(Runtime &runtime, void *bytes, size_t size) {
-  auto buffer = std::make_shared<UnownedMutableBuffer>(bytes, size);
-  return ArrayBuffer(runtime, buffer);
-}
-
-inline ArrayBuffer createOwnedArrayBuffer(Runtime &runtime, void *bytes, size_t size) {
-  auto buffer = std::make_shared<OwnedMutableBuffer>(bytes, size);
-  return ArrayBuffer(runtime, buffer);
-}
-
-inline ArrayBuffer createOwnedVectorArrayBuffer(Runtime &runtime, std::vector<uint8_t> &&vec) {
-  auto buffer = std::make_shared<OwnedVectorMutableBuffer>(std::move(vec));
-  return ArrayBuffer(runtime, buffer);
+inline bool isJSIArray(Runtime &runtime, const Value &value) {
+  return value.isObject() && value.asObject(runtime).isArray(runtime);
 }
 
 inline Value makeJSError(Runtime &runtime, std::string message) {
@@ -189,30 +103,6 @@ inline Value makeJSSet(Runtime &runtime, Value *items, size_t size) {
   }
   return std::move(set);
 }
-
-inline ArrayBuffer getArrayBufferFromArrayBufferLike(Runtime &runtime, Object arrayBufferLike) {
-  if (arrayBufferLike.isArrayBuffer(runtime)) {
-    return arrayBufferLike.getArrayBuffer(runtime);
-  } else if (arrayBufferLike.hasProperty(runtime, "buffer")) {
-    return arrayBufferLike.getPropertyAsObject(runtime, "buffer").getArrayBuffer(runtime);
-  }
-  throw new JSError(runtime, "Unsupported ArrayBufferLike object");
-}
-
-// Wrapper around c pointer to manage lifetime
-class DeviceWrapper {
- public:
-  explicit DeviceWrapper(WGPUDevice device) : _device(device) {}
-  ~DeviceWrapper() { wgpuDeviceRelease(_device); }
-  WGPUDevice _device;
-};
-
-class AdapterWrapper {
- public:
-  explicit AdapterWrapper(WGPUAdapter adapter) : _adapter(adapter) {}
-  ~AdapterWrapper() { wgpuAdapterRelease(_adapter); }
-  WGPUAdapter _adapter;
-};
 
 template <typename T, typename U>
 bool cArrayContains(T *data, size_t size, U searchItem) {

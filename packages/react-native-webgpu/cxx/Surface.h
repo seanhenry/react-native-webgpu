@@ -4,7 +4,7 @@
 
 #include <functional>
 
-#include "WGPUJsiUtils.h"
+#include "WGPUWrappers.h"
 #include "webgpu.h"
 
 #ifdef ANDROID

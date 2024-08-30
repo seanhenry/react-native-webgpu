@@ -26,7 +26,7 @@
       auto format = arguments[1].asString(runtime).utf8(runtime);                                       \
       auto offset = count > 2 ? arguments[2].asNumber() : 0;                                            \
       auto size = count > 3 ? arguments[3].asNumber() : wgpuBufferGetSize(buffer) - offset;             \
-      __func(_value, buffer, StringToWGPUIndexFormat(format.data()), offset, size);                     \
+      __func(_value, buffer, StringToWGPUIndexFormat(format), offset, size);                            \
       _context->getErrorHandler()->throwPendingJSIError();                                              \
       return Value::undefined();                                                                        \
     });                                                                                                 \

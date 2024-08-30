@@ -31,14 +31,12 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
             return (const WGPURenderPassColorAttachment){0};
           }
           auto attachment = value.asObject(runtime);
-          auto loadOp = WGPU_UTF8(attachment, loadOp);
-          auto storeOp = WGPU_UTF8(attachment, storeOp);
           return (const WGPURenderPassColorAttachment){
             .view = WGPU_HOST_OBJ(attachment, view, TextureViewHostObject)->getValue(),
             .depthSlice = WGPU_DEPTH_SLICE_UNDEFINED,
             .resolveTarget = WGPU_HOST_OBJ_VALUE_OPT(attachment, resolveTarget, TextureViewHostObject, NULL),
-            .loadOp = StringToWGPULoadOp(loadOp.data()),
-            .storeOp = StringToWGPUStoreOp(storeOp.data()),
+            .loadOp = StringToWGPULoadOp(WGPU_UTF8(attachment, loadOp)),
+            .storeOp = StringToWGPUStoreOp(WGPU_UTF8(attachment, storeOp)),
             .clearValue = makeWGPUColorFromProp(runtime, attachment, "clearValue"),
           };
         });
@@ -63,20 +61,20 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
         depthStencilAttachment.depthClearValue = WGPU_NUMBER_OPT(attachment, depthClearValue, float, 0.0);
 
         auto depthLoadOp = WGPU_UTF8_OPT(attachment, depthLoadOp, "undefined");
-        depthStencilAttachment.depthLoadOp = StringToWGPULoadOp(depthLoadOp.data());
+        depthStencilAttachment.depthLoadOp = StringToWGPULoadOp(depthLoadOp);
 
         auto depthStoreOp = WGPU_UTF8_OPT(attachment, depthStoreOp, "undefined");
-        depthStencilAttachment.depthStoreOp = StringToWGPUStoreOp(depthStoreOp.data());
+        depthStencilAttachment.depthStoreOp = StringToWGPUStoreOp(depthStoreOp);
 
         depthStencilAttachment.depthReadOnly = WGPU_BOOL_OPT(attachment, depthReadOnly, false);
 
         depthStencilAttachment.stencilClearValue = WGPU_NUMBER_OPT(attachment, stencilClearValue, uint32_t, 0);
 
         auto stencilLoadOp = WGPU_UTF8_OPT(attachment, stencilLoadOp, "undefined");
-        depthStencilAttachment.stencilLoadOp = StringToWGPULoadOp(stencilLoadOp.data());
+        depthStencilAttachment.stencilLoadOp = StringToWGPULoadOp(stencilLoadOp);
 
         auto stencilStoreOp = WGPU_UTF8_OPT(attachment, stencilStoreOp, "undefined");
-        depthStencilAttachment.stencilStoreOp = StringToWGPUStoreOp(stencilStoreOp.data());
+        depthStencilAttachment.stencilStoreOp = StringToWGPUStoreOp(stencilStoreOp);
 
         depthStencilAttachment.stencilReadOnly = WGPU_BOOL_OPT(attachment, stencilReadOnly, false);
 
@@ -164,7 +162,7 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
       auto copySize = makeGPUExtent3D(runtime, arguments[2].asObject(runtime));
 
       auto sourceCopyTexture = makeWGPUImageCopyTexture(runtime, std::move(source));
-      auto destCopyBuffer = makeWGPUImageCopyBuffer(runtime, destination, &copySize);
+      auto destCopyBuffer = makeWGPUImageCopyBuffer(runtime, destination, copySize);
       wgpuCommandEncoderCopyTextureToBuffer(_value, &sourceCopyTexture, &destCopyBuffer, &copySize);
       _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();

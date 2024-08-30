@@ -2,8 +2,7 @@
 
 #include <jsi/jsi.h>
 
-#include "WGPUJsiUtils.h"
-#include "webgpu.h"
+#include "WGPUWrappers.h"
 
 using namespace facebook::jsi;
 

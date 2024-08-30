@@ -4,8 +4,8 @@
 #include <boost/format.hpp>
 #include "ImageBitmapHostObject.h"
 #include "JSIInstance.h"
+#include "Promise.h"
 #import "UIImage+Bitmap.h"
-#include "WGPUJsiUtils.h"
 #import "WGPUObjCInstance.h"
 
 using namespace facebook::jsi;

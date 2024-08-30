@@ -2,10 +2,11 @@
 
 #include <thread>
 
+#include "ArrayBufferUtils.h"
 #include "ConstantConversion.h"
 #include "JSIInstance.h"
+#include "Promise.h"
 #include "WGPUContext.h"
-#include "WGPUJsiUtils.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;

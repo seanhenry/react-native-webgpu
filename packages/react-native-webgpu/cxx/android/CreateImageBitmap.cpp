@@ -10,6 +10,7 @@
 
 #include "ImageBitmapHostObject.h"
 #include "JSIInstance.h"
+#include "Promise.h"
 #include "WGPUAndroidInstance.h"
 #include "WGPUJsiUtils.h"
 #include "WGPULog.h"

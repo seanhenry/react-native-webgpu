@@ -1,6 +1,6 @@
 #include "ShaderModuleHostObject.h"
 
-#include "WGPUJsiUtils.h"
+#include "Promise.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;

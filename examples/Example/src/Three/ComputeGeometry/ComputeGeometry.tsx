@@ -144,7 +144,9 @@ export const ComputeGeometry = () => {
     }
 
     async function animate() {
-      if (computeUpdate) await renderer.computeAsync(computeUpdate);
+      if (computeUpdate) {
+        await renderer.computeAsync(computeUpdate);
+      }
 
       renderer.render(scene, camera);
       context.presentSurface();

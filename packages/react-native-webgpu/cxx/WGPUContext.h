@@ -2,7 +2,7 @@
 
 #include "ErrorHandler.h"
 #include "JSIInstance.h"
-#include "WGPUJsiUtils.h"
+#include "WGPUWrappers.h"
 
 using namespace facebook::react;
 

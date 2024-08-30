@@ -34,7 +34,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
       AutoReleasePool autoReleasePool;
 
       auto options = arguments[0].asObject(runtime);
-      auto vertex = makeGPUVertexState(runtime, &autoReleasePool, WGPU_OBJ(options, vertex));
+      auto vertex = makeGPUVertexState(runtime, autoReleasePool, WGPU_OBJ(options, vertex));
       auto label = WGPU_UTF8_OPT(options, label, "");
 
       WGPURenderPipelineDescriptor descriptor = {
@@ -59,9 +59,9 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
       if (options.hasProperty(runtime, "primitive")) {
         auto primitive = WGPU_OBJ(options, primitive);
         auto topology = WGPU_UTF8_OPT(primitive, topology, "triangle-list");
-        descriptor.primitive.topology = StringToWGPUPrimitiveTopology(topology.data());
+        descriptor.primitive.topology = StringToWGPUPrimitiveTopology(topology);
         auto cullMode = WGPU_UTF8_OPT(primitive, cullMode, "none");
-        descriptor.primitive.cullMode = StringToWGPUCullMode(cullMode.data());
+        descriptor.primitive.cullMode = StringToWGPUCullMode(cullMode);
         auto stripIndexFormat = WGPU_UTF8_OPT(primitive, stripIndexFormat, "undefined");
         descriptor.primitive.stripIndexFormat = StringToWGPUIndexFormat(stripIndexFormat);
       }
@@ -72,7 +72,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
       }
       WGPUFragmentState fragment;
       if (options.hasProperty(runtime, "fragment")) {
-        fragment = makeGPUFragmentState(runtime, &autoReleasePool, WGPU_OBJ(options, fragment));
+        fragment = makeGPUFragmentState(runtime, autoReleasePool, WGPU_OBJ(options, fragment));
         descriptor.fragment = &fragment;
       }
       WGPUMultisampleState multisample = makeDefaultWGPUMultisampleState();
@@ -104,7 +104,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         .layout = options.hasProperty(runtime, "layout") && options.getProperty(runtime, "layout").isObject()
                     ? WGPU_HOST_OBJ(options, layout, PipelineLayoutHostObject)->getValue()
                     : nullptr,
-        .compute = makeWGPUProgrammableStageDescriptor(runtime, &autoReleasePool, WGPU_OBJ(options, compute)),
+        .compute = makeWGPUProgrammableStageDescriptor(runtime, autoReleasePool, WGPU_OBJ(options, compute)),
       };
       auto pipeline = wgpuDeviceCreateComputePipeline(getValue(), &descriptor);
       _context->getErrorHandler()->throwPendingJSIError();
@@ -194,7 +194,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
       descriptor.size = makeGPUExtent3D(runtime, WGPU_OBJ(desc, size));
       descriptor.usage = WGPU_NUMBER(desc, usage, WGPUTextureUsageFlags);
       descriptor.sampleCount = WGPU_NUMBER_OPT(desc, sampleCount, uint32_t, descriptor.sampleCount);
-      descriptor.dimension = StringToWGPUTextureDimension(dimension.data());
+      descriptor.dimension = StringToWGPUTextureDimension(dimension);
       descriptor.mipLevelCount = WGPU_NUMBER_OPT(desc, mipLevelCount, uint32_t, descriptor.mipLevelCount);
       auto texture = wgpuDeviceCreateTexture(getValue(), &descriptor);
       _context->getErrorHandler()->throwPendingJSIError();
@@ -216,7 +216,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
           WGPUBindGroupEntry entry = {
             .binding = WGPU_NUMBER(obj, binding, uint32_t),
           };
-          makeWGPUBindingResource(runtime, std::move(resource), &entry);
+          addWGPUBindingResource(runtime, resource, entry);
           return entry;
         });
 
@@ -253,14 +253,14 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
         auto lodMinClamp = WGPU_NUMBER_OPT(desc, lodMinClamp, float, descriptor.lodMinClamp);
         auto lodMaxClamp = WGPU_NUMBER_OPT(desc, lodMaxClamp, float, descriptor.lodMaxClamp);
         descriptor.label = label.data();
-        descriptor.magFilter = StringToWGPUFilterMode(magFilter.data());
-        descriptor.minFilter = StringToWGPUFilterMode(minFilter.data());
-        descriptor.mipmapFilter = StringToWGPUMipmapFilterMode(mipmapFilter.data());
+        descriptor.magFilter = StringToWGPUFilterMode(magFilter);
+        descriptor.minFilter = StringToWGPUFilterMode(minFilter);
+        descriptor.mipmapFilter = StringToWGPUMipmapFilterMode(mipmapFilter);
         descriptor.maxAnisotropy = WGPU_NUMBER_OPT(desc, maxAnisotropy, uint16_t, descriptor.maxAnisotropy);
-        descriptor.addressModeU = StringToWGPUAddressMode(addressModeU.data());
-        descriptor.addressModeV = StringToWGPUAddressMode(addressModeV.data());
-        descriptor.addressModeW = StringToWGPUAddressMode(addressModeW.data());
-        descriptor.compare = StringToWGPUCompareFunction(compare.data());
+        descriptor.addressModeU = StringToWGPUAddressMode(addressModeU);
+        descriptor.addressModeV = StringToWGPUAddressMode(addressModeV);
+        descriptor.addressModeW = StringToWGPUAddressMode(addressModeW);
+        descriptor.compare = StringToWGPUCompareFunction(compare);
         descriptor.lodMinClamp = lodMinClamp;
         descriptor.lodMaxClamp = lodMaxClamp;
       }
@@ -284,42 +284,36 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
           };
           if (obj.hasProperty(runtime, "buffer")) {
             auto buffer = obj.getPropertyAsObject(runtime, "buffer");
-            auto type = WGPU_UTF8_OPT(buffer, type, "uniform");
             entry.buffer = {
-              .type = StringToWGPUBufferBindingType(type.data()),
+              .type = StringToWGPUBufferBindingType(WGPU_UTF8_OPT(buffer, type, "uniform")),
               .hasDynamicOffset = WGPU_BOOL_OPT(buffer, hasDynamicOffset, false),
               .minBindingSize = WGPU_NUMBER_OPT(buffer, minBindingSize, uint64_t, 0),
             };
           }
           if (obj.hasProperty(runtime, "texture")) {
             auto texture = obj.getPropertyAsObject(runtime, "texture");
-            auto viewDimension = WGPU_UTF8_OPT(texture, viewDimension, "2d");
-            auto sampleType = WGPU_UTF8_OPT(texture, sampleType, "float");
             entry.texture = {
               .nextInChain = nullptr,
-              .sampleType = StringToWGPUTextureSampleType(sampleType.data()),
-              .viewDimension = StringToWGPUTextureViewDimension(viewDimension.data()),
+              .sampleType = StringToWGPUTextureSampleType(WGPU_UTF8_OPT(texture, sampleType, "float")),
+              .viewDimension = StringToWGPUTextureViewDimension(WGPU_UTF8_OPT(texture, viewDimension, "2d")),
               .multisampled = WGPU_BOOL_OPT(texture, multisampled, false),
             };
           }
           if (obj.hasProperty(runtime, "sampler")) {
             auto sampler = obj.getPropertyAsObject(runtime, "sampler");
-            auto type = WGPU_UTF8_OPT(sampler, type, "filtering");
             entry.sampler = {
               .nextInChain = nullptr,
-              .type = StringToWGPUSamplerBindingType(type.data()),
+              .type = StringToWGPUSamplerBindingType(WGPU_UTF8_OPT(sampler, type, "filtering")),
             };
           }
           if (obj.hasProperty(runtime, "storageTexture")) {
             auto storageTexture = WGPU_OBJ(obj, storageTexture);
-            auto formatStr = WGPU_UTF8(storageTexture, format);
-            auto accessStr = WGPU_UTF8_OPT(storageTexture, access, "undefined");
-            auto viewDimensionStr = WGPU_UTF8_OPT(storageTexture, viewDimension, "undefined");
             entry.storageTexture = {
               .nextInChain = nullptr,
-              .access = StringToWGPUStorageTextureAccess(accessStr.data()),
-              .format = StringToWGPUTextureFormat(formatStr),
-              .viewDimension = StringToWGPUTextureViewDimension(viewDimensionStr.data()),
+              .access = StringToWGPUStorageTextureAccess(WGPU_UTF8_OPT(storageTexture, access, "undefined")),
+              .format = StringToWGPUTextureFormat(WGPU_UTF8(storageTexture, format)),
+              .viewDimension =
+                StringToWGPUTextureViewDimension(WGPU_UTF8_OPT(storageTexture, viewDimension, "undefined")),
             };
           }
           return entry;
@@ -365,25 +359,24 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
     std::vector<WGPUFeatureName> features;
     features.resize(size);
     wgpuDeviceEnumerateFeatures(getValue(), features.data());
-    return makeJsiFeatures(runtime, &features);
+    return makeJsiFeatures(runtime, features);
   }
 
   if (name == "limits") {
     WGPUSupportedLimits limits = {nullptr};
     wgpuDeviceGetLimits(getValue(), &limits);
-    return makeJsiLimits(runtime, &limits.limits);
+    return makeJsiLimits(runtime, limits.limits);
   }
 
   if (name == "createQuerySet") {
     return WGPU_FUNC_FROM_HOST_FUNC(createQuerySet, 1, [this]) {
       WGPU_LOG_FUNC_ARGS(createQuerySet);
       auto desc = arguments[0].asObject(runtime);
-      auto type = WGPU_UTF8(desc, type);
       auto label = WGPU_UTF8_OPT(desc, label, "");
       WGPUQuerySetDescriptor descriptor = {
         .nextInChain = nullptr,
         .label = label.data(),
-        .type = StringToWGPUQueryType(type.data()),
+        .type = StringToWGPUQueryType(WGPU_UTF8(desc, type)),
         .count = WGPU_NUMBER(desc, count, uint32_t),
       };
       auto querySet = wgpuDeviceCreateQuerySet(getValue(), &descriptor);

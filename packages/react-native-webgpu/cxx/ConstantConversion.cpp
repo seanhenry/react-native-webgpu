@@ -7,7 +7,6 @@
 const char *WGPUTextureFormatToString(WGPUTextureFormat format) {
   static std::unordered_map<WGPUTextureFormat, const char *> map;
   if (map.size() == 0) {
-    // [WGPUTextureFormat_Undefined] = "";
     map[WGPUTextureFormat_R8Unorm] = "r8unorm";
     map[WGPUTextureFormat_R8Snorm] = "r8snorm";
     map[WGPUTextureFormat_R8Uint] = "r8uint";
@@ -103,15 +102,13 @@ const char *WGPUTextureFormatToString(WGPUTextureFormat format) {
     map[WGPUTextureFormat_ASTC12x10UnormSrgb] = "astc-12x10-unorm-srgb";
     map[WGPUTextureFormat_ASTC12x12Unorm] = "astc-12x12-unorm";
     map[WGPUTextureFormat_ASTC12x12UnormSrgb] = "astc-12x12-unorm-srgb";
-    //    map[WGPUTextureFormat_Force32] = "";
   }
   return map.at(format);
 }
 
-WGPUTextureFormat StringToWGPUTextureFormat(std::string &format) {
+WGPUTextureFormat StringToWGPUTextureFormat(const std::string &format) {
   static std::unordered_map<std::string, WGPUTextureFormat> map;
   if (map.size() == 0) {
-    //    map[""] = WGPUTextureFormat_Undefined;
     map["r8unorm"] = WGPUTextureFormat_R8Unorm;
     map["r8snorm"] = WGPUTextureFormat_R8Snorm;
     map["r8uint"] = WGPUTextureFormat_R8Uint;
@@ -208,7 +205,6 @@ WGPUTextureFormat StringToWGPUTextureFormat(std::string &format) {
     map["astc-12x12-unorm"] = WGPUTextureFormat_ASTC12x12Unorm;
     map["astc-12x12-unorm-srgb"] = WGPUTextureFormat_ASTC12x12UnormSrgb;
     map["undefined"] = WGPUTextureFormat_Undefined;
-    //    map[""] = WGPUTextureFormat_Force32;
   }
   return map.at(format);
 }
@@ -219,8 +215,6 @@ const char *WGPUCompositeAlphaModeToString(WGPUCompositeAlphaMode alphaMode) {
       return "premultiplied";
     case WGPUCompositeAlphaMode_Opaque:
       return "opaque";
-    case WGPUCompositeAlphaMode_Force32:
-      return "force32";
     case WGPUCompositeAlphaMode_Inherit:
       return "inherit";
     case WGPUCompositeAlphaMode_Unpremultiplied:
@@ -232,72 +226,61 @@ const char *WGPUCompositeAlphaModeToString(WGPUCompositeAlphaMode alphaMode) {
   }
 }
 
-WGPUCompositeAlphaMode StringToWGPUCompositeAlphaMode(const char *alphaMode) {
-  if (strcmp(alphaMode, "premultiplied") == 0) {
+WGPUCompositeAlphaMode StringToWGPUCompositeAlphaMode(const std::string &alphaMode) {
+  if (alphaMode == "premultiplied") {
     return WGPUCompositeAlphaMode_Premultiplied;
-  } else if (strcmp(alphaMode, "opaque") == 0) {
+  } else if (alphaMode == "opaque") {
     return WGPUCompositeAlphaMode_Opaque;
-  } else if (strcmp(alphaMode, "force32") == 0) {
-    return WGPUCompositeAlphaMode_Force32;
-  } else if (strcmp(alphaMode, "inherit") == 0) {
+  } else if (alphaMode == "inherit") {
     return WGPUCompositeAlphaMode_Inherit;
-  } else if (strcmp(alphaMode, "unpremultiplied") == 0) {
+  } else if (alphaMode == "unpremultiplied") {
     return WGPUCompositeAlphaMode_Unpremultiplied;
-  } else if (strcmp(alphaMode, "auto") == 0) {
+  } else if (alphaMode == "auto") {
     return WGPUCompositeAlphaMode_Auto;
   }
   return WGPUCompositeAlphaMode_Auto;
 }
 
-WGPUPrimitiveTopology StringToWGPUPrimitiveTopology(const char *topology) {
-  if (strcmp(topology, "point-list") == 0) {
+WGPUPrimitiveTopology StringToWGPUPrimitiveTopology(const std::string &topology) {
+  if (topology == "point-list") {
     return WGPUPrimitiveTopology_PointList;
   }
-  if (strcmp(topology, "line-list") == 0) {
+  if (topology == "line-list") {
     return WGPUPrimitiveTopology_LineList;
   }
-  if (strcmp(topology, "line-strip") == 0) {
+  if (topology == "line-strip") {
     return WGPUPrimitiveTopology_LineStrip;
   }
-  if (strcmp(topology, "triangle-list") == 0) {
+  if (topology == "triangle-list") {
     return WGPUPrimitiveTopology_TriangleList;
   }
-  if (strcmp(topology, "triangle-strip") == 0) {
+  if (topology == "triangle-strip") {
     return WGPUPrimitiveTopology_TriangleStrip;
-  }
-  if (strcmp(topology, "force32") == 0) {
-    return WGPUPrimitiveTopology_Force32;
   }
   return WGPUPrimitiveTopology_PointList;
 }
 
-WGPULoadOp StringToWGPULoadOp(const char *str) {
-  if (strcmp(str, "clear") == 0) {
+WGPULoadOp StringToWGPULoadOp(const std::string &str) {
+  if (str == "clear") {
     return WGPULoadOp_Clear;
   }
-  if (strcmp(str, "load") == 0) {
+  if (str == "load") {
     return WGPULoadOp_Load;
-  }
-  if (strcmp(str, "force32") == 0) {
-    return WGPULoadOp_Force32;
   }
   return WGPULoadOp_Undefined;
 }
 
-WGPUStoreOp StringToWGPUStoreOp(const char *str) {
-  if (strcmp(str, "store") == 0) {
+WGPUStoreOp StringToWGPUStoreOp(const std::string &str) {
+  if (str == "store") {
     return WGPUStoreOp_Store;
   }
-  if (strcmp(str, "discard") == 0) {
+  if (str == "discard") {
     return WGPUStoreOp_Discard;
-  }
-  if (strcmp(str, "force32") == 0) {
-    return WGPUStoreOp_Force32;
   }
   return WGPUStoreOp_Undefined;
 }
 
-WGPUVertexFormat StringToWGPUVertexFormat(std::string &str) {
+WGPUVertexFormat StringToWGPUVertexFormat(const std::string &str) {
   static std::unordered_map<std::string, WGPUVertexFormat> map;
   if (map.size() == 0) {
     map["uint8x2"] = WGPUVertexFormat_Uint8x2;
@@ -330,90 +313,90 @@ WGPUVertexFormat StringToWGPUVertexFormat(std::string &str) {
     map["sint32x2"] = WGPUVertexFormat_Sint32x2;
     map["sint32x3"] = WGPUVertexFormat_Sint32x3;
     map["sint32x4"] = WGPUVertexFormat_Sint32x4;
-    //        map["unorm10-10-10-2";] = WGPUVertexFormat_Unorm;
+    // map["unorm10-10-10-2";] = WGPUVertexFormat_Unorm;
   }
   return map[str];
 }
 
-WGPUVertexStepMode StringToWGPUVertexStepMode(const char *str) {
-  if (strcmp(str, "vertex") == 0) {
+WGPUVertexStepMode StringToWGPUVertexStepMode(const std::string &str) {
+  if (str == "vertex") {
     return WGPUVertexStepMode_Vertex;
   }
-  if (strcmp(str, "instance") == 0) {
+  if (str == "instance") {
     return WGPUVertexStepMode_Instance;
   }
   return WGPUVertexStepMode_Vertex;
 }
 
-WGPUCullMode StringToWGPUCullMode(const char *str) {
-  if (strcmp(str, "none") == 0) {
+WGPUCullMode StringToWGPUCullMode(const std::string &str) {
+  if (str == "none") {
     return WGPUCullMode_None;
   }
-  if (strcmp(str, "front") == 0) {
+  if (str == "front") {
     return WGPUCullMode_Front;
   }
-  if (strcmp(str, "back") == 0) {
+  if (str == "back") {
     return WGPUCullMode_Back;
   }
   return WGPUCullMode_None;
 }
 
-WGPUCompareFunction StringToWGPUCompareFunction(const char *str) {
-  if (strcmp(str, "never") == 0) {
+WGPUCompareFunction StringToWGPUCompareFunction(const std::string &str) {
+  if (str == "never") {
     return WGPUCompareFunction_Never;
   }
-  if (strcmp(str, "less") == 0) {
+  if (str == "less") {
     return WGPUCompareFunction_Less;
   }
-  if (strcmp(str, "equal") == 0) {
+  if (str == "equal") {
     return WGPUCompareFunction_Equal;
   }
-  if (strcmp(str, "less-equal") == 0) {
+  if (str == "less-equal") {
     return WGPUCompareFunction_LessEqual;
   }
-  if (strcmp(str, "greater") == 0) {
+  if (str == "greater") {
     return WGPUCompareFunction_Greater;
   }
-  if (strcmp(str, "not-equal") == 0) {
+  if (str == "not-equal") {
     return WGPUCompareFunction_NotEqual;
   }
-  if (strcmp(str, "greater-equal") == 0) {
+  if (str == "greater-equal") {
     return WGPUCompareFunction_GreaterEqual;
   }
-  if (strcmp(str, "always") == 0) {
+  if (str == "always") {
     return WGPUCompareFunction_Always;
   }
   return WGPUCompareFunction_Undefined;
 }
 
-WGPUFilterMode StringToWGPUFilterMode(const char *str) {
-  if (strcmp(str, "nearest") == 0) {
+WGPUFilterMode StringToWGPUFilterMode(const std::string &str) {
+  if (str == "nearest") {
     return WGPUFilterMode_Nearest;
   }
-  if (strcmp(str, "linear") == 0) {
+  if (str == "linear") {
     return WGPUFilterMode_Linear;
   }
   return WGPUFilterMode_Nearest;
 }
 
-WGPUMipmapFilterMode StringToWGPUMipmapFilterMode(const char *str) {
-  if (strcmp(str, "nearest") == 0) {
+WGPUMipmapFilterMode StringToWGPUMipmapFilterMode(const std::string &str) {
+  if (str == "nearest") {
     return WGPUMipmapFilterMode_Nearest;
   }
-  if (strcmp(str, "linear") == 0) {
+  if (str == "linear") {
     return WGPUMipmapFilterMode_Linear;
   }
   return WGPUMipmapFilterMode_Nearest;
 }
 
-WGPUTextureDimension StringToWGPUTextureDimension(const char *str) {
-  if (strcmp(str, "1d") == 0) {
+WGPUTextureDimension StringToWGPUTextureDimension(const std::string &str) {
+  if (str == "1d") {
     return WGPUTextureDimension_1D;
   }
-  if (strcmp(str, "2d") == 0) {
+  if (str == "2d") {
     return WGPUTextureDimension_2D;
   }
-  if (strcmp(str, "3d") == 0) {
+  if (str == "3d") {
     return WGPUTextureDimension_3D;
   }
   return WGPUTextureDimension_2D;
@@ -432,36 +415,36 @@ const char *WGPUTextureDimensionToString(WGPUTextureDimension dim) {
   }
 }
 
-WGPUTextureViewDimension StringToWGPUTextureViewDimension(const char *str) {
-  if (strcmp(str, "1d") == 0) {
+WGPUTextureViewDimension StringToWGPUTextureViewDimension(const std::string &str) {
+  if (str == "1d") {
     return WGPUTextureViewDimension_1D;
   }
-  if (strcmp(str, "2d") == 0) {
+  if (str == "2d") {
     return WGPUTextureViewDimension_2D;
   }
-  if (strcmp(str, "2d-array") == 0) {
+  if (str == "2d-array") {
     return WGPUTextureViewDimension_2DArray;
   }
-  if (strcmp(str, "cube") == 0) {
+  if (str == "cube") {
     return WGPUTextureViewDimension_Cube;
   }
-  if (strcmp(str, "cube-array") == 0) {
+  if (str == "cube-array") {
     return WGPUTextureViewDimension_CubeArray;
   }
-  if (strcmp(str, "3d") == 0) {
+  if (str == "3d") {
     return WGPUTextureViewDimension_3D;
   }
   return WGPUTextureViewDimension_Undefined;
 }
 
-WGPUTextureAspect StringToWGPUTextureAspect(const char *str) {
-  if (strcmp(str, "all") == 0) {
+WGPUTextureAspect StringToWGPUTextureAspect(const std::string &str) {
+  if (str == "all") {
     return WGPUTextureAspect_All;
   }
-  if (strcmp(str, "depth-only") == 0) {
+  if (str == "depth-only") {
     return WGPUTextureAspect_DepthOnly;
   }
-  if (strcmp(str, "stencil-only") == 0) {
+  if (str == "stencil-only") {
     return WGPUTextureAspect_StencilOnly;
   }
   return WGPUTextureAspect_All;
@@ -498,61 +481,61 @@ const char *WGPUFeatureNameToString(WGPUFeatureName name) {
   return NULL;
 }
 
-WGPUFeatureName StringToWGPUFeatureName(const char *name) {
-  if (strcmp(name, "depth-clip-control") == 0) {
+WGPUFeatureName StringToWGPUFeatureName(const std::string &name) {
+  if (name == "depth-clip-control") {
     return WGPUFeatureName_DepthClipControl;
   }
-  if (strcmp(name, "depth32float-stencil8") == 0) {
+  if (name == "depth32float-stencil8") {
     return WGPUFeatureName_Depth32FloatStencil8;
   }
-  if (strcmp(name, "texture-compression-bc") == 0) {
+  if (name == "texture-compression-bc") {
     return WGPUFeatureName_TextureCompressionBC;
   }
-  if (strcmp(name, "texture-compression-etc2") == 0) {
+  if (name == "texture-compression-etc2") {
     return WGPUFeatureName_TextureCompressionETC2;
   }
-  if (strcmp(name, "texture-compression-astc") == 0) {
+  if (name == "texture-compression-astc") {
     return WGPUFeatureName_TextureCompressionASTC;
   }
-  if (strcmp(name, "timestamp-query") == 0) {
+  if (name == "timestamp-query") {
     return WGPUFeatureName_TimestampQuery;
   }
-  if (strcmp(name, "indirect-first-instance") == 0) {
+  if (name == "indirect-first-instance") {
     return WGPUFeatureName_IndirectFirstInstance;
   }
-  if (strcmp(name, "shader-f16") == 0) {
+  if (name == "shader-f16") {
     return WGPUFeatureName_ShaderF16;
   }
-  if (strcmp(name, "rg11b10ufloat-renderable") == 0) {
+  if (name == "rg11b10ufloat-renderable") {
     return WGPUFeatureName_RG11B10UfloatRenderable;
   }
-  if (strcmp(name, "bgra8unorm-storage") == 0) {
+  if (name == "bgra8unorm-storage") {
     return WGPUFeatureName_BGRA8UnormStorage;
   }
-  if (strcmp(name, "float32-filterable") == 0) {
+  if (name == "float32-filterable") {
     return WGPUFeatureName_Float32Filterable;
   }
   return WGPUFeatureName_Undefined;
 }
 
-WGPUBufferBindingType StringToWGPUBufferBindingType(const char *name) {
-  if (strcmp(name, "uniform") == 0) {
+WGPUBufferBindingType StringToWGPUBufferBindingType(const std::string &name) {
+  if (name == "uniform") {
     return WGPUBufferBindingType_Uniform;
   }
-  if (strcmp(name, "storage") == 0) {
+  if (name == "storage") {
     return WGPUBufferBindingType_Storage;
   }
-  if (strcmp(name, "read-only-storage") == 0) {
+  if (name == "read-only-storage") {
     return WGPUBufferBindingType_ReadOnlyStorage;
   }
   return WGPUBufferBindingType_Undefined;
 }
 
-WGPUQueryType StringToWGPUQueryType(const char *name) {
-  if (strcmp(name, "occlusion") == 0) {
+WGPUQueryType StringToWGPUQueryType(const std::string &name) {
+  if (name == "occlusion") {
     return WGPUQueryType_Occlusion;
   }
-  if (strcmp(name, "timestamp") == 0) {
+  if (name == "timestamp") {
     return WGPUQueryType_Timestamp;
   }
   return WGPUQueryType_Occlusion;
@@ -569,56 +552,56 @@ const char *WGPUQuerySetToString(WGPUQueryType type) {
   }
 }
 
-WGPUIndexFormat StringToWGPUIndexFormat(const char *str) {
-  if (strcmp(str, "uint16") == 0) {
+WGPUIndexFormat StringToWGPUIndexFormat(const std::string &str) {
+  if (str == "uint16") {
     return WGPUIndexFormat_Uint16;
   }
-  if (strcmp(str, "uint32") == 0) {
+  if (str == "uint32") {
     return WGPUIndexFormat_Uint32;
   }
   return WGPUIndexFormat_Undefined;
 }
 
-WGPUSamplerBindingType StringToWGPUSamplerBindingType(const char *str) {
-  if (strcmp(str, "filtering") == 0) {
+WGPUSamplerBindingType StringToWGPUSamplerBindingType(const std::string &str) {
+  if (str == "filtering") {
     return WGPUSamplerBindingType_Filtering;
   }
-  if (strcmp(str, "non-filtering") == 0) {
+  if (str == "non-filtering") {
     return WGPUSamplerBindingType_NonFiltering;
   }
-  if (strcmp(str, "comparison") == 0) {
+  if (str == "comparison") {
     return WGPUSamplerBindingType_Comparison;
   }
   return WGPUSamplerBindingType_Undefined;
 }
 
-WGPUTextureSampleType StringToWGPUTextureSampleType(const char *str) {
-  if (strcmp(str, "float") == 0) {
+WGPUTextureSampleType StringToWGPUTextureSampleType(const std::string &str) {
+  if (str == "float") {
     return WGPUTextureSampleType_Float;
   }
-  if (strcmp(str, "unfilterable-float") == 0) {
+  if (str == "unfilterable-float") {
     return WGPUTextureSampleType_UnfilterableFloat;
   }
-  if (strcmp(str, "depth") == 0) {
+  if (str == "depth") {
     return WGPUTextureSampleType_Depth;
   }
-  if (strcmp(str, "sint") == 0) {
+  if (str == "sint") {
     return WGPUTextureSampleType_Sint;
   }
-  if (strcmp(str, "uint") == 0) {
+  if (str == "uint") {
     return WGPUTextureSampleType_Uint;
   }
   return WGPUTextureSampleType_Undefined;
 }
 
-WGPUAddressMode StringToWGPUAddressMode(const char *str) {
-  if (strcmp(str, "repeat") == 0) {
+WGPUAddressMode StringToWGPUAddressMode(const std::string &str) {
+  if (str == "repeat") {
     return WGPUAddressMode_Repeat;
   }
-  if (strcmp(str, "mirror-repeat") == 0) {
+  if (str == "mirror-repeat") {
     return WGPUAddressMode_MirrorRepeat;
   }
-  if (strcmp(str, "clamp-to-edge") == 0) {
+  if (str == "clamp-to-edge") {
     return WGPUAddressMode_ClampToEdge;
   }
   return WGPUAddressMode_Repeat;
@@ -637,14 +620,14 @@ const char *WGPUBufferMapStateToString(WGPUBufferMapState state) {
   }
 }
 
-WGPUStorageTextureAccess StringToWGPUStorageTextureAccess(const char *str) {
-  if (strcmp(str, "write-only") == 0) {
+WGPUStorageTextureAccess StringToWGPUStorageTextureAccess(const std::string &str) {
+  if (str == "write-only") {
     return WGPUStorageTextureAccess_WriteOnly;
   }
-  if (strcmp(str, "read-only") == 0) {
+  if (str == "read-only") {
     return WGPUStorageTextureAccess_ReadOnly;
   }
-  if (strcmp(str, "read-write") == 0) {
+  if (str == "read-write") {
     return WGPUStorageTextureAccess_ReadWrite;
   }
   return WGPUStorageTextureAccess_Undefined;

@@ -76,7 +76,7 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
       auto format = WGPU_UTF8(options, format);
       auto usage = WGPU_NUMBER_OPT(options, usage, WGPUTextureUsage, WGPUTextureUsage_RenderAttachment);
       auto alphaModeStr = WGPU_UTF8_OPT(options, alphaMode, "auto");
-      auto alphaMode = StringToWGPUCompositeAlphaMode(alphaModeStr.data());
+      auto alphaMode = StringToWGPUCompositeAlphaMode(alphaModeStr);
 
       WGPUSurfaceCapabilities capabilities = {
         .formatCount = 0,

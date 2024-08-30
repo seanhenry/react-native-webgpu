@@ -7,9 +7,9 @@
 #include "ConstantConversion.h"
 #include "DeviceHostObject.h"
 #include "ErrorHandler.h"
+#include "Promise.h"
 #include "WGPUContext.h"
 #include "WGPUConversions.h"
-#include "WGPUJsiUtils.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
@@ -58,7 +58,7 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
             requiredFeatures = jsiArrayToVector<WGPUFeatureName>(runtime, std::move(requiredFeaturesIn),
                                                                  [](Runtime &runtime, Value value) {
                                                                    auto str = value.asString(runtime).utf8(runtime);
-                                                                   return StringToWGPUFeatureName(str.data());
+                                                                   return StringToWGPUFeatureName(str);
                                                                  });
             descriptor.requiredFeatures = requiredFeatures.data();
             descriptor.requiredFeatureCount = requiredFeatures.size();
@@ -74,13 +74,13 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
     std::vector<WGPUFeatureName> features;
     features.resize(size);
     wgpuAdapterEnumerateFeatures(_adapter->_adapter, features.data());
-    return makeJsiFeatures(runtime, &features);
+    return makeJsiFeatures(runtime, features);
   }
 
   if (name == "limits") {
     WGPUSupportedLimits limits = {0};
     wgpuAdapterGetLimits(_adapter->_adapter, &limits);
-    return makeJsiLimits(runtime, &limits.limits);
+    return makeJsiLimits(runtime, limits.limits);
   }
 
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;

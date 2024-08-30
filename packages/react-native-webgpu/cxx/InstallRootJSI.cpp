@@ -7,6 +7,7 @@
 #include "ConstantConversion.h"
 #include "ContextHostObject.h"
 #include "CreateImageBitmap.h"
+#include "Promise.h"
 #include "Surface.h"
 #include "WGPUJsiUtils.h"
 

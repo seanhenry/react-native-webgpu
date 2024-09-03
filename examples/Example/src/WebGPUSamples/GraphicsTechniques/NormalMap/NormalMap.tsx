@@ -142,7 +142,7 @@ export const NormalMap = () => {
     let brickwallAlbedoTexture: GPUTexture;
     {
       const imageBitmap = await createImageBitmap(
-        require('../../assets/img/brickwall_albedo.png'),
+        require('../../assets/img/brickwall_albedo.jpg'),
       );
       brickwallAlbedoTexture = createTextureFromImage(device, imageBitmap);
     }
@@ -150,7 +150,7 @@ export const NormalMap = () => {
     let brickwallNormalTexture: GPUTexture;
     {
       const imageBitmap = await createImageBitmap(
-        require('../../assets/img/brickwall_normal.png'),
+        require('../../assets/img/brickwall_normal.jpg'),
       );
       brickwallNormalTexture = createTextureFromImage(device, imageBitmap);
     }
@@ -158,7 +158,7 @@ export const NormalMap = () => {
     let brickwallHeightTexture: GPUTexture;
     {
       const imageBitmap = await createImageBitmap(
-        require('../../assets/img/brickwall_height.png'),
+        require('../../assets/img/brickwall_height.jpg'),
       );
       brickwallHeightTexture = createTextureFromImage(device, imageBitmap);
     }

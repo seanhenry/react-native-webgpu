@@ -33,10 +33,6 @@ if (!WGPUWebGPUView) {
   throw new Error(LINKING_ERROR);
 }
 
-if (!webGpuJsi.install()) {
-  throw new Error('Failed to install JSI');
-}
-
 function createImageBitmap(source: ImageSourcePropType) {
   const resolvedSource = Image.resolveAssetSource(source);
   return __reactNativeWebGPU.createImageBitmap(resolvedSource);

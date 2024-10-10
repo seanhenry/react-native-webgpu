@@ -23,6 +23,7 @@
     "react-native-screens": "^3.32.0",
     "react-native-webgpu": "workspace:*",
     "react-native-webgpu-three": "workspace:*",
+    "teapot": "^1.0.0",
     "three": "0.166.1",
     "wgpu-matrix": "^3.0.1"
   },

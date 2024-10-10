@@ -1,3 +1,4 @@
+import {ABuffer} from '../WebGPUSamples/WebGPUFeatures/ABuffer/ABuffer';
 import {type ComponentType} from 'react';
 import {HelloTriangle} from '../WebGPUSamples/BasicGraphics/HelloTriangle/HelloTriangle';
 import {CubeMap} from '../WebGPUSamples/BasicGraphics/CubeMap/CubeMap';
@@ -55,6 +56,7 @@ export type Example =
   | 'ReversedZ'
   | 'RenderBundles'
   | 'OcclusionQueries'
+  | 'ABuffer'
   // GraphicsTechniques
   | 'Cameras'
   | 'NormalMap'
@@ -98,6 +100,7 @@ const examples: Record<Example, ComponentType> = {
   ReversedZ,
   RenderBundles,
   OcclusionQueries,
+  ABuffer,
   // GraphicsTechniques
   Cameras,
   NormalMap,

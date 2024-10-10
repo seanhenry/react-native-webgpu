@@ -55,6 +55,20 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
     });
   }
 
+  if (name == "setScissorRect") {
+    return WGPU_FUNC_FROM_HOST_FUNC(setViewport, 6, [this]) {
+      WGPU_LOG_FUNC_ARGS(setViewport);
+      auto x = (float)arguments[0].asNumber();
+      auto y = (float)arguments[1].asNumber();
+      auto width = (float)arguments[2].asNumber();
+      auto height = (float)arguments[3].asNumber();
+
+      wgpuRenderPassEncoderSetScissorRect(_value, x, y, width, height);
+      _context->getErrorHandler()->throwPendingJSIError();
+      return Value::undefined();
+    });
+  }
+
   if (name == "executeBundles") {
     return WGPU_FUNC_FROM_HOST_FUNC(executeBundles, 1, [this]) {
       WGPU_LOG_FUNC_ARGS(executeBundles);
@@ -95,6 +109,6 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
 
 std::vector<PropNameID> RenderPassEncoderHostObject::getPropertyNames(Runtime &runtime) {
   return PropNameID::names(runtime, "end", "label", "setViewport", "executeBundles", "beginOcclusionQuery",
-                           "endOcclusionQuery", WGPU_GPU_RENDER_COMMANDS_MIXIN_PROP_NAMES,
+                           "endOcclusionQuery", "setScissorRect", WGPU_GPU_RENDER_COMMANDS_MIXIN_PROP_NAMES,
                            WGPU_GPU_BINDING_COMMANDS_MIXIN_PROP_NAMES);
 }

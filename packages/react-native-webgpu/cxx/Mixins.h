@@ -84,23 +84,27 @@
 #define WGPU_GPU_RENDER_COMMANDS_MIXIN_PROP_NAMES \
   "setPipeline", "setIndexBuffer", "setVertexBuffer", "draw", "drawIndexed"
 
-// GPUBindingCommandsMixin
-
 // TODO: see overloaded version with 5 args
-#define WGPU_GPU_BINDING_COMMANDS_MIXIN_SET_BIND_GROUP(__func)                                    \
-  if (name == "setBindGroup") {                                                                   \
-    return WGPU_FUNC_FROM_HOST_FUNC(setBindGroup, 5, [this]) {                                    \
-      WGPU_LOG_FUNC_ARGS(setBindGroup);                                                           \
-      auto index = (uint32_t)arguments[0].asNumber();                                             \
-      WGPUBindGroup bindGroup = nullptr;                                                          \
-      if (arguments[1].isObject()) {                                                              \
-        auto groupIn = arguments[1].asObject(runtime).asHostObject<BindGroupHostObject>(runtime); \
-        bindGroup = groupIn->getValue();                                                          \
-      }                                                                                           \
-      __func(_value, index, bindGroup, 0, NULL);                                                  \
-      _context->getErrorHandler()->throwPendingJSIError();                                        \
-      return Value::undefined();                                                                  \
-    });                                                                                           \
+#define WGPU_GPU_BINDING_COMMANDS_MIXIN_SET_BIND_GROUP(__func)                                                      \
+  if (name == "setBindGroup") {                                                                                     \
+    return WGPU_FUNC_FROM_HOST_FUNC(setBindGroup, 5, [this]) {                                                      \
+      WGPU_LOG_FUNC_ARGS(setBindGroup);                                                                             \
+      auto index = (uint32_t)arguments[0].asNumber();                                                               \
+      WGPUBindGroup bindGroup = nullptr;                                                                            \
+      if (arguments[1].isObject()) {                                                                                \
+        auto groupIn = arguments[1].asObject(runtime).asHostObject<BindGroupHostObject>(runtime);                   \
+        bindGroup = groupIn->getValue();                                                                            \
+      }                                                                                                             \
+      std::vector<uint32_t> offsets;                                                                                \
+      if (count > 2 && arguments[2].isObject()) {                                                                   \
+        auto jsOffsets = arguments[2].asObject(runtime).asArray(runtime);                                           \
+        offsets = jsiArrayToVector<uint32_t>(                                                                       \
+          runtime, std::move(jsOffsets), [](Runtime &runtime, Value value) { return (uint32_t)value.asNumber(); }); \
+      }                                                                                                             \
+      __func(_value, index, bindGroup, offsets.size(), offsets.data());                                             \
+      _context->getErrorHandler()->throwPendingJSIError();                                                          \
+      return Value::undefined();                                                                                    \
+    });                                                                                                             \
   }
 
 #define WGPU_GPU_BINDING_COMMANDS_MIXIN_PROP_NAMES "setBindGroup"

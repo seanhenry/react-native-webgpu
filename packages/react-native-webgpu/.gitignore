@@ -1,3 +1,8 @@
+# MacOS
+__MACOSX
+.DS_Store
+*.pem
+
 # Xcode
 !**/*.xcodeproj
 !**/*.pbxproj

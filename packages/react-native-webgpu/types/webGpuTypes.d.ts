@@ -424,17 +424,17 @@ interface GPUBindGroupLayoutEntry {
 //   dstFactor?: GPUBlendFactor;
 // }
 //
-// interface GPUBlendState {
-//   /**
-//    * Defines the blending behavior of the corresponding render target for color channels.
-//    */
-//   color: GPUBlendComponent;
-//   /**
-//    * Defines the blending behavior of the corresponding render target for the alpha channel.
-//    */
-//   alpha: GPUBlendComponent;
-// }
-//
+interface GPUBlendState {
+  /**
+   * Defines the blending behavior of the corresponding render target for color channels.
+   */
+  color: GPUBlendComponent;
+  /**
+   * Defines the blending behavior of the corresponding render target for the alpha channel.
+   */
+  alpha: GPUBlendComponent;
+}
+
 interface GPUBufferBinding {
   /**
    * The {@link GPUBuffer} to bind.
@@ -569,7 +569,7 @@ interface GPUColorTargetState {
   //    * The blending behavior for this color target. If left undefined, disables blending for this
   //    * color target.
   //    */
-  //   blend?: GPUBlendState;
+  blend?: GPUBlendState;
   /**
    * Bitmask controlling which channels are are written to when drawing to this color target.
    */
@@ -1568,8 +1568,8 @@ interface GPUBindingCommandsMixin {
    */
   setBindGroup(
     index: GPUIndex32,
-    bindGroup: GPUBindGroup | null
-    // dynamicOffsets?: Iterable<GPUBufferDynamicOffset>
+    bindGroup: GPUBindGroup | null,
+    dynamicOffsets?: Iterable<GPUBufferDynamicOffset>
   ): undefined;
   //   /**
   //    * Sets the current {@link GPUBindGroup} for the given index, specifying dynamic offsets as a subset
@@ -2720,12 +2720,12 @@ interface GPURenderPassEncoder
   //    * @param width - Width of the scissor rectangle in pixels.
   //    * @param height - Height of the scissor rectangle in pixels.
   //    */
-  //   setScissorRect(
-  //     x: GPUIntegerCoordinate,
-  //     y: GPUIntegerCoordinate,
-  //     width: GPUIntegerCoordinate,
-  //     height: GPUIntegerCoordinate
-  //   ): undefined;
+  setScissorRect(
+    x: GPUIntegerCoordinate,
+    y: GPUIntegerCoordinate,
+    width: GPUIntegerCoordinate,
+    height: GPUIntegerCoordinate
+  ): undefined;
   //   /**
   //    * Sets the constant blend color and alpha values used with {@link GPUBlendFactor#"constant"}
   //    * and {@link GPUBlendFactor#"one-minus-constant"} {@link GPUBlendFactor}s.

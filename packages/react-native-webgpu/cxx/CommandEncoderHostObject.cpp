@@ -26,20 +26,20 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
       auto desc = arguments[0].asObject(runtime);
       auto colorAttachments = jsiArrayToVector<WGPURenderPassColorAttachment>(
         runtime, WGPU_ARRAY(desc, colorAttachments), [](Runtime &runtime, Value value) {
-          if (value.isNull()) {
-            // TODO: handle null state
-            return (const WGPURenderPassColorAttachment){0};
-          }
-          auto attachment = value.asObject(runtime);
-          return (const WGPURenderPassColorAttachment){
-            .view = WGPU_HOST_OBJ(attachment, view, TextureViewHostObject)->getValue(),
-            .depthSlice = WGPU_DEPTH_SLICE_UNDEFINED,
-            .resolveTarget = WGPU_HOST_OBJ_VALUE_OPT(attachment, resolveTarget, TextureViewHostObject, NULL),
-            .loadOp = StringToWGPULoadOp(WGPU_UTF8(attachment, loadOp)),
-            .storeOp = StringToWGPUStoreOp(WGPU_UTF8(attachment, storeOp)),
-            .clearValue = makeWGPUColorFromProp(runtime, attachment, "clearValue"),
-          };
-        });
+        if (value.isNull()) {
+          // TODO: handle null state
+          return (const WGPURenderPassColorAttachment){0};
+        }
+        auto attachment = value.asObject(runtime);
+        return (const WGPURenderPassColorAttachment){
+          .view = WGPU_HOST_OBJ(attachment, view, TextureViewHostObject)->getValue(),
+          .depthSlice = WGPU_DEPTH_SLICE_UNDEFINED,
+          .resolveTarget = WGPU_HOST_OBJ_VALUE_OPT(attachment, resolveTarget, TextureViewHostObject, NULL),
+          .loadOp = StringToWGPULoadOp(WGPU_UTF8(attachment, loadOp)),
+          .storeOp = StringToWGPUStoreOp(WGPU_UTF8(attachment, storeOp)),
+          .clearValue = makeWGPUColorFromProp(runtime, attachment, "clearValue"),
+        };
+      });
 
       auto label = WGPU_UTF8_OPT(desc, label, "");
 

@@ -25,8 +25,8 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
       auto commandsJsi = arguments[0].asObject(runtime).asArray(runtime);
       auto commands =
         jsiArrayToVector<WGPUCommandBuffer>(runtime, std::move(commandsJsi), [](Runtime &runtime, Value item) {
-          return item.asObject(runtime).asHostObject<CommandBufferHostObject>(runtime)->getValue();
-        });
+        return item.asObject(runtime).asHostObject<CommandBufferHostObject>(runtime)->getValue();
+      });
       wgpuQueueSubmit(_value, commands.size(), commands.data());
       _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();

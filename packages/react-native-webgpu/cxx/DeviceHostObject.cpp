@@ -210,15 +210,15 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
       auto layout = WGPU_HOST_OBJ(desc, layout, BindGroupLayoutHostObject);
       auto entries =
         jsiArrayToVector<WGPUBindGroupEntry>(runtime, WGPU_ARRAY(desc, entries), [](Runtime &runtime, Value value) {
-          auto obj = value.asObject(runtime);
-          auto resource = obj.getProperty(runtime, "resource");
+        auto obj = value.asObject(runtime);
+        auto resource = obj.getProperty(runtime, "resource");
 
-          WGPUBindGroupEntry entry = {
-            .binding = WGPU_NUMBER(obj, binding, uint32_t),
-          };
-          addWGPUBindingResource(runtime, resource, entry);
-          return entry;
-        });
+        WGPUBindGroupEntry entry = {
+          .binding = WGPU_NUMBER(obj, binding, uint32_t),
+        };
+        addWGPUBindingResource(runtime, resource, entry);
+        return entry;
+      });
 
       auto label = WGPU_UTF8_OPT(desc, label, "");
       WGPUBindGroupDescriptor descriptor = {
@@ -275,49 +275,49 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
     return WGPU_FUNC_FROM_HOST_FUNC(createBindGroupLayout, 1, [this]) {
       WGPU_LOG_FUNC_ARGS(createBindGroupLayout);
       auto desc = arguments[0].asObject(runtime);
-      auto entries = jsiArrayToVector<WGPUBindGroupLayoutEntry>(
-        runtime, WGPU_ARRAY(desc, entries), [](Runtime &runtime, Value value) {
-          auto obj = value.asObject(runtime);
-          WGPUBindGroupLayoutEntry entry = {
-            .binding = WGPU_NUMBER(obj, binding, uint32_t),
-            .visibility = WGPU_NUMBER(obj, visibility, WGPUShaderStageFlags),
+      auto entries = jsiArrayToVector<WGPUBindGroupLayoutEntry>(runtime, WGPU_ARRAY(desc, entries),
+                                                                [](Runtime &runtime, Value value) {
+        auto obj = value.asObject(runtime);
+        WGPUBindGroupLayoutEntry entry = {
+          .binding = WGPU_NUMBER(obj, binding, uint32_t),
+          .visibility = WGPU_NUMBER(obj, visibility, WGPUShaderStageFlags),
+        };
+        if (obj.hasProperty(runtime, "buffer")) {
+          auto buffer = obj.getPropertyAsObject(runtime, "buffer");
+          entry.buffer = {
+            .type = StringToWGPUBufferBindingType(WGPU_UTF8_OPT(buffer, type, "uniform")),
+            .hasDynamicOffset = WGPU_BOOL_OPT(buffer, hasDynamicOffset, false),
+            .minBindingSize = WGPU_NUMBER_OPT(buffer, minBindingSize, uint64_t, 0),
           };
-          if (obj.hasProperty(runtime, "buffer")) {
-            auto buffer = obj.getPropertyAsObject(runtime, "buffer");
-            entry.buffer = {
-              .type = StringToWGPUBufferBindingType(WGPU_UTF8_OPT(buffer, type, "uniform")),
-              .hasDynamicOffset = WGPU_BOOL_OPT(buffer, hasDynamicOffset, false),
-              .minBindingSize = WGPU_NUMBER_OPT(buffer, minBindingSize, uint64_t, 0),
-            };
-          }
-          if (obj.hasProperty(runtime, "texture")) {
-            auto texture = obj.getPropertyAsObject(runtime, "texture");
-            entry.texture = {
-              .nextInChain = nullptr,
-              .sampleType = StringToWGPUTextureSampleType(WGPU_UTF8_OPT(texture, sampleType, "float")),
-              .viewDimension = StringToWGPUTextureViewDimension(WGPU_UTF8_OPT(texture, viewDimension, "2d")),
-              .multisampled = WGPU_BOOL_OPT(texture, multisampled, false),
-            };
-          }
-          if (obj.hasProperty(runtime, "sampler")) {
-            auto sampler = obj.getPropertyAsObject(runtime, "sampler");
-            entry.sampler = {
-              .nextInChain = nullptr,
-              .type = StringToWGPUSamplerBindingType(WGPU_UTF8_OPT(sampler, type, "filtering")),
-            };
-          }
-          if (obj.hasProperty(runtime, "storageTexture")) {
-            auto storageTexture = WGPU_OBJ(obj, storageTexture);
-            entry.storageTexture = {
-              .nextInChain = nullptr,
-              .access = StringToWGPUStorageTextureAccess(WGPU_UTF8_OPT(storageTexture, access, "undefined")),
-              .format = StringToWGPUTextureFormat(WGPU_UTF8(storageTexture, format)),
-              .viewDimension =
-                StringToWGPUTextureViewDimension(WGPU_UTF8_OPT(storageTexture, viewDimension, "undefined")),
-            };
-          }
-          return entry;
-        });
+        }
+        if (obj.hasProperty(runtime, "texture")) {
+          auto texture = obj.getPropertyAsObject(runtime, "texture");
+          entry.texture = {
+            .nextInChain = nullptr,
+            .sampleType = StringToWGPUTextureSampleType(WGPU_UTF8_OPT(texture, sampleType, "float")),
+            .viewDimension = StringToWGPUTextureViewDimension(WGPU_UTF8_OPT(texture, viewDimension, "2d")),
+            .multisampled = WGPU_BOOL_OPT(texture, multisampled, false),
+          };
+        }
+        if (obj.hasProperty(runtime, "sampler")) {
+          auto sampler = obj.getPropertyAsObject(runtime, "sampler");
+          entry.sampler = {
+            .nextInChain = nullptr,
+            .type = StringToWGPUSamplerBindingType(WGPU_UTF8_OPT(sampler, type, "filtering")),
+          };
+        }
+        if (obj.hasProperty(runtime, "storageTexture")) {
+          auto storageTexture = WGPU_OBJ(obj, storageTexture);
+          entry.storageTexture = {
+            .nextInChain = nullptr,
+            .access = StringToWGPUStorageTextureAccess(WGPU_UTF8_OPT(storageTexture, access, "undefined")),
+            .format = StringToWGPUTextureFormat(WGPU_UTF8(storageTexture, format)),
+            .viewDimension =
+              StringToWGPUTextureViewDimension(WGPU_UTF8_OPT(storageTexture, viewDimension, "undefined")),
+          };
+        }
+        return entry;
+      });
 
       auto label = WGPU_UTF8_OPT(desc, label, "");
       WGPUBindGroupLayoutDescriptor descriptor = {
@@ -336,10 +336,10 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
     return WGPU_FUNC_FROM_HOST_FUNC(createPipelineLayout, 1, [this]) {
       WGPU_LOG_FUNC_ARGS(createPipelineLayout);
       auto desc = arguments[0].asObject(runtime);
-      auto layouts = jsiArrayToVector<WGPUBindGroupLayout>(
-        runtime, WGPU_ARRAY(desc, bindGroupLayouts), [](Runtime &runtime, Value value) {
-          return value.asObject(runtime).asHostObject<BindGroupLayoutHostObject>(runtime)->getValue();
-        });
+      auto layouts = jsiArrayToVector<WGPUBindGroupLayout>(runtime, WGPU_ARRAY(desc, bindGroupLayouts),
+                                                           [](Runtime &runtime, Value value) {
+        return value.asObject(runtime).asHostObject<BindGroupLayoutHostObject>(runtime)->getValue();
+      });
       auto label = WGPU_UTF8_OPT(desc, label, "");
       WGPUPipelineLayoutDescriptor descriptor = {
         .nextInChain = nullptr,
@@ -394,9 +394,9 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
       auto colorFormatsIn = WGPU_ARRAY(obj, colorFormats);
       auto colorFormats =
         jsiArrayToVector<WGPUTextureFormat>(runtime, std::move(colorFormatsIn), [](Runtime &runtime, Value value) {
-          auto format = value.asString(runtime).utf8(runtime);
-          return StringToWGPUTextureFormat(format);
-        });
+        auto format = value.asString(runtime).utf8(runtime);
+        return StringToWGPUTextureFormat(format);
+      });
       WGPURenderBundleEncoderDescriptor descriptor = {
         .nextInChain = nullptr,
         .label = label.data(),

@@ -75,8 +75,8 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
       auto bundlesIn = arguments[0].asObject(runtime).asArray(runtime);
       auto bundles =
         jsiArrayToVector<WGPURenderBundle>(runtime, std::move(bundlesIn), [](Runtime &runtime, Value value) {
-          return value.asObject(runtime).asHostObject<RenderBundleHostObject>(runtime)->getValue();
-        });
+        return value.asObject(runtime).asHostObject<RenderBundleHostObject>(runtime)->getValue();
+      });
       wgpuRenderPassEncoderExecuteBundles(_value, bundles.size(), bundles.data());
       _context->getErrorHandler()->throwPendingJSIError();
       return Value::undefined();

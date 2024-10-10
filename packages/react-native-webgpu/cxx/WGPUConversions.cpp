@@ -54,12 +54,12 @@ ConstantEntries wgpu::makeWGPUConstantEntries(Runtime &runtime, AutoReleasePool 
     auto constantsOut = jsiArrayToVector<WGPUConstantEntry>(
       runtime, constantsIn.getPropertyNames(runtime),
       [constantsIn = std::move(constantsIn), &autoReleasePool](Runtime &runtime, const Value &value) {
-        auto key = autoReleasePool.addString(runtime, value);
-        return (WGPUConstantEntry){
-          .key = key->data(),
-          .value = constantsIn.getProperty(runtime, key->data()).asNumber(),
-        };
-      });
+      auto key = autoReleasePool.addString(runtime, value);
+      return (WGPUConstantEntry){
+        .key = key->data(),
+        .value = constantsIn.getProperty(runtime, key->data()).asNumber(),
+      };
+    });
     constants = std::make_shared<std::vector<WGPUConstantEntry>>(constantsOut);
   }
   autoReleasePool.add(constants);
@@ -78,10 +78,10 @@ WGPUVertexState wgpu::makeGPUVertexState(Runtime &runtime, AutoReleasePool &auto
   };
   if (obj.hasProperty(runtime, "buffers")) {
     auto buffersIn = WGPU_ARRAY(obj, buffers);
-    auto buffers = jsiArrayToVector<WGPUVertexBufferLayout>(
-      runtime, std::move(buffersIn), [&autoReleasePool](Runtime &runtime, const Value &value) {
-        return makeWGPUVertexBufferLayout(runtime, autoReleasePool, value);
-      });
+    auto buffers = jsiArrayToVector<WGPUVertexBufferLayout>(runtime, std::move(buffersIn),
+                                                            [&autoReleasePool](Runtime &runtime, const Value &value) {
+      return makeWGPUVertexBufferLayout(runtime, autoReleasePool, value);
+    });
     auto sharedBuffers = std::make_shared<std::vector<WGPUVertexBufferLayout>>(buffers);
     autoReleasePool.add(sharedBuffers);
     state.buffers = sharedBuffers->data();
@@ -93,16 +93,16 @@ WGPUVertexState wgpu::makeGPUVertexState(Runtime &runtime, AutoReleasePool &auto
 WGPUFragmentState wgpu::makeGPUFragmentState(Runtime &runtime, AutoReleasePool &autoReleasePool, const Object &obj) {
   auto targets =
     jsiArrayToVector<WGPUColorTargetState>(runtime, WGPU_ARRAY(obj, targets), [](Runtime &runtime, const Value &value) {
-      if (value.isNull()) {
-        // TODO: handle null state
-        return (const WGPUColorTargetState){nullptr};
-      }
-      auto target = value.asObject(runtime);
-      return (const WGPUColorTargetState){
-        .format = StringToWGPUTextureFormat(WGPU_UTF8(target, format)),
-        .writeMask = WGPU_NUMBER_OPT(target, writeMask, WGPUColorWriteMaskFlags, WGPUColorWriteMask_All),
-      };
-    });
+    if (value.isNull()) {
+      // TODO: handle null state
+      return (const WGPUColorTargetState){nullptr};
+    }
+    auto target = value.asObject(runtime);
+    return (const WGPUColorTargetState){
+      .format = StringToWGPUTextureFormat(WGPU_UTF8(target, format)),
+      .writeMask = WGPU_NUMBER_OPT(target, writeMask, WGPUColorWriteMaskFlags, WGPUColorWriteMask_All),
+    };
+  });
   auto sharedTargets = std::make_shared<std::vector<WGPUColorTargetState>>(targets);
   autoReleasePool.add(sharedTargets);
   auto entryPoint = autoReleasePool.addString(runtime, obj.getProperty(runtime, "entryPoint"));

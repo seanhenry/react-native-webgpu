@@ -170,14 +170,13 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
 
       auto formats = cArrayToJsi(runtime, capabilities.formats, capabilities.formatCount,
                                  [](Runtime &runtime, WGPUTextureFormat format) {
-                                   return Value(String::createFromAscii(runtime, WGPUTextureFormatToString(format)));
-                                 });
+        return Value(String::createFromAscii(runtime, WGPUTextureFormatToString(format)));
+      });
 
-      auto alphaModes =
-        cArrayToJsi(runtime, capabilities.alphaModes, capabilities.alphaModeCount,
-                    [](Runtime &runtime, WGPUCompositeAlphaMode alphaMode) {
-                      return Value(String::createFromAscii(runtime, WGPUCompositeAlphaModeToString(alphaMode)));
-                    });
+      auto alphaModes = cArrayToJsi(runtime, capabilities.alphaModes, capabilities.alphaModeCount,
+                                    [](Runtime &runtime, WGPUCompositeAlphaMode alphaMode) {
+        return Value(String::createFromAscii(runtime, WGPUCompositeAlphaModeToString(alphaMode)));
+      });
 
       auto result = Object(runtime);
       result.setProperty(runtime, PropNameID::forAscii(runtime, "formats"), std::move(formats));

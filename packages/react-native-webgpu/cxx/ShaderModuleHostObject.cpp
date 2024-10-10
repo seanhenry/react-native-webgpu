@@ -13,14 +13,14 @@ void wgpuShaderModuleGetCompilationInfoCallback(WGPUCompilationInfoRequestStatus
   if (status == WGPUCompilationInfoRequestStatus_Success) {
     auto messages = cArrayToJsi(runtime, compilationInfo->messages, compilationInfo->messageCount,
                                 [](Runtime &runtime, WGPUCompilationMessage item) {
-                                  auto obj = Object(runtime);
-                                  obj.setProperty(runtime, "message", String::createFromUtf8(runtime, item.message));
-                                  obj.setProperty(runtime, "lineNum", Value((int)item.lineNum));
-                                  obj.setProperty(runtime, "linePos", Value((int)item.linePos));
-                                  obj.setProperty(runtime, "offset", Value((int)item.offset));
-                                  obj.setProperty(runtime, "length", Value((int)item.length));
-                                  return obj;
-                                });
+      auto obj = Object(runtime);
+      obj.setProperty(runtime, "message", String::createFromUtf8(runtime, item.message));
+      obj.setProperty(runtime, "lineNum", Value((int)item.lineNum));
+      obj.setProperty(runtime, "linePos", Value((int)item.linePos));
+      obj.setProperty(runtime, "offset", Value((int)item.offset));
+      obj.setProperty(runtime, "length", Value((int)item.length));
+      return obj;
+    });
 
     auto result = Object(runtime);
     result.setProperty(runtime, "messages", messages);

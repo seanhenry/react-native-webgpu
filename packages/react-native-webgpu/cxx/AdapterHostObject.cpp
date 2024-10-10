@@ -59,9 +59,9 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
             auto requiredFeaturesIn = obj.getPropertyAsObject(runtime, "requiredFeatures").asArray(runtime);
             requiredFeatures = jsiArrayToVector<WGPUFeatureName>(runtime, std::move(requiredFeaturesIn),
                                                                  [](Runtime &runtime, Value value) {
-                                                                   auto str = value.asString(runtime).utf8(runtime);
-                                                                   return StringToWGPUFeatureName(str);
-                                                                 });
+              auto str = value.asString(runtime).utf8(runtime);
+              return StringToWGPUFeatureName(str);
+            });
             descriptor.requiredFeatures = requiredFeatures.data();
             descriptor.requiredFeatureCount = requiredFeatures.size();
           }

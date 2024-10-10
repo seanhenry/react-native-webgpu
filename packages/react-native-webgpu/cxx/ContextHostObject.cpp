@@ -20,6 +20,10 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
   if (name == "getCurrentTexture") {
     return WGPU_FUNC_FROM_HOST_FUNC(getCurrentTexture, 0, [this]) {
       WGPU_LOG_FUNC_ARGS(getCurrentTexture);
+      auto surface = _surface.lock();
+      if (surface == nullptr) {
+        return Value::null();
+      }
       if (_configuredContext == nullptr) {
         // TODO: warn
         return Value::null();
@@ -30,7 +34,7 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
           runtime, std::make_shared<TextureHostObject>(_texture, _configuredContext, "[WEBGPU] SurfaceTexture", true));
       }
       WGPUSurfaceTexture texture;
-      wgpuSurfaceGetCurrentTexture(_surface->getWGPUSurface(), &texture);
+      wgpuSurfaceGetCurrentTexture(surface->getWGPUSurface(), &texture);
       throwPendingJSIError();
       if (texture.status == WGPUSurfaceGetCurrentTextureStatus_Success) {
         _texture = texture.texture;
@@ -52,10 +56,16 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
   if (name == "presentSurface") {
     return WGPU_FUNC_FROM_HOST_FUNC(present, 0, [this]) {
       WGPU_LOG_FUNC_ARGS(present);
-      // [Surface texture note 3] assuming we called getCurrentTexture() we have a surface
-      // texture. Once the surface is presented, we release it, so we can get the next one.
+      auto surface = _surface.lock();
+      if (surface == nullptr) {
+        jsLog(runtime, "warn", {"Surface was released from memory"});
+        return Value::undefined();
+      }
+      // [Surface texture note 3] assuming we called getCurrentTexture() we have
+      // a surface texture. Once the surface is presented, we release it, so we
+      // can get the next one.
       if (_texture != nullptr) {
-        wgpuSurfacePresent(_surface->getWGPUSurface());
+        wgpuSurfacePresent(surface->getWGPUSurface());
         wgpuTextureRelease(_texture);
         _texture = nullptr;
         throwPendingJSIError();
@@ -71,6 +81,12 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
   if (name == "configure") {
     return WGPU_FUNC_FROM_HOST_FUNC(configure, 0, [this]) {
       WGPU_LOG_FUNC_ARGS(configure);
+      auto surface = _surface.lock();
+      if (surface == nullptr) {
+        jsLog(runtime, "warn", {"Surface was released from memory"});
+        return Value::undefined();
+      }
+
       auto options = arguments[0].asObject(runtime);
       auto device = WGPU_HOST_OBJ(options, device, DeviceHostObject);
       auto format = WGPU_UTF8(options, format);
@@ -81,7 +97,7 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
       WGPUSurfaceCapabilities capabilities = {
         .formatCount = 0,
       };
-      wgpuSurfaceGetCapabilities(_surface->getWGPUSurface(), device->getAdapter(), &capabilities);
+      wgpuSurfaceGetCapabilities(surface->getWGPUSurface(), device->getAdapter(), &capabilities);
 
       if (capabilities.alphaModeCount == 0) {
         throw JSError(runtime, "Surface had 0 alpha modes");
@@ -95,8 +111,8 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
               {"Alpha mode", alphaModeStr, "is not valid. Using", WGPUCompositeAlphaModeToString(alphaMode)});
       }
 
-      auto width = _surface->getPixelWidth();
-      auto height = _surface->getPixelHeight();
+      auto width = surface->getPixelWidth();
+      auto height = surface->getPixelHeight();
 
       if (width == 0 || height == 0) {
         throw JSError(runtime, "[WebGPU] Metal layer size was 0");
@@ -113,10 +129,10 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
         .height = height,
         .presentMode = WGPUPresentMode_Fifo,  // TODO:
       };
-      wgpuSurfaceConfigure(_surface->getWGPUSurface(), &config);
+      wgpuSurfaceConfigure(surface->getWGPUSurface(), &config);
       _configuredContext = device->getContext();
       throwPendingJSIError();
-      _surface->createTimer();
+      surface->createTimer(device->getContext()->getJSIInstance());
 
       return Value::undefined();
     });
@@ -129,9 +145,12 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
         wgpuTextureRelease(_texture);
         _texture = nullptr;
       }
-      _surface->invalidateTimer();
-      wgpuSurfaceUnconfigure(_surface->getWGPUSurface());
-      throwPendingJSIError();
+      auto surface = _surface.lock();
+      if (surface != nullptr) {
+        surface->invalidateTimer();
+        wgpuSurfaceUnconfigure(surface->getWGPUSurface());
+        throwPendingJSIError();
+      }
       _configuredContext = nullptr;
       return Value::undefined();
     });
@@ -140,11 +159,14 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
   if (name == "surfaceCapabilities") {
     return WGPU_FUNC_FROM_HOST_FUNC(surfaceCapabilities, 1, [this]) {
       WGPU_LOG_FUNC_ARGS(surfaceCapabilities);
+      auto surface = _surface.lock();
+      if (surface == nullptr) {
+        throw JSINativeException("Surface was released from memory");
+      }
       auto adapter = arguments[0].asObject(runtime).asHostObject<AdapterHostObject>(runtime)->_adapter->_adapter;
-      auto surface = _surface->getWGPUSurface();
 
       WGPUSurfaceCapabilities capabilities;
-      wgpuSurfaceGetCapabilities(surface, adapter, &capabilities);
+      wgpuSurfaceGetCapabilities(surface->getWGPUSurface(), adapter, &capabilities);
 
       auto formats = cArrayToJsi(runtime, capabilities.formats, capabilities.formatCount,
                                  [](Runtime &runtime, WGPUTextureFormat format) {
@@ -169,23 +191,28 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
   }
 
   if (name == "width") {
-    return Value((int)_surface->getPixelWidth());
+    auto surface = _surface.lock();
+    return Value(surface != nullptr ? (int)surface->getPixelWidth() : 0);
   }
 
   if (name == "height") {
-    return Value((int)_surface->getPixelHeight());
+    auto surface = _surface.lock();
+    return Value(surface != nullptr ? (int)surface->getPixelHeight() : 0);
   }
 
   if (name == "pointWidth") {
-    return Value((int)_surface->getPointWidth());
+    auto surface = _surface.lock();
+    return Value(surface != nullptr ? (int)surface->getPointWidth() : 0);
   }
 
   if (name == "pointHeight") {
-    return Value((int)_surface->getPointHeight());
+    auto surface = _surface.lock();
+    return Value(surface != nullptr ? (int)surface->getPointHeight() : 0);
   }
 
   if (name == "scale") {
-    return Value(_surface->getScale());
+    auto surface = _surface.lock();
+    return Value(surface != nullptr ? surface->getScale() : 1);
   }
 
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;

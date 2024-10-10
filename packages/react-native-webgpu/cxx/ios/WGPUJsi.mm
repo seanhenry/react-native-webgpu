@@ -1,15 +1,24 @@
 #import "WGPUJsi.h"
 #import <React-callinvoker/ReactCommon/CallInvoker.h>
 #import <jsi/jsi.h>
-#include "InstallRootJSI.h"
-#include "JSIInstance.h"
+#import <memory>
+#import <string>
+#import "InstallRootJSI.h"
+#import "JSIInstance.h"
 #import "React/RCTBridge+Private.h"
+#import "ThreadManager.h"
 #import "WGPUObjCInstance.h"
 #import "webgpu.h"
 
 using namespace facebook::react;
 using namespace facebook::jsi;
 using namespace wgpu;
+
+#ifdef WGPU_ENABLE_THREADS
+const BOOL WGPUEnableThreads = YES;
+#else
+const BOOL WGPUEnableThreads = NO;
+#endif
 
 @interface RCTBridge ()
 - (std::shared_ptr<CallInvoker>)jsCallInvoker;
@@ -22,7 +31,13 @@ RCT_EXPORT_MODULE(WGPUJsi)
 @synthesize bridge;
 @synthesize moduleRegistry;
 
-RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
+- (NSDictionary *)constantsToExport {
+  return @{
+    @"ENABLE_THREADS" : @(WGPUEnableThreads),
+  };
+}
+
+RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSNumber *, installWithThreadId:(NSString *)threadId) {
   RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
   if (cxxBridge == nil) {
     NSLog(@"Cxx bridge not found");
@@ -31,16 +46,31 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
 
   auto &runtime = *(Runtime *)cxxBridge.runtime;
 
-  auto surfaces = std::make_shared<std::unordered_map<std::string, std::shared_ptr<Surface>>>();
-  JSIInstance::instance = std::make_unique<JSIInstance>(runtime, std::make_shared<Thread>([cxxBridge jsCallInvoker]));
-  JSIInstance::instance->onCreateSurface = [surfaces](std::string uuid, std::shared_ptr<Surface> surface) {
-    surfaces->insert_or_assign(uuid, surface);
-  };
+  auto jsiInstance = std::make_shared<JSIInstance>(runtime, std::make_shared<Thread>([cxxBridge jsCallInvoker]));
   [[WGPUObjCInstance shared] loadModules:moduleRegistry];
 
-  installRootJSI(runtime, surfaces);
+  installRootJSI(runtime, jsiInstance);
+
+#ifdef WGPU_ENABLE_THREADS
+  std::string threadIdStr = threadId.UTF8String;
+  ThreadManager::getInstance()->setJSIInstance(jsiInstance, threadIdStr);
+  ThreadManager::getInstance()->installJsi(runtime);
+#endif
 
   return @(YES);
 }
+
+#ifdef RCT_NEW_ARCH_ENABLED
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+  (const facebook::react::ObjCTurboModule::InitParams &)params {
+  return std::make_shared<facebook::react::NativeWebgpuModuleSpecJSI>(params);
+}
+
+- (facebook::react::ModuleConstants<JS::NativeWebgpuModule::Constants::Builder>)getConstants {
+  return [self constantsToExport];
+}
+
+#endif
 
 @end

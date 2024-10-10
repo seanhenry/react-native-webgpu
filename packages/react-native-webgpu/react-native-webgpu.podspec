@@ -4,6 +4,8 @@ package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 folly_compiler_flags = '-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -Wno-comma -Wno-shorten-64-to-32'
 
 Pod::Spec.new do |s|
+  enable_threads = defined?($WGPUEnableThreads) && $WGPUEnableThreads == true
+
   s.name         = "react-native-webgpu"
   s.version      = package["version"]
   s.summary      = package["description"]
@@ -14,7 +16,7 @@ Pod::Spec.new do |s|
   s.platforms    = { :ios => min_ios_version_supported }
   s.source       = { :git => "https://github.com/seanhenry/react-native-webgpu.git", :tag => "#{s.version}" }
 
-  s.source_files = ["cxx/*.{hpp,h,cpp,c}", "cxx/ios/*.{hpp,h,m,mm,cpp,c}", "include/webgpu.h", "include/wgpu.h"]
+  s.source_files = ["cxx/*.{hpp,h,cpp,c}", "cxx/ios/**/*.{hpp,h,m,mm,cpp,c}", "include/webgpu.h", "include/wgpu.h"]
 
   pods_root = ENV['PWD']
   relative_path_to_libs = Pathname.new("#{__dir__}/bin").relative_path_from(Pathname.new(pods_root)).to_s
@@ -23,6 +25,13 @@ Pod::Spec.new do |s|
     "OTHER_LDFLAGS[sdk=iphoneos*]" => '$(inherited) -l"wgpu_native_ios_aarch64"',
     "LIBRARY_SEARCH_PATHS" => "\"#{relative_path_to_libs}\"",
   }
+  if enable_threads
+    Pod::UI.puts "#{s.name}: Turning on experimental threads feature"
+    s.pod_target_xcconfig = {
+      "HEADER_SEARCH_PATHS" => %("$(PODS_ROOT)/Headers/Private/React-RuntimeApple" "$(PODS_ROOT)/Headers/Private/React-RuntimeCore" "$(PODS_ROOT)/Headers/Private/React-RuntimeHermes" "$(PODS_ROOT)/Headers/Private/React-jserrorhandler"),
+      "GCC_PREPROCESSOR_DEFINITIONS" => "WGPU_ENABLE_THREADS=1",
+    }
+  end
 
   # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.
   # See https://github.com/facebook/react-native/blob/febf6b7f33fdb4904669f99d795eba4c0f95d7bf/scripts/cocoapods/new_architecture.rb#L79.

@@ -3,7 +3,9 @@
 #include <jsi/jsi.h>
 
 #include <functional>
+#include <memory>
 
+#include "JSIInstance.h"
 #include "WGPUWrappers.h"
 #include "webgpu.h"
 
@@ -58,7 +60,7 @@ class Surface : public std::enable_shared_from_this<Surface> {
   inline float getPointWidth() { return _size.pointWidth; }
   inline float getPointHeight() { return _size.pointHeight; }
   void requestAnimationFrame(Function fn);
-  void createTimer();
+  void createTimer(std::shared_ptr<JSIInstance> jsiInstance);
   void invalidateTimer();
 
  private:

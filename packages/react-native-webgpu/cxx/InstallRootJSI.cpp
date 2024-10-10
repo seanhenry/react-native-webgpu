@@ -9,6 +9,7 @@
 #include "CreateImageBitmap.h"
 #include "Promise.h"
 #include "Surface.h"
+#include "SurfacesManager.h"
 #include "VideoPlayer.h"
 #include "WGPUJsiUtils.h"
 
@@ -23,35 +24,43 @@ using namespace facebook::jsi;
 static void wgpuHandleRequestAdapter(WGPURequestAdapterStatus status, WGPUAdapter adapter, char const *message,
                                      void *userdata);
 typedef struct HandleRequestAdapterData {
-  std::shared_ptr<Surface> optionalSurface;
+  std::weak_ptr<Surface> optionalSurface;
+  std::shared_ptr<JSIInstance> jsiInstance;
 } HandleRequestAdapterData;
 
-void wgpu::installRootJSI(
-  Runtime &runtime, const std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<Surface>>> &newSurfaces) {
-  auto getSurfaceBackedWebGPU = WGPU_FUNC_FROM_HOST_FUNC(getWebGPUForSurface, 1, [newSurfaces]) {
+void wgpu::installRootJSI(Runtime &runtime, std::shared_ptr<JSIInstance> jsiInstance) {
+  auto getSurfaceBackedWebGPU = WGPU_FUNC_FROM_HOST_FUNC(getWebGPUForSurface, 1, [jsiInstance]) {
     auto uuid = arguments[0].asString(runtime).utf8(runtime);
-    auto surfaceHandle = newSurfaces->extract(uuid);
-    if (surfaceHandle.empty()) {
-      throw JSError(runtime, "getWebGPUForSurface failed to find surface");
+    auto weakSurface = SurfacesManager::getInstance()->get(uuid);
+    if (weakSurface.expired()) {
+      throw JSINativeException("getWebGPUForSurface failed to find surface");
     }
-    auto surface = std::move(surfaceHandle.mapped());
-    (*JSIInstance::instance->weakSurfaces)[uuid] = surface;
 
     auto result = Object(runtime);
 
     result.setProperty(runtime, "context",
-                       Object::createFromHostObject(runtime, std::make_shared<ContextHostObject>(surface)));
-    result.setProperty(runtime, "requestAnimationFrame", WGPU_FUNC_FROM_HOST_FUNC(requestAnimationFrame, 1, [surface]) {
-      surface->requestAnimationFrame(arguments[0].asObject(runtime).asFunction(runtime));
+                       Object::createFromHostObject(runtime, std::make_shared<ContextHostObject>(weakSurface)));
+    result.setProperty(runtime, "requestAnimationFrame", WGPU_FUNC_FROM_HOST_FUNC(requestAnimationFrame, 1, [weakSurface]) {
+      auto surface = weakSurface.lock();
+      if (surface != nullptr) {
+        surface->requestAnimationFrame(arguments[0].asObject(runtime).asFunction(runtime));
+      }
       return Value::undefined();
     }));
 
     auto gpu = Object(runtime);
-    gpu.setProperty(runtime, "requestAdapter", WGPU_FUNC_FROM_HOST_FUNC(requestAdapter, 1, [surface]) {
+    gpu.setProperty(runtime, "requestAdapter", WGPU_FUNC_FROM_HOST_FUNC(requestAdapter, 1, [weakSurface, jsiInstance]) {
       auto promise = new Promise<HandleRequestAdapterData>(runtime);
-      return promise->jsPromise([promise, surface]() {
+      return promise->jsPromise([promise, weakSurface, jsiInstance]() {
+        auto surface = weakSurface.lock();
+        if (surface == nullptr) {
+          promise->reject(makeJSError(promise->runtime, "Surface was released from memory"));
+          delete promise;
+          return;
+        }
         promise->data = {
-          .optionalSurface = surface,
+          .optionalSurface = weakSurface,
+          .jsiInstance = jsiInstance,
         };
         WGPURequestAdapterOptions adapterOptions = {
           .nextInChain = nullptr,
@@ -64,7 +73,13 @@ void wgpu::installRootJSI(
         wgpuInstanceRequestAdapter(surface->getWGPUInstance(), &adapterOptions, wgpuHandleRequestAdapter, promise);
       });
     }));
-    gpu.setProperty(runtime, "getPreferredCanvasFormat", WGPU_FUNC_FROM_HOST_FUNC(getPreferredCanvasFormat, 0, [surface]) {
+    gpu.setProperty(runtime, "getPreferredCanvasFormat", WGPU_FUNC_FROM_HOST_FUNC(getPreferredCanvasFormat, 0, [weakSurface]) {
+      auto surface = weakSurface.lock();
+      if (surface == nullptr) {
+        jsLog(runtime, "warn", {"Surface was released from memory"});
+
+        return String::createFromUtf8(runtime, defaultTextureFormat);
+      }
       auto adapter = surface->getUnownedWGPUAdapter().lock();
       if (adapter == nullptr) {
         jsLog(runtime, "warn",
@@ -90,14 +105,18 @@ void wgpu::installRootJSI(
     return std::move(result);
   });
 
-  auto getHeadlessWebGPU = WGPU_FUNC_FROM_HOST_FUNC(getWebGPUForHeadless, 0, []) {
+  auto getHeadlessWebGPU = WGPU_FUNC_FROM_HOST_FUNC(getWebGPUForHeadless, 0, [jsiInstance]) {
     // context, requestAnimationFrame, getPreferredCanvasFormat don't make sense without a
     // surface
     auto result = Object(runtime);
 
     auto gpu = Object(runtime);
-    gpu.setProperty(runtime, "requestAdapter", WGPU_FUNC_FROM_HOST_FUNC(requestAdapter, 1, []) {
+    gpu.setProperty(runtime, "requestAdapter", WGPU_FUNC_FROM_HOST_FUNC(requestAdapter, 1, [jsiInstance]) {
       auto promise = new Promise<HandleRequestAdapterData>(runtime);
+      promise->data = {
+        .optionalSurface = std::shared_ptr<Surface>(),
+        .jsiInstance = jsiInstance,
+      };
       return promise->jsPromise([promise]() {
         auto instance = wgpuCreateInstance(nullptr);
 
@@ -127,7 +146,7 @@ void wgpu::installRootJSI(
   });
 
   auto webgpu = Object(runtime);
-  webgpu.setProperty(runtime, "createImageBitmap", createImageBitmap(runtime));
+  webgpu.setProperty(runtime, "createImageBitmap", createImageBitmap(runtime, jsiInstance));
   webgpu.setProperty(runtime, "getSurfaceBackedWebGPU", std::move(getSurfaceBackedWebGPU));
   webgpu.setProperty(runtime, "getHeadlessWebGPU", std::move(getHeadlessWebGPU));
   auto experimental = Object(runtime);
@@ -145,10 +164,12 @@ static void wgpuHandleRequestAdapter(WGPURequestAdapterStatus status, WGPUAdapte
 
   if (status == WGPURequestAdapterStatus_Success) {
     auto adapterWrapper = std::make_shared<AdapterWrapper>(adapter);
-    if (promise->data.optionalSurface != nullptr) {
-      promise->data.optionalSurface->setAdapter(adapterWrapper);
+    auto surface = promise->data.optionalSurface.lock();
+    if (surface != nullptr) {
+      surface->setAdapter(adapterWrapper);
     }
-    auto adapterHostObject = Object::createFromHostObject(runtime, std::make_shared<AdapterHostObject>(adapterWrapper));
+    auto adapterHostObject = Object::createFromHostObject(
+      runtime, std::make_shared<AdapterHostObject>(adapterWrapper, promise->data.jsiInstance));
     promise->resolve(std::move(adapterHostObject));
   } else {
     std::ostringstream ss;

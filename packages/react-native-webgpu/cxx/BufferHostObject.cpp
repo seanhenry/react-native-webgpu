@@ -126,7 +126,7 @@ static std::string mapAsyncStatusToString(WGPUBufferMapAsyncStatus status) {
 static void wgpuHandleMapAsync(WGPUBufferMapAsyncStatus status, void *userdata) {
   auto promise = (Promise<HandleMapAsyncData> *)userdata;
   *promise->data.isReady = true;
-  JSIInstance::instance->jsThread->run([status, promise]() {
+  promise->data.context->runOnJsThread([status, promise]() {
     if (status == WGPUBufferMapAsyncStatus_Success) {
       promise->resolve(Value::undefined());
     } else {

@@ -10,4 +10,8 @@ import {install} from 'react-native-webgpu';
 import 'react-native-webgpu-three';
 
 install();
+global.reactNativeWebGPUThreads.spawn({
+  bundleId: 'myThread',
+  threadId: 'myThread-0',
+});
 AppRegistry.registerComponent(appName, () => App);

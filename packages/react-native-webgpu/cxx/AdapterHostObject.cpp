@@ -20,6 +20,7 @@ static void wgpuHandleRequestDevice(WGPURequestDeviceStatus status, WGPUDevice d
 typedef struct HandleRequestDeviceUserData {
   std::shared_ptr<AdapterWrapper> adapter;
   std::shared_ptr<ErrorHandler> errorHandler;
+  std::shared_ptr<JSIInstance> jsiInstance;
 } HandleRequestDeviceUserData;
 
 Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
@@ -40,6 +41,7 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
         promise->data = (const HandleRequestDeviceUserData){
           .adapter = _adapter,
           .errorHandler = errorHandler,
+          .jsiInstance = _jsiInstance,
         };
         std::vector<WGPUFeatureName> requiredFeatures;
         WGPUDeviceDescriptor descriptor = {nullptr};
@@ -105,7 +107,8 @@ static void wgpuHandleRequestDevice(WGPURequestDeviceStatus status, WGPUDevice d
 
   if (status == WGPURequestDeviceStatus_Success) {
     auto deviceWrapper = std::make_shared<DeviceWrapper>(device);
-    auto context = std::make_shared<WGPUContext>(promise->data.adapter, deviceWrapper, promise->data.errorHandler);
+    auto context = std::make_shared<WGPUContext>(promise->data.adapter, deviceWrapper, promise->data.errorHandler,
+                                                 promise->data.jsiInstance);
     auto deviceHostObject =
       Object::createFromHostObject(runtime, std::make_shared<DeviceHostObject>(deviceWrapper, context));
     promise->resolve(std::move(deviceHostObject));

@@ -34,6 +34,7 @@ import {FlakesTexture} from '../InHouse/FlakesTexture';
 import {VolumeRendering} from '../WebGPUSamples/GraphicsTechniques/VolumeRendering/VolumeRendering';
 import {SkinnedMesh} from '../WebGPUSamples/GraphicsTechniques/SkinnedMesh/SkinnedMesh';
 import {Video} from '../InHouse/Video';
+import {Thread} from '../InHouse/Thread';
 
 export type Examples = 'WebGPUSamples' | 'Three' | 'InHouse';
 
@@ -79,7 +80,8 @@ export type Example =
   | 'GLTFLoader'
   // InHouse
   | 'FlakesTexture'
-  | 'Video';
+  | 'Video'
+  | 'Thread';
 
 const examples: Record<Example, ComponentType> = {
   // BasicGraphics
@@ -124,6 +126,7 @@ const examples: Record<Example, ComponentType> = {
   // InHouse
   FlakesTexture,
   Video,
+  Thread,
 };
 
 export function ExampleScreen() {

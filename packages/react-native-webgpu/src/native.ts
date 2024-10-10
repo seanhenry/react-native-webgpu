@@ -1,12 +1,12 @@
 import {
   Image,
   type ImageSourcePropType,
-  NativeModules,
   type NativeSyntheticEvent,
   Platform,
   requireNativeComponent,
   type ViewProps,
 } from 'react-native';
+import { NativeWebgpuModule } from './specs';
 
 const LINKING_ERROR =
   `The package 'react-native-webgpu' doesn't seem to be linked. Make sure: \n\n` +
@@ -23,9 +23,8 @@ export type WGPUWebGPUViewProps = ViewProps & {
 
 export const WGPUWebGPUView =
   requireNativeComponent<WGPUWebGPUViewProps>('WGPUWebGPUView');
-const webGpuJsi = NativeModules.WGPUJsi;
 
-if (!webGpuJsi) {
+if (!NativeWebgpuModule) {
   throw new Error(LINKING_ERROR);
 }
 
@@ -38,11 +37,20 @@ function createImageBitmap(source: ImageSourcePropType) {
   return __reactNativeWebGPU.createImageBitmap(resolvedSource);
 }
 
-globalThis.reactNativeWebGPU = new Proxy(__reactNativeWebGPU, {
-  get: function (target, prop, receiver) {
-    if (prop === 'createImageBitmap') {
-      return createImageBitmap;
-    }
-    return Reflect.get(target, prop, receiver);
-  },
-});
+export const installWithThreadId = (threadId: string) => {
+  if (!NativeWebgpuModule.installWithThreadId(threadId)) {
+    throw new Error('Failed to install JSI');
+  }
+  globalThis.reactNativeWebGPU = new Proxy(__reactNativeWebGPU, {
+    get: function (target, prop, receiver) {
+      if (prop === 'createImageBitmap') {
+        return createImageBitmap;
+      }
+      return Reflect.get(target, prop, receiver);
+    },
+  });
+};
+
+export const install = () => installWithThreadId('__js');
+
+export const { ENABLE_THREADS } = NativeWebgpuModule.getConstants();

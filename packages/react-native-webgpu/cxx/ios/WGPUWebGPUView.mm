@@ -1,18 +1,20 @@
 #import "WGPUWebGPUView.h"
 #import <React/RCTBridgeConstants.h>
 #include <memory>
-#include "JSIInstance.h"
 #include "Surface.h"
+#include "SurfacesManager.h"
 #include "webgpu.h"
 
 using namespace wgpu;
 
-typedef struct SurfaceObjCWrapper {
-  std::shared_ptr<Surface> surface;
-} SurfaceObjCWrapper;
+@interface WGPUWebGPUView ()
+
+@property(nonatomic, readonly) std::string uuidCxxString;
+
+@end
 
 @implementation WGPUWebGPUView {
-  SurfaceObjCWrapper wrapper;
+  std::shared_ptr<Surface> _surface;
 }
 
 + (Class)layerClass {
@@ -71,7 +73,7 @@ typedef struct SurfaceObjCWrapper {
 }
 
 - (void)createSurface {
-  if (self->wrapper.surface != nullptr || ![self hasNonZeroSize]) {
+  if (self->_surface != nullptr || ![self hasNonZeroSize]) {
     return;
   }
   struct WGPUSurfaceDescriptorFromMetalLayer descriptorFromMetalLayer = {
@@ -112,25 +114,24 @@ typedef struct SurfaceObjCWrapper {
 
   auto managedSurface = std::make_shared<Surface>(instance, surface, surfaceSize);
 
-  self->wrapper.surface = managedSurface;
+  self->_surface = managedSurface;
 
-  __weak WGPUWebGPUView *weakSelf = self;
-  JSIInstance::instance->jsThread->run([managedSurface, weakSelf]() {
-    WGPUWebGPUView *strongSelf = weakSelf;
-    if (strongSelf == nil) {
-      return;
-    }
-    std::string uuidStr = [strongSelf.uuid cStringUsingEncoding:NSUTF8StringEncoding];
-    JSIInstance::instance->onCreateSurface(std::move(uuidStr), managedSurface);
-    strongSelf.onCreateSurface(@{@"uuid" : strongSelf.uuid});
-  });
+  auto uuidStr = self.uuidCxxString;
+  SurfacesManager::getInstance()->set(uuidStr, managedSurface);
+  self.onCreateSurface(@{@"uuid" : self.uuid});
 }
 
 - (void)deleteSurface {
-  if (self->wrapper.surface != nullptr) {
-    self->wrapper.surface->invalidateTimer();
-    self->wrapper.surface = nullptr;
+  if (self->_surface != nullptr) {
+    auto uuidStr = self.uuidCxxString;
+    SurfacesManager::getInstance()->remove(uuidStr);
+    self->_surface->invalidateTimer();
+    self->_surface = nullptr;
   }
+}
+
+- (std::string)uuidCxxString {
+  return [self.uuid cStringUsingEncoding:NSUTF8StringEncoding];
 }
 
 // TODO: update surface size

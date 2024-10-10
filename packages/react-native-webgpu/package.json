@@ -74,6 +74,7 @@
     "eslint-plugin-prettier": "^5.0.1",
     "jest": "^29.7.0",
     "prettier": "^3.0.3",
+    "react-native": "*",
     "react-native-builder-bob": "^0.27.0",
     "release-it": "^15.0.0",
     "turbo": "^1.10.7",
@@ -157,5 +158,18 @@
       "module",
       "typescript"
     ]
+  },
+  "codegenConfig": {
+    "name": "WebgpuSpec",
+    "type": "modules",
+    "jsSrcsDir": "./src/specs",
+    "outputDir": {
+      "ios": "cxx/ios/generated",
+      "android": "cxx/android/generated"
+    },
+    "includesGeneratedCode": true,
+    "android": {
+      "javaPackageName": "com.rn.webgpu"
+    }
   }
 }

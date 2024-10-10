@@ -23,4 +23,32 @@ declare global {
     getHeadlessWebGPU(uuid: string): HeadlessWebGPU;
     experimental: WGPUExperimental;
   };
+
+  var reactNativeWebGPUThreads: {
+    spawn(input: ThreadInput): void;
+    attachSurface(input: AttachSurfaceInput): void;
+  };
+
+  var reactNativeWebGPUThreadsInstance: {
+    onAttachSurface(callback: (payload: OnAttachSurfacePayload) => void): void;
+    getContext(): ThreadInstanceContext;
+  };
 }
+
+type ThreadInput = {
+  bundleId: string;
+  threadId: string;
+};
+
+type AttachSurfaceInput = {
+  uuid: string;
+  threadId: string;
+};
+
+type OnAttachSurfacePayload = {
+  uuid: string;
+};
+
+type ThreadInstanceContext = {
+  threadId: string;
+};

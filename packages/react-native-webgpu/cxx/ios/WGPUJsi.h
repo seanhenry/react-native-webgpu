@@ -7,9 +7,9 @@
 #import "wgpu.h"
 
 #ifdef RCT_NEW_ARCH_ENABLED
-#import "RNWebgpuSpec.h"
+#import "WebgpuSpec.h"
 
-@interface WGPUJsi : NSObject <NativeWebgpuSpec>
+@interface WGPUJsi : NSObject <NativeWebgpuModuleSpec>
 #else
 #import <React/RCTBridgeModule.h>
 

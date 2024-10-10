@@ -11,6 +11,7 @@ using namespace facebook::jsi;
   std::vector<Function> _animationCallbacks;
   std::vector<Function> _animationCallbacksForProcessing;
   CADisplayLink *_displayLink;
+  std::shared_ptr<JSIInstance> _jsiInstance;
 }
 
 @end
@@ -39,7 +40,7 @@ using namespace facebook::jsi;
 - (void)onAnimationFrame {
   std::swap(_animationCallbacks, _animationCallbacksForProcessing);
 
-  auto &runtime = JSIInstance::instance->runtime;
+  auto &runtime = _jsiInstance->runtime;
   auto performance = runtime.global().getPropertyAsObject(runtime, "performance");
   auto now =
     performance.getPropertyAsFunction(runtime, "now").callWithThis(runtime, performance, nullptr, 0).asNumber();
@@ -67,9 +68,10 @@ Surface::~Surface() {
   wgpuInstanceRelease(_wgpuInstance);
 }
 
-void Surface::createTimer() {
+void Surface::createTimer(std::shared_ptr<JSIInstance> jsiInstance) {
   invalidateTimer();
   auto timer = [[WGPUTimer alloc] init];
+  timer->_jsiInstance = jsiInstance;
   [timer start];
   _timer = (void *)CFBridgingRetain(timer);
 }

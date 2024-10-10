@@ -260,3 +260,13 @@ export function HelloTriangle() {
 ```
 
 </details>
+
+## Experimental thread support
+
+Thread support is only available with the new architecture and bridgeless mode.
+
+Enable on iOS by adding this to the top of your `Podfile`:
+
+```
+$WGPUEnableThreads = true
+```

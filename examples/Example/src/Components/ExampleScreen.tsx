@@ -1,4 +1,4 @@
-import {ABuffer} from '../WebGPUSamples/WebGPUFeatures/ABuffer/ABuffer';
+import {ABuffer} from '../WebGPUSamples/GraphicsTechniques/ABuffer/ABuffer';
 import {type ComponentType} from 'react';
 import {HelloTriangle} from '../WebGPUSamples/BasicGraphics/HelloTriangle/HelloTriangle';
 import {CubeMap} from '../WebGPUSamples/BasicGraphics/CubeMap/CubeMap';
@@ -56,7 +56,6 @@ export type Example =
   | 'ReversedZ'
   | 'RenderBundles'
   | 'OcclusionQueries'
-  | 'ABuffer'
   // GraphicsTechniques
   | 'Cameras'
   | 'NormalMap'
@@ -64,6 +63,7 @@ export type Example =
   | 'DeferredRendering'
   | 'ImageBlur'
   | 'Cornell'
+  | 'ABuffer'
   | 'SkinnedMesh'
   | 'VolumeRendering'
   // Three
@@ -100,7 +100,6 @@ const examples: Record<Example, ComponentType> = {
   ReversedZ,
   RenderBundles,
   OcclusionQueries,
-  ABuffer,
   // GraphicsTechniques
   Cameras,
   NormalMap,
@@ -108,6 +107,7 @@ const examples: Record<Example, ComponentType> = {
   DeferredRendering,
   ImageBlur,
   Cornell,
+  ABuffer,
   SkinnedMesh,
   VolumeRendering,
   // Three.js

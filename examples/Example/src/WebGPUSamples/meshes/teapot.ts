@@ -1,4 +1,4 @@
-// @ts-expect-error implicit any, missing dexlaration file
+// @ts-expect-error implicit any, missing declaration file
 import teapotData from 'teapot';
 import {computeSurfaceNormals} from './utils';
 

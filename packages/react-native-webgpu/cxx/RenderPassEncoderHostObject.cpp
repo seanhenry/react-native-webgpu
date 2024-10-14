@@ -56,12 +56,12 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
   }
 
   if (name == "setScissorRect") {
-    return WGPU_FUNC_FROM_HOST_FUNC(setViewport, 6, [this]) {
+    return WGPU_FUNC_FROM_HOST_FUNC(setScissorRect, 4, [this]) {
       WGPU_LOG_FUNC_ARGS(setViewport);
-      auto x = (float)arguments[0].asNumber();
-      auto y = (float)arguments[1].asNumber();
-      auto width = (float)arguments[2].asNumber();
-      auto height = (float)arguments[3].asNumber();
+      auto x = (uint32_t)arguments[0].asNumber();
+      auto y = (uint32_t)arguments[1].asNumber();
+      auto width = (uint32_t)arguments[2].asNumber();
+      auto height = (uint32_t)arguments[3].asNumber();
 
       wgpuRenderPassEncoderSetScissorRect(_value, x, y, width, height);
       _context->getErrorHandler()->throwPendingJSIError();

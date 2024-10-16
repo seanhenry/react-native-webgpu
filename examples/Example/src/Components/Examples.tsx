@@ -64,6 +64,7 @@ const sections: Record<Examples, ListProps<Example>['sections']> = {
         {title: 'DeferredRendering'},
         {title: 'ImageBlur'},
         {title: 'Cornell'},
+        {title: 'ABuffer'},
         {title: 'SkinnedMesh'},
         {title: 'VolumeRendering'},
       ],

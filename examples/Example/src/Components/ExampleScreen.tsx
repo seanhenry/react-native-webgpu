@@ -1,3 +1,4 @@
+import {ABuffer} from '../WebGPUSamples/GraphicsTechniques/ABuffer/ABuffer';
 import {type ComponentType} from 'react';
 import {HelloTriangle} from '../WebGPUSamples/BasicGraphics/HelloTriangle/HelloTriangle';
 import {CubeMap} from '../WebGPUSamples/BasicGraphics/CubeMap/CubeMap';
@@ -62,6 +63,7 @@ export type Example =
   | 'DeferredRendering'
   | 'ImageBlur'
   | 'Cornell'
+  | 'ABuffer'
   | 'SkinnedMesh'
   | 'VolumeRendering'
   // Three
@@ -105,6 +107,7 @@ const examples: Record<Example, ComponentType> = {
   DeferredRendering,
   ImageBlur,
   Cornell,
+  ABuffer,
   SkinnedMesh,
   VolumeRendering,
   // Three.js

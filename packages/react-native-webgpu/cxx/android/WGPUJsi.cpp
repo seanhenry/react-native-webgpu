@@ -31,8 +31,9 @@ extern "C" JNIEXPORT jboolean JNICALL Java_com_webgpu_CxxBridge_00024Companion_i
   }
 
   auto runtime{reinterpret_cast<Runtime *>(jsiRuntimeRef)};
-  auto jsCallInvoker{alias_ref<CallInvokerHolder::javaobject>{reinterpret_cast<CallInvokerHolder::javaobject>(
-                       jsCallInvokerHolder)} -> cthis()->getCallInvoker()};
+  auto jsCallInvoker{alias_ref<CallInvokerHolder::javaobject>{
+    reinterpret_cast<CallInvokerHolder::javaobject>(jsCallInvokerHolder)} -> cthis()
+                       ->getCallInvoker()};
 
   auto newSurfaces = std::make_shared<std::unordered_map<std::string, std::shared_ptr<Surface>>>();
   JSIInstance::instance = std::make_unique<JSIInstance>(*runtime, std::make_shared<Thread>(jsCallInvoker));

@@ -1,3 +1,8 @@
+# MacOS
+__MACOSX
+.DS_Store
+*.pem
+
 # Yarn
 .yarn/*
 !.yarn/patches
@@ -5,6 +10,9 @@
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# VSCode
+/.vscode
 
 /.idea
 /node_modules

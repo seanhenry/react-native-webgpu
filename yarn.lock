@@ -3905,6 +3905,7 @@ __metadata:
     react-native-webgpu: "workspace:*"
     react-native-webgpu-three: "workspace:*"
     react-test-renderer: 18.2.0
+    teapot: ^1.0.0
     three: 0.166.1
     typescript: 5.0.4
     wgpu-matrix: ^3.0.1
@@ -12877,6 +12878,13 @@ __metadata:
     mkdirp: ^1.0.3
     yallist: ^4.0.0
   checksum: f1322768c9741a25356c11373bce918483f40fa9a25c69c59410c8a1247632487edef5fe76c5f12ac51a6356d2f1829e96d2bc34098668a2fc34d76050ac2b6c
+  languageName: node
+  linkType: hard
+
+"teapot@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "teapot@npm:1.0.0"
+  checksum: a1702c097314bac83cff03f0f4edaf1a9ccd77d35c02afa9344d58b9ef806e26c2feba9cb8ce8a2a274eb72007fa0c0460c745376aa9c2ec17e84ce1e25947a9
   languageName: node
   linkType: hard
 

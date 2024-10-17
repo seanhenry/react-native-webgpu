@@ -10,6 +10,7 @@
 #include "JNIBitmapLoaderFactory.h"
 #include "JSIInstance.h"
 #include "Surface.h"
+#include "SurfacesManager.h"
 #include "WGPUAndroidInstance.h"
 #include "WGPULog.h"
 #include "webgpu.h"
@@ -20,6 +21,7 @@ using namespace facebook::jni;
 using namespace facebook::react;
 
 extern "C" JNIEXPORT jboolean JNICALL Java_com_webgpu_CxxBridge_00024Companion_installJsi(JNIEnv *env, jobject obj,
+                                                                                          jstring threadId,
                                                                                           jlong jsiRuntimeRef,
                                                                                           jobject jsCallInvokerHolder,
                                                                                           jobject bitmapLoaderFactory) {
@@ -34,16 +36,19 @@ extern "C" JNIEXPORT jboolean JNICALL Java_com_webgpu_CxxBridge_00024Companion_i
   auto jsCallInvoker{alias_ref<CallInvokerHolder::javaobject>{reinterpret_cast<CallInvokerHolder::javaobject>(
                        jsCallInvokerHolder)} -> cthis()->getCallInvoker()};
 
-  auto newSurfaces = std::make_shared<std::unordered_map<std::string, std::shared_ptr<Surface>>>();
-  JSIInstance::instance = std::make_unique<JSIInstance>(*runtime, std::make_shared<Thread>(jsCallInvoker));
-  JSIInstance::instance->onCreateSurface = [newSurfaces](std::string uuid, std::shared_ptr<Surface> surface) {
-    newSurfaces->insert_or_assign(uuid, surface);
-  };
+  auto jsiInstance = std::make_shared<JSIInstance>(*runtime, std::make_shared<Thread>(jsCallInvoker));
 
   WGPUAndroidInstance::instance = std::make_unique<WGPUAndroidInstance>(jvm, env);
   WGPUAndroidInstance::instance->setBitmapLoaderFactory(env, bitmapLoaderFactory);
 
-  installRootJSI(*runtime, newSurfaces);
+  installRootJSI(*runtime, jsiInstance);
+
+#ifdef WGPU_ENABLE_THREADS
+  std::string threadIdStr = threadId.UTF8String;
+  ThreadManager::getInstance()->setJSIInstance(jsiInstance, threadIdStr);
+  ThreadManager::getInstance()->installJsi(runtime);
+#endif
+
   return true;
 }
 
@@ -93,8 +98,8 @@ extern "C" JNIEXPORT jboolean JNICALL Java_com_webgpu_CxxBridge_00024Companion_o
   };
   auto managedSurface = std::make_shared<Surface>(instance, surface, surfaceSize, window);
 
-  JSIInstance::instance->jsThread->run(
-    [uuid = std::move(uuid), managedSurface]() { JSIInstance::instance->onCreateSurface(uuid, managedSurface); });
+  SurfacesManager::getInstance()->set(uuid, managedSurface);
+
   return true;
 }
 
@@ -104,15 +109,10 @@ extern "C" JNIEXPORT void JNICALL Java_com_webgpu_CxxBridge_00024Companion_onSur
   std::string uuid(uuidChars);
   env->ReleaseStringUTFChars(inUUID, uuidChars);
 
-  JSIInstance::instance->jsThread->run([uuid = std::move(uuid)]() {
-    auto surfaces = JSIInstance::instance->weakSurfaces;
-    auto iterator = surfaces->find(uuid);
-    if (iterator != surfaces->end()) {
-      auto weakSurface = surfaces->at(uuid);
-      auto surface = weakSurface.lock();
-      if (surface != nullptr) {
-        surface->invalidateTimer();
-      }
-    }
-  });
+  auto weakSurface = SurfacesManager::getInstance()->get(uuid);
+  auto surface = weakSurface.lock();
+  if (surface != nullptr) {
+    surface->invalidateTimer();
+    SurfacesManager::getInstance()->remove(uuid);
+  }
 }

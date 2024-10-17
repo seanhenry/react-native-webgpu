@@ -24,6 +24,7 @@ class Surface;
 typedef struct WGPUSurfaceCallbackData {
   // Keeps a strong reference to self whilst a frame has been requested
   std::shared_ptr<wgpu::Surface> surface;
+  std::shared_ptr<JSIInstance> jsiInstance;
   std::vector<Function> animationCallbacks;
   std::vector<Function> animationCallbacksForProcessing;
 } WGPUSurfaceCallbackData;

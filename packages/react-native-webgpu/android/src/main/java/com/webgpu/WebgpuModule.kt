@@ -17,7 +17,7 @@ class WebgpuModule(reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
-  fun install(): Boolean {
+  fun installWithThreadId(threadId: String): Boolean {
     try {
       val context = weakReactContext.get()
       if (context == null) {
@@ -29,11 +29,17 @@ class WebgpuModule(reactContext: ReactApplicationContext) :
       val jsCallInvokerHolder = context.catalystInstance.jsCallInvokerHolder
       val blobModule = context.getNativeModule(BlobModule::class.java)
       val factory = BitmapLoaderFactory(blobModule)
-      return CxxBridge.installJsi(jsiRuntimeRef, jsCallInvokerHolder, factory)
+      return CxxBridge.installJsi(threadId, jsiRuntimeRef, jsCallInvokerHolder, factory)
     } catch (exception: Exception) {
       Log.e(NAME, "Failed to initialize react-native-webgpu", exception)
       return false
     }
+  }
+
+  override fun getConstants(): MutableMap<String, Any> {
+    return mutableMapOf(
+      "ENABLE_THREADS" to false
+    )
   }
 
   companion object {

@@ -31,7 +31,7 @@ class WebGPUView : SurfaceView, SurfaceHolder.Callback2 {
     holder.let { h ->
 
       val density = context.resources.displayMetrics.density
-      val result = CxxBridge.onSurfaceCreated(h.surface, uuid, density);
+      val result = CxxBridge.onSurfaceCreated(h.surface, uuid, density)
       if (result) {
         setWillNotDraw(false)
 

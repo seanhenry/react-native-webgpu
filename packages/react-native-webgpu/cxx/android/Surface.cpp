@@ -1,4 +1,4 @@
-#import "Surface.h"
+#include "Surface.h"
 
 #include <jsi/jsi.h>
 
@@ -20,8 +20,9 @@ Surface::~Surface() {
   ANativeWindow_release(_window);
 }
 
-void Surface::createTimer() {
+void Surface::createTimer(std::shared_ptr<JSIInstance> jsiInstance) {
   invalidateTimer();
+  _callbackData.jsiInstance = jsiInstance;
   _choreographer = AChoreographer_getInstance();
 }
 
@@ -65,7 +66,7 @@ static void wgpuChoreographerFrameCallback(long frameTimeNanos, void *data) {
 
   std::swap(callbackData->animationCallbacks, callbackData->animationCallbacksForProcessing);
 
-  auto &runtime = JSIInstance::instance->runtime;
+  auto &runtime = callbackData->jsiInstance->runtime;
   auto performance = runtime.global().getPropertyAsObject(runtime, "performance");
   auto now =
     performance.getPropertyAsFunction(runtime, "now").callWithThis(runtime, performance, nullptr, 0).asNumber();

@@ -20,36 +20,36 @@ using namespace wgpu;
 
 namespace wgpu {
 
-Value fetchImageBitmap(Runtime &runtime, std::string uri);
+Value fetchImageBitmap(Runtime &runtime, std::string uri, std::shared_ptr<JSIInstance> jsiInstance);
 
-Value getImageBitmapFromBlob(Runtime &runtime, Object obj);
+Value getImageBitmapFromBlob(Runtime &runtime, Object obj, std::shared_ptr<JSIInstance> jsiInstance);
 
 size_t getBufferFromSharedMemory(JNIEnv *env, jobject sharedMemory, jint width, jint height,
                                  const std::shared_ptr<std::string> &errorMessage, Promise<void *> *promise,
-                                 uint8_t **dataOut);
+                                 std::shared_ptr<JSIInstance> jsiInstance, uint8_t **dataOut);
 
 }  // namespace wgpu
 
-Function wgpu::createImageBitmap(Runtime &runtime) {
-  return WGPU_FUNC_FROM_HOST_FUNC(createImageBitmap, 1, []) {
+Function wgpu::createImageBitmap(Runtime &runtime, std::shared_ptr<JSIInstance> jsiInstance) {
+  return WGPU_FUNC_FROM_HOST_FUNC(createImageBitmap, 1, [jsiInstance]) {
     auto obj = arguments[0].asObject(runtime);
     if (obj.hasProperty(runtime, "uri")) {
       auto uri = WGPU_UTF8(obj, uri);
-      return fetchImageBitmap(runtime, std::move(uri));
+      return fetchImageBitmap(runtime, std::move(uri), jsiInstance);
     } else if (obj.hasProperty(runtime, "_data")) {
-      return getImageBitmapFromBlob(runtime, std::move(obj));
+      return getImageBitmapFromBlob(runtime, std::move(obj), jsiInstance);
     }
     throw JSError(runtime, "[WebGPU] Unsupported type passed to createImageBitmap");
   });
 }
 
-Value wgpu::fetchImageBitmap(Runtime &runtime, std::string uri) {
+Value wgpu::fetchImageBitmap(Runtime &runtime, std::string uri, std::shared_ptr<JSIInstance> jsiInstance) {
   auto promise = new Promise<void *>(runtime);
-  return promise->jsPromise([promise, uri = std::move(uri)]() {
-    auto thread = std::thread([promise, uri]() {
+  return promise->jsPromise([promise, jsiInstance, uri = std::move(uri)]() {
+    auto thread = std::thread([promise, jsiInstance, uri]() {
       auto jvm = WGPUAndroidInstance::instance->getJVM();
       if (jvm == nullptr) {
-        JSIInstance::instance->jsThread->run([promise]() {
+        jsiInstance->jsThread->run([promise]() {
           promise->reject(makeJSError(promise->runtime, "The JVM is not available"));
           delete promise;
         });
@@ -61,7 +61,7 @@ Value wgpu::fetchImageBitmap(Runtime &runtime, std::string uri) {
         jvm->AttachCurrentThread(&env, nullptr);
       } else if (getEngStatus != JNI_OK) {
         WGPU_LOG_ERROR("%s:%i jvm->GetEnv() returned status %i", __FILE__, __LINE__, getEngStatus);
-        JSIInstance::instance->jsThread->run([promise]() {
+        jsiInstance->jsThread->run([promise]() {
           promise->reject(makeJSError(promise->runtime, "Failed to get JNIEnv"));
           delete promise;
         });
@@ -84,10 +84,11 @@ Value wgpu::fetchImageBitmap(Runtime &runtime, std::string uri) {
       }
 
       uint8_t *buffer = nullptr;
-      auto size = getBufferFromSharedMemory(env, sharedMemory, width, height, errorMessage, promise, &buffer);
+      auto size =
+        getBufferFromSharedMemory(env, sharedMemory, width, height, errorMessage, promise, jsiInstance, &buffer);
 
       jvm->DetachCurrentThread();
-      JSIInstance::instance->jsThread->run([promise, buffer, size, width, height]() {
+      jsiInstance->jsThread->run([promise, buffer, size, width, height]() {
         auto obj = Object::createFromHostObject(promise->runtime, std::make_shared<wgpu::ImageBitmapHostObject>(
                                                                     buffer, size, (uint32_t)width, (uint32_t)height));
         promise->resolve(std::move(obj));
@@ -98,10 +99,10 @@ Value wgpu::fetchImageBitmap(Runtime &runtime, std::string uri) {
   });
 }
 
-Value wgpu::getImageBitmapFromBlob(Runtime &runtime, Object obj) {
+Value wgpu::getImageBitmapFromBlob(Runtime &runtime, Object obj, std::shared_ptr<JSIInstance> jsiInstance) {
   auto promise = new Promise<void *>(runtime);
   auto jsDataPtr = std::make_shared<Object>(obj.getPropertyAsObject(runtime, "_data"));
-  return promise->jsPromise([promise, jsDataPtr] {
+  return promise->jsPromise([promise, jsiInstance, jsDataPtr] {
     auto jsData = std::move(*jsDataPtr.get());
     auto &runtime = promise->runtime;
     auto env = WGPUAndroidInstance::instance->getMainThreadEnv();
@@ -126,7 +127,7 @@ Value wgpu::getImageBitmapFromBlob(Runtime &runtime, Object obj) {
     auto width = loader->getWidth(env);
     auto height = loader->getHeight(env);
     uint8_t *buffer = nullptr;
-    auto size = getBufferFromSharedMemory(env, sharedMemory, width, height, nullptr, promise, &buffer);
+    auto size = getBufferFromSharedMemory(env, sharedMemory, width, height, nullptr, promise, jsiInstance, &buffer);
     if (size > 0) {
       auto bitmap = std::make_shared<wgpu::ImageBitmapHostObject>(buffer, size, (uint32_t)width, (uint32_t)height);
       auto obj = Object::createFromHostObject(promise->runtime, bitmap);
@@ -138,11 +139,11 @@ Value wgpu::getImageBitmapFromBlob(Runtime &runtime, Object obj) {
 
 size_t wgpu::getBufferFromSharedMemory(JNIEnv *env, jobject sharedMemory, jint width, jint height,
                                        const std::shared_ptr<std::string> &errorMessage, Promise<void *> *promise,
-                                       uint8_t **dataOut) {
+                                       std::shared_ptr<JSIInstance> jsiInstance, uint8_t **dataOut) {
   if (sharedMemory == nullptr || width == 0 || height == 0) {
     WGPU_LOG_ERROR("%s:%i Failed to get bitmap %s", __FILE__, __LINE__,
                    errorMessage != nullptr ? errorMessage->data() : "");
-    JSIInstance::instance->jsThread->run([promise]() {
+    jsiInstance->jsThread->run([promise]() {
       promise->reject(makeJSError(promise->runtime, "Failed to fetch bitmap"));
       delete promise;
     });
@@ -160,7 +161,7 @@ size_t wgpu::getBufferFromSharedMemory(JNIEnv *env, jobject sharedMemory, jint w
       "%s:%i Copying shared memory bitmap to buffer failed. Bytes read: "
       "%zi shared memory size: %zu",
       __FILE__, __LINE__, bytesRead, size);
-    JSIInstance::instance->jsThread->run([promise]() {
+    jsiInstance->jsThread->run([promise]() {
       promise->reject(makeJSError(promise->runtime, "Copying shared memory bitmap to buffer failed"));
       delete promise;
     });

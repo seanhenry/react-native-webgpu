@@ -116,3 +116,20 @@ extern "C" JNIEXPORT void JNICALL Java_com_webgpu_CxxBridge_00024Companion_onSur
     SurfacesManager::getInstance()->remove(uuid);
   }
 }
+
+#if WGPU_NEW_ARCHITECTURE
+
+#include "WGPUJsi.h"
+
+namespace facebook::react {
+WGPUJsi::WGPUJsi(std::shared_ptr<CallInvoker> jsInvoker) : NativeWebgpuModuleCxxSpec(std::move(jsInvoker)) {}
+
+jsi::Object WGPUJsi::getConstants(Runtime &rt) {
+  return Object(rt);
+}
+bool WGPUJsi::installWithThreadId(Runtime &rt, String threadId) {
+  return true;
+}
+}  // namespace facebook::react
+
+#endif

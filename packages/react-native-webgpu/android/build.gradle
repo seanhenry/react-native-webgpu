@@ -1,3 +1,5 @@
+import com.android.Version
+
 import java.nio.file.Paths
 
 buildscript {
@@ -14,11 +16,6 @@ buildscript {
     // noinspection DifferentKotlinGradleVersion
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
   }
-}
-
-def reactNativeArchitectures() {
-  def value = rootProject.getProperties().get("reactNativeArchitectures")
-  return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
 }
 
 def isNewArchitectureEnabled() {
@@ -40,8 +37,8 @@ def getExtOrIntegerDefault(name) {
   return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["Webgpu_" + name]).toInteger()
 }
 
-def supportsNamespace() {
-  def parsed = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')
+static def supportsNamespace() {
+  def parsed = Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')
   def major = parsed[0].toInteger()
   def minor = parsed[1].toInteger()
 
@@ -49,22 +46,19 @@ def supportsNamespace() {
   return (major == 7 && minor >= 3) || major >= 8
 }
 
-static def findNodeModules(baseDir) {
+static def findReactNativeAndroidDir(baseDir) {
   def basePath = baseDir.toPath().normalize()
-  // Node's module resolution algorithm searches up to the root directory,
-  // after which the base path will be null
   while (basePath) {
-    def nodeModulesPath = Paths.get(basePath.toString(), "node_modules")
-    def reactNativePath = Paths.get(nodeModulesPath.toString(), "react-native")
-    if (nodeModulesPath.toFile().exists() && reactNativePath.toFile().exists()) {
-      return nodeModulesPath.toString()
+    def rnAndroidPath = Paths.get(basePath.toString(), "node_modules", "react-native", "ReactAndroid")
+    if (rnAndroidPath.toFile().exists()) {
+      return rnAndroidPath.toString()
     }
     basePath = basePath.getParent()
   }
   throw new GradleException("react-native-webgpu: Failed to find node_modules path")
 }
 
-def nodeModules = findNodeModules(projectDir)
+def rnAndroidDir = findReactNativeAndroidDir(projectDir)
 
 tasks.register('deleteCmakeCache') {
   doFirst {
@@ -88,36 +82,38 @@ android {
   defaultConfig {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
+    buildConfigField("boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString())
+    sourceSets {
+      main {
+        if (isNewArchitectureEnabled()) {
+          java.srcDirs += ['src/newarch']
+          java.srcDirs += ['../cxx/android/generated/java']
+        } else {
+          java.srcDirs += ['src/oldarch']
+        }
+      }
+    }
 
-    externalNativeBuild {
-      cmake {
-        cppFlags "-Wuninitialized -Wall -Wextra -O3"
-        arguments "-DANDROID_STL=c++_shared", "-DANDROID_TOOLCHAIN=clang", "-DNODE_MODULES_DIR=${nodeModules}"
-        abiFilters "armeabi-v7a", "x86", "x86_64", "arm64-v8a"
+    if (!isNewArchitectureEnabled()) {
+      externalNativeBuild {
+        cmake {
+          arguments "-DANDROID_STL=c++_shared", "-DANDROID_TOOLCHAIN=clang", "-DREACT_ANDROID_DIR=${rnAndroidDir}", "-DIS_OLD_ARCHITECTURE=1"
+        }
       }
     }
   }
 
   buildFeatures {
-    prefab true
-    prefabPublishing true
+    buildConfig true
+    if (!isNewArchitectureEnabled()) {
+      prefab true
+      prefabPublishing true
+    }
   }
 
   buildTypes {
-    debug {
-      externalNativeBuild {
-        cmake {
-          cppFlags "-Wuninitialized -Wall -Wextra -Og -g -fno-omit-frame-pointer"
-        }
-      }
-    }
     release {
       minifyEnabled false
-      externalNativeBuild {
-        cmake {
-          cppFlags "-Wuninitialized -Wall -Wextra -O3"
-        }
-      }
     }
   }
 
@@ -130,31 +126,33 @@ android {
     targetCompatibility JavaVersion.VERSION_1_8
   }
 
-  externalNativeBuild {
-    cmake {
-      path "CMakeLists.txt"
+  if (!isNewArchitectureEnabled()) {
+    externalNativeBuild {
+      cmake {
+        path "CMakeLists.txt"
+      }
     }
-  }
 
-  packagingOptions {
-    // https://developer.android.com/build/releases/past-releases/agp-4-0-0-release-notes#cmake-imported-targets
-    excludes = [
-            "META-INF",
-            "META-INF/**",
-            "**/libc++_shared.so",
-            "**/libfbjni.so",
-            "**/libjsi.so",
-            "**/libfolly_json.so",
-            "**/libfolly_runtime.so",
-            "**/libglog.so",
-            "**/libhermes.so",
-            "**/libhermes-executor-debug.so",
-            "**/libhermes_executor.so",
-            "**/libreactnativejni.so",
-            "**/libturbomodulejsijni.so",
-            "**/libreact_nativemodule_core.so",
-            "**/libjscexecutor.so",
-    ]
+    packagingOptions {
+      // https://developer.android.com/build/releases/past-releases/agp-4-0-0-release-notes#cmake-imported-targets
+      excludes = [
+              "META-INF",
+              "META-INF/**",
+              "**/libc++_shared.so",
+              "**/libfbjni.so",
+              "**/libjsi.so",
+              "**/libfolly_json.so",
+              "**/libfolly_runtime.so",
+              "**/libglog.so",
+              "**/libhermes.so",
+              "**/libhermes-executor-debug.so",
+              "**/libhermes_executor.so",
+              "**/libreactnativejni.so",
+              "**/libturbomodulejsijni.so",
+              "**/libreact_nativemodule_core.so",
+              "**/libjscexecutor.so",
+      ]
+    }
   }
 }
 

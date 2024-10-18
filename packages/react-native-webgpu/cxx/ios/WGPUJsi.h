@@ -7,7 +7,8 @@
 #import "wgpu.h"
 
 #ifdef RCT_NEW_ARCH_ENABLED
-#import "WebgpuSpec.h"
+
+#import "generated/WebgpuSpec/WebgpuSpec.h"
 
 @interface WGPUJsi : NSObject <NativeWebgpuModuleSpec>
 #else

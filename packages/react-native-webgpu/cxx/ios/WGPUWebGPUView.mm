@@ -5,7 +5,15 @@
 #include "SurfacesManager.h"
 #include "webgpu.h"
 
+#ifdef RCT_NEW_ARCH_ENABLED
+#import "generated/WebgpuSpec/ComponentDescriptors.h"
+#import "generated/WebgpuSpec/EventEmitters.h"
+#import "generated/WebgpuSpec/Props.h"
+#import "generated/WebgpuSpec/RCTComponentViewHelpers.h"
+#endif
+
 using namespace wgpu;
+using namespace facebook::react;
 
 @interface WGPUWebGPUView ()
 
@@ -37,6 +45,11 @@ using namespace wgpu;
                                            selector:@selector(onJSReload)
                                                name:RCTBridgeFastRefreshNotification
                                              object:nil];
+#ifdef RCT_NEW_ARCH_ENABLED
+    static const auto defaultProps = std::make_shared<const WGPUWebGPUViewProps>();
+    _props = defaultProps;
+    self.contentView = [[UIView alloc] init];
+#endif
   }
   return self;
 }
@@ -118,7 +131,7 @@ using namespace wgpu;
 
   auto uuidStr = self.uuidCxxString;
   SurfacesManager::getInstance()->set(uuidStr, managedSurface);
-  self.onCreateSurface(@{@"uuid" : self.uuid});
+  [self callOnCreateSurface];
 }
 
 - (void)deleteSurface {
@@ -137,4 +150,45 @@ using namespace wgpu;
 // TODO: update surface size
 //- (void)layoutSubviews {}
 
+#ifdef RCT_NEW_ARCH_ENABLED
+
++ (ComponentDescriptorProvider)componentDescriptorProvider {
+  return concreteComponentDescriptorProvider<WGPUWebGPUViewComponentDescriptor>();
+}
+
+- (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps {
+  //  const auto &oldViewProps = *std::static_pointer_cast<WGPUWebGPUViewProps const>(_props);
+  //  const auto &newViewProps = *std::static_pointer_cast<WGPUWebGPUViewProps const>(props);
+
+  [super updateProps:props oldProps:oldProps];
+}
+
+- (void)callOnCreateSurface {
+  if (self->_eventEmitter == nullptr) {
+    return;
+  }
+
+  assert(std::dynamic_pointer_cast<WGPUWebGPUViewEventEmitter const>(self->_eventEmitter));
+  auto emitter = std::static_pointer_cast<WGPUWebGPUViewEventEmitter const>(self->_eventEmitter);
+  emitter->onCreateSurface({
+    .uuid = self.uuidCxxString,
+  });
+}
+
+#else
+
+- (void)callOnCreateSurface {
+  if (self.onCreateSurface != nil) {
+    self.onCreateSurface(@{@"uuid" : self.uuid});
+  }
+}
+
+#endif
+
 @end
+
+#ifdef RCT_NEW_ARCH_ENABLED
+extern "C" {
+Class<RCTComponentViewProtocol> WGPUWebGPUViewCls(void) { return WGPUWebGPUView.class; }
+}
+#endif

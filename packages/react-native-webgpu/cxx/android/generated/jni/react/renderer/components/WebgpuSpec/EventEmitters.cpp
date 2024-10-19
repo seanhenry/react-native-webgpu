@@ -10,4 +10,15 @@
 
 #include "EventEmitters.h"
 
-namespace facebook::react {}  // namespace facebook::react
+namespace facebook::react {
+
+void WGPUWebGPUViewEventEmitter::onCreateSurface(OnCreateSurface $event) const {
+  dispatchEvent("createSurface", [$event = std::move($event)](jsi::Runtime &runtime) {
+    auto $payload = jsi::Object(runtime);
+    $payload.setProperty(runtime, "uuid", $event.uuid);
+    $payload.setProperty(runtime, "error", $event.error);
+    return $payload;
+  });
+}
+
+}  // namespace facebook::react

@@ -4458,6 +4458,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"babel-plugin-transform-wgsl@workspace:packages/react-native-webgpu/babel-plugin-transform-wgsl":
+  version: 0.0.0-use.local
+  resolution: "babel-plugin-transform-wgsl@workspace:packages/react-native-webgpu/babel-plugin-transform-wgsl"
+  languageName: unknown
+  linkType: soft
+
 "babel-preset-current-node-syntax@npm:^1.0.0":
   version: 1.0.1
   resolution: "babel-preset-current-node-syntax@npm:1.0.1"
@@ -11408,6 +11414,12 @@ __metadata:
   checksum: 28c1f6e556c318ffcbd79d153b9612cc8a0b8d8b70f909d3cde2fd6d0586a7c151a449e57400d8996f4ee6c3b5140c5c4f643a427e974f6dc573b2bcd8eb7356
   languageName: node
   linkType: hard
+
+"react-native-webgpu-metro@workspace:packages/react-native-webgpu/metro":
+  version: 0.0.0-use.local
+  resolution: "react-native-webgpu-metro@workspace:packages/react-native-webgpu/metro"
+  languageName: unknown
+  linkType: soft
 
 "react-native-webgpu-three@workspace:*, react-native-webgpu-three@workspace:packages/react-native-webgpu-three":
   version: 0.0.0-use.local

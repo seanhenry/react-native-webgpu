@@ -7,14 +7,6 @@
   "types": "lib/typescript/src/index.d.ts",
   "react-native": "src/index",
   "source": "src/index",
-  "exports": {
-    ".": {
-      "types": "./lib/typescript/src/index.d.ts",
-      "default": "./src/index.ts"
-    },
-    "./babel-plugin-transform-wgsl": "./babel-plugin-transform-wgsl/index.js",
-    "./metro": "./metro/index.js"
-  },
   "files": [
     "src",
     "lib",

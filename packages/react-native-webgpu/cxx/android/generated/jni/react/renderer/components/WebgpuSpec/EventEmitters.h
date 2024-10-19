@@ -15,5 +15,11 @@ namespace facebook::react {
 class WGPUWebGPUViewEventEmitter : public ViewEventEmitter {
  public:
   using ViewEventEmitter::ViewEventEmitter;
+
+  struct OnCreateSurface {
+    std::string uuid;
+    std::string error;
+  };
+  void onCreateSurface(OnCreateSurface value) const;
 };
 }  // namespace facebook::react

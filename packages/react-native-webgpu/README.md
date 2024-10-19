@@ -51,7 +51,7 @@ import 'react-native-webgpu';
 ```javascript
 // babel.config.js
 modules.exports = {
-  plugins: [require('react-native-webgpu/babel-plugin-transform-wgsl')],
+  plugins: ['react-native-webgpu/babel-plugin-transform-wgsl'],
 };
 ```
 

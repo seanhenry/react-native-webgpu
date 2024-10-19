@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any,eqeqeq */
+/* eslint-disable eqeqeq */
 import {Quatn} from 'wgpu-matrix';
 import {Accessor, BufferView, GlTf, Scene} from './gltf';
 import {Mat4, Vec3n, mat4} from 'wgpu-matrix';

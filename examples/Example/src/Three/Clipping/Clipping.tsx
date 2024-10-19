@@ -23,7 +23,6 @@ export const Clipping = () => {
       scene: Scene,
       renderer: WebGPURenderer,
       startTime: number,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       object: any;
 
     init();

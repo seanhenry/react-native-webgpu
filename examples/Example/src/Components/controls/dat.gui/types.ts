@@ -54,7 +54,6 @@ interface ControlComponentProps {
   disabled: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ControlComponent<T extends keyof ControlComponentType = any> {
   type: T;
   props: ControlComponentProps & ControlComponentType[T];

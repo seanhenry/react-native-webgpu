@@ -37,7 +37,6 @@ export const LogarithmicDepthBuffer = () => {
     const minzoomspeed = 0.015;
     let zoomspeed = minzoomspeed;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let object: any = {};
 
     // Generate a number of text labels, from 1µm in size up to 100,000,000 light years

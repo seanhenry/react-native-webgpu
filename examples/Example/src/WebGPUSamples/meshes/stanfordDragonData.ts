@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-loss-of-precision */
 // from github.com/hughsk/stanford-dragon
 export default {
   // prettier-ignore

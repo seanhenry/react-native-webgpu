@@ -40,7 +40,7 @@ export const gridJoints = new Uint32Array([
   1, 2, 3, 0,  //11
   2, 3, 0, 0,  //12
   2, 3, 0, 0,  //13
-])
+]);
 
 // The weights applied when ve
 // prettier-ignore

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {ControlComponent, ControlComponentType} from './types';
 import {getId} from './incrementingId';
 import {Observable, observable} from '../../../utils/observable';

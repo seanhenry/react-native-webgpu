@@ -86,7 +86,6 @@ export class Gui {
     _: undefined,
     max: number,
   ): NumberController<T>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   add<T>(object: T, property: keyof T, ...args: any[]): Controller<T> {
     let controller;
     const value = object[property];

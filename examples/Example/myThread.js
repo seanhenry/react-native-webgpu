@@ -2,7 +2,7 @@ import {installWithThreadId} from 'react-native-webgpu';
 import triangleVertWGSL from './src/WebGPUSamples/shaders/triangle.vert.wgsl';
 import redFragWGSL from './src/WebGPUSamples/shaders/red.frag.wgsl';
 
-global.reactNativeWebGPUThreadsInstance.onAttachSurface(({uuid}) => {
+global.reactNativeWebGPUThreadsInstance.onAttachSurface = ({uuid}) => {
   const run = async ({context, navigator, requestAnimationFrame}) => {
     const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter.requestDevice();
@@ -74,7 +74,7 @@ global.reactNativeWebGPUThreadsInstance.onAttachSurface(({uuid}) => {
   };
   const webGPU = global.reactNativeWebGPU.getSurfaceBackedWebGPU(uuid);
   run(webGPU);
-});
+};
 
 installWithThreadId(
   global.reactNativeWebGPUThreadsInstance.getContext().threadId,

@@ -30,7 +30,7 @@ declare global {
   };
 
   var reactNativeWebGPUThreadsInstance: {
-    onAttachSurface(callback: (payload: OnAttachSurfacePayload) => void): void;
+    onAttachSurface?: OnAttachSurfacePayload | null;
     getContext(): ThreadInstanceContext;
   };
 }

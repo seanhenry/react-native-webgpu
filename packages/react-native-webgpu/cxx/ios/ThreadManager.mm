@@ -111,9 +111,7 @@ void ThreadInstance::attachSurface(std::string &uuid) {
 
 }  // namespace wgpu
 
-@implementation WGPUThreadInstance {
-  std::shared_ptr<Function> _onAttachSurface;
-}
+@implementation WGPUThreadInstance
 
 - (instancetype)initWithBundleURL:(NSURL *)url threadId:(NSString *)threadId {
   self = [super init];
@@ -146,14 +144,17 @@ void ThreadInstance::attachSurface(std::string &uuid) {
   if (jsiInstance == nullptr) {
     throw JSINativeException("Tried to attach a surface before the thread was installed");
   }
-  if (_onAttachSurface == nullptr) {
-    throw JSINativeException("Tried to attach a surface but onAttachSurface was not set");
-  }
   std::string uuidStr = uuid.UTF8String;
-  jsiInstance->jsThread->run([onAttachSurface = _onAttachSurface, &runtime = jsiInstance->runtime, uuidStr]() {
+  jsiInstance->jsThread->run([&runtime = jsiInstance->runtime, uuidStr]() {
     Object payload(runtime);
     payload.setProperty(runtime, "uuid", uuidStr);
-    onAttachSurface->call(runtime, std::move(payload));
+    auto instance = WGPU_OBJ(runtime.global(), reactNativeWebGPUThreadsInstance);
+    try {
+      auto onAttachSurface = WGPU_OBJ(instance, onAttachSurface).asFunction(runtime);
+      onAttachSurface.call(runtime, std::move(payload));
+    } catch (...) {
+      throw JSINativeException("Tried to attach a surface but onAttachSurface was not set");
+    }
   });
 }
 
@@ -166,12 +167,6 @@ void ThreadInstance::attachSurface(std::string &uuid) {
     auto result = Object(runtime);
     result.setProperty(runtime, "threadId", [weakSelf.threadId UTF8String]);
     return result;
-  }));
-  instance.setProperty(runtime, "onAttachSurface", WGPU_FUNC_FROM_HOST_FUNC(onAttachSurface, 1, [weakSelf]) {
-    WGPUThreadInstance *strongSelf = weakSelf;
-    auto fn = arguments[0].asObject(runtime).asFunction(runtime);
-    strongSelf->_onAttachSurface = std::make_shared<Function>(std::move(fn));
-    return Value::undefined();
   }));
   runtime.global().setProperty(runtime, "reactNativeWebGPUThreadsInstance", instance);
 }

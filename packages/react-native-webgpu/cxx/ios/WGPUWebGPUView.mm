@@ -18,19 +18,12 @@ using namespace facebook::react;
 @interface WGPUWebGPUView ()
 
 @property(nonatomic, readonly) std::string uuidCxxString;
+@property(nonatomic, readonly, nullable) CAMetalLayer *metalLayer;
 
 @end
 
 @implementation WGPUWebGPUView {
   std::shared_ptr<Surface> _surface;
-}
-
-+ (Class)layerClass {
-  return [CAMetalLayer self];
-}
-
-- (CAMetalLayer *)metalLayer {
-  return (CAMetalLayer *)self.layer;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -82,13 +75,16 @@ using namespace facebook::react;
 }
 
 - (BOOL)hasNonZeroSize {
-  return CGRectGetWidth(self.metalLayer.frame) > 0 && CGRectGetHeight(self.metalLayer.frame) > 0;
+  return CGRectGetWidth(self.layer.frame) > 0 && CGRectGetHeight(self.layer.frame) > 0;
 }
 
 - (void)createSurface {
   if (self->_surface != nullptr || ![self hasNonZeroSize]) {
     return;
   }
+  _metalLayer = [CAMetalLayer layer];
+  self.metalLayer.frame = self.layer.bounds;
+
   struct WGPUSurfaceDescriptorFromMetalLayer descriptorFromMetalLayer = {
     .chain =
       (const WGPUChainedStruct){
@@ -103,14 +99,16 @@ using namespace facebook::react;
   WGPUInstance instance = wgpuCreateInstance(NULL);
 
   if (instance == nullptr) {
-    self.onCreateSurface(@{@"error" : @"Failed to create wgpu instance"});
+    _metalLayer = nil;
+    [self callOnCreateSurfaceWithError:@"Failed to create wgpu instance"];
     return;
   }
 
   auto surface = wgpuInstanceCreateSurface(instance, &descriptor);
 
   if (surface == nullptr) {
-    self.onCreateSurface(@{@"error" : @"Failed to create surface"});
+    _metalLayer = nil;
+    [self callOnCreateSurfaceWithError:@"Failed to create surface"];
     return;
   }
 
@@ -131,7 +129,8 @@ using namespace facebook::react;
 
   auto uuidStr = self.uuidCxxString;
   SurfacesManager::getInstance()->set(uuidStr, managedSurface);
-  [self callOnCreateSurface];
+  [self.layer addSublayer:self.metalLayer];
+  [self callOnCreateSurfaceWithError:nil];
 }
 
 - (void)deleteSurface {
@@ -141,10 +140,21 @@ using namespace facebook::react;
     self->_surface->invalidateTimer();
     self->_surface = nullptr;
   }
+  if (self.metalLayer != nil) {
+    [self.metalLayer removeFromSuperlayer];
+    _metalLayer = nil;
+  }
 }
 
 - (std::string)uuidCxxString {
   return [self.uuid cStringUsingEncoding:NSUTF8StringEncoding];
+}
+
+- (void)layoutSublayersOfLayer:(CALayer *)layer {
+  [super layoutSublayersOfLayer:layer];
+  if (self.metalLayer != nil) {
+    self.metalLayer.frame = layer.bounds;
+  }
 }
 
 // TODO: update surface size
@@ -163,23 +173,33 @@ using namespace facebook::react;
   [super updateProps:props oldProps:oldProps];
 }
 
-- (void)callOnCreateSurface {
+- (void)callOnCreateSurfaceWithError:(NSString *)error {
   if (self->_eventEmitter == nullptr) {
     return;
   }
 
   assert(std::dynamic_pointer_cast<WGPUWebGPUViewEventEmitter const>(self->_eventEmitter));
   auto emitter = std::static_pointer_cast<WGPUWebGPUViewEventEmitter const>(self->_eventEmitter);
-  emitter->onCreateSurface({
-    .uuid = self.uuidCxxString,
-  });
+  if (error != nil) {
+    emitter->onCreateSurface({
+      .error = error.UTF8String,
+    });
+  } else {
+    emitter->onCreateSurface({
+      .uuid = self.uuidCxxString,
+    });
+  }
 }
 
 #else
 
-- (void)callOnCreateSurface {
+- (void)callOnCreateSurfaceWithError:(NSString *)error {
   if (self.onCreateSurface != nil) {
-    self.onCreateSurface(@{@"uuid" : self.uuid});
+    if (error != nil) {
+      self.onCreateSurface(@{@"error" : error});
+    } else {
+      self.onCreateSurface(@{@"uuid" : self.uuid});
+    }
   }
 }
 

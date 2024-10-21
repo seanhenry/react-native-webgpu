@@ -3,10 +3,16 @@ import type {
   SurfaceBackedWebGPU,
   WGPUContext,
 } from '../types/types';
-import { type ImageSourcePropType, View, type ViewProps } from 'react-native';
+import {
+  type ImageSourcePropType,
+  type NativeSyntheticEvent,
+  View,
+  type ViewProps,
+} from 'react-native';
 import { useCallback, useEffect, useRef } from 'react';
-import { type OnCreateSurfaceEvent, WGPUWebGPUView } from './native';
+import { WGPUWebGPUView } from './native';
 import { styles } from './styles';
+import type { OnCreateSurfaceEvent } from './specs/WebgpuNativeComponent';
 
 export interface OnCreateSurfacePayload extends SurfaceBackedWebGPU {
   createImageBitmap(source: ImageSourcePropType): Promise<ImageBitmap>;
@@ -41,9 +47,9 @@ export const WebGpuView = ({
   }, []);
 
   const onCreateSurfaceInternal = useCallback(
-    ({ nativeEvent }: OnCreateSurfaceEvent) => {
+    ({ nativeEvent }: NativeSyntheticEvent<OnCreateSurfaceEvent>) => {
       tearDown();
-      if ('uuid' in nativeEvent) {
+      if (nativeEvent?.uuid) {
         const webGPU = reactNativeWebGPU.getSurfaceBackedWebGPU(
           nativeEvent.uuid
         );

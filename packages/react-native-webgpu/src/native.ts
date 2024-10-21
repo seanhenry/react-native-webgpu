@@ -1,13 +1,5 @@
-import {
-  type HostComponent,
-  Image,
-  type ImageSourcePropType,
-  type NativeSyntheticEvent,
-  Platform,
-  type ViewProps,
-} from 'react-native';
+import { Image, type ImageSourcePropType, Platform } from 'react-native';
 import { NativeWebgpuModule, WebgpuNativeComponent } from './specs';
-import type { WebgpuNativeComponentProps } from './specs/WebgpuNativeComponent';
 
 const LINKING_ERROR =
   `The package 'react-native-webgpu' doesn't seem to be linked. Make sure: \n\n` +
@@ -15,17 +7,7 @@ const LINKING_ERROR =
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n';
 
-export type OnCreateSurfaceEvent = NativeSyntheticEvent<
-  { uuid: string } | { error: string }
->;
-
-export interface WGPUWebGPUViewProps extends ViewProps {
-  onCreateSurface(event: OnCreateSurfaceEvent): void;
-}
-
-export const WGPUWebGPUView = WebgpuNativeComponent as HostComponent<
-  WebgpuNativeComponentProps & WGPUWebGPUViewProps
->;
+export const WGPUWebGPUView = WebgpuNativeComponent;
 
 if (!NativeWebgpuModule) {
   throw new Error(LINKING_ERROR);

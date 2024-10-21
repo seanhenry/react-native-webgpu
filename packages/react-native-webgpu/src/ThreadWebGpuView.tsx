@@ -1,12 +1,9 @@
-import { View, type ViewProps } from 'react-native';
+import { type NativeSyntheticEvent, View, type ViewProps } from 'react-native';
 import { useCallback, useEffect, useRef } from 'react';
 import type { WGPUContext } from '../types/types';
-import {
-  type OnCreateSurfaceEvent,
-  WGPUWebGPUView,
-  ENABLE_THREADS,
-} from './native';
+import { ENABLE_THREADS, WGPUWebGPUView } from './native';
 import { styles } from './styles';
+import type { OnCreateSurfaceEvent } from './specs/WebgpuNativeComponent';
 
 export interface ThreadWebGpuViewProps extends ViewProps {
   threadId: string;
@@ -35,9 +32,9 @@ export const ThreadWebGpuView = ({
   }, []);
 
   const onCreateSurfaceInternal = useCallback(
-    ({ nativeEvent }: OnCreateSurfaceEvent) => {
+    ({ nativeEvent }: NativeSyntheticEvent<OnCreateSurfaceEvent>) => {
       tearDown();
-      if ('uuid' in nativeEvent) {
+      if (nativeEvent?.uuid) {
         console.log('>', threadId);
         reactNativeWebGPUThreads.attachSurface({
           uuid: nativeEvent.uuid,

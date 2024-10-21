@@ -13,7 +13,9 @@
 using namespace facebook::jsi;
 using namespace wgpu;
 
-WGPUDepthStencilState wgpu::makeWGPUDepthStencilState(Runtime &runtime, const Object &obj) {
+namespace wgpu {
+
+WGPUDepthStencilState makeWGPUDepthStencilState(Runtime &runtime, const Object &obj) {
   return {
     .format = StringToWGPUTextureFormat(WGPU_UTF8(obj, format)),
     .depthWriteEnabled = WGPU_BOOL_OPT(obj, depthWriteEnabled, false),
@@ -23,7 +25,7 @@ WGPUDepthStencilState wgpu::makeWGPUDepthStencilState(Runtime &runtime, const Ob
   };
 }
 
-WGPUVertexAttribute wgpu::makeWGPUVertexAttribute(Runtime &runtime, const Value &value) {
+WGPUVertexAttribute makeWGPUVertexAttribute(Runtime &runtime, const Value &value) {
   auto obj = value.asObject(runtime);
   return {
     .format = StringToWGPUVertexFormat(WGPU_UTF8(obj, format)),
@@ -32,7 +34,7 @@ WGPUVertexAttribute wgpu::makeWGPUVertexAttribute(Runtime &runtime, const Value 
   };
 }
 
-WGPUVertexBufferLayout wgpu::makeWGPUVertexBufferLayout(Runtime &runtime, AutoReleasePool &pool, const Value &value) {
+WGPUVertexBufferLayout makeWGPUVertexBufferLayout(Runtime &runtime, AutoReleasePool &pool, const Value &value) {
   auto obj = value.asObject(runtime);
   auto attributesIn = WGPU_ARRAY(obj, attributes);
   auto attributes = jsiArrayToVector<WGPUVertexAttribute>(runtime, std::move(attributesIn), makeWGPUVertexAttribute);
@@ -47,7 +49,7 @@ WGPUVertexBufferLayout wgpu::makeWGPUVertexBufferLayout(Runtime &runtime, AutoRe
   };
 }
 
-ConstantEntries wgpu::makeWGPUConstantEntries(Runtime &runtime, AutoReleasePool &autoReleasePool, const Object &obj) {
+ConstantEntries makeWGPUConstantEntries(Runtime &runtime, AutoReleasePool &autoReleasePool, const Object &obj) {
   ConstantEntries constants;
   if (obj.hasProperty(runtime, "constants")) {
     auto constantsIn = obj.getPropertyAsObject(runtime, "constants");
@@ -66,7 +68,7 @@ ConstantEntries wgpu::makeWGPUConstantEntries(Runtime &runtime, AutoReleasePool 
   return constants;
 }
 
-WGPUVertexState wgpu::makeGPUVertexState(Runtime &runtime, AutoReleasePool &autoReleasePool, const Object &obj) {
+WGPUVertexState makeGPUVertexState(Runtime &runtime, AutoReleasePool &autoReleasePool, const Object &obj) {
   auto vertexModule = WGPU_HOST_OBJ(obj, module, ShaderModuleHostObject);
   auto entryPoint = autoReleasePool.addString(runtime, obj.getProperty(runtime, "entryPoint"));
   auto constants = makeWGPUConstantEntries(runtime, autoReleasePool, obj);
@@ -90,18 +92,25 @@ WGPUVertexState wgpu::makeGPUVertexState(Runtime &runtime, AutoReleasePool &auto
   return state;
 }
 
-WGPUFragmentState wgpu::makeGPUFragmentState(Runtime &runtime, AutoReleasePool &autoReleasePool, const Object &obj) {
-  auto targets =
-    jsiArrayToVector<WGPUColorTargetState>(runtime, WGPU_ARRAY(obj, targets), [](Runtime &runtime, const Value &value) {
+WGPUFragmentState makeGPUFragmentState(Runtime &runtime, AutoReleasePool &autoReleasePool, const Object &obj) {
+  auto targets = jsiArrayToVector<WGPUColorTargetState>(runtime, WGPU_ARRAY(obj, targets),
+                                                        [&autoReleasePool](Runtime &runtime, const Value &value) {
     if (value.isNull()) {
       // TODO: handle null state
       return (const WGPUColorTargetState){nullptr};
     }
     auto target = value.asObject(runtime);
-    return (const WGPUColorTargetState){
+    WGPUColorTargetState state = {
       .format = StringToWGPUTextureFormat(WGPU_UTF8(target, format)),
       .writeMask = WGPU_NUMBER_OPT(target, writeMask, WGPUColorWriteMaskFlags, WGPUColorWriteMask_All),
     };
+    if (WGPU_HAS_PROP(target, blend)) {
+      auto blendIn = WGPU_OBJ(target, blend);
+      auto blend = std::make_shared<WGPUBlendState>(makeGPUBlendState(runtime, blendIn));
+      autoReleasePool.add(blend);
+      state.blend = blend.get();
+    }
+    return state;
   });
   auto sharedTargets = std::make_shared<std::vector<WGPUColorTargetState>>(targets);
   autoReleasePool.add(sharedTargets);
@@ -118,9 +127,8 @@ WGPUFragmentState wgpu::makeGPUFragmentState(Runtime &runtime, AutoReleasePool &
   };
 }
 
-WGPUProgrammableStageDescriptor wgpu::makeWGPUProgrammableStageDescriptor(Runtime &runtime,
-                                                                          AutoReleasePool &autoReleasePool,
-                                                                          const Object &obj) {
+WGPUProgrammableStageDescriptor makeWGPUProgrammableStageDescriptor(Runtime &runtime, AutoReleasePool &autoReleasePool,
+                                                                    const Object &obj) {
   auto vertexModule = WGPU_HOST_OBJ(obj, module, ShaderModuleHostObject);
   auto entryPoint = autoReleasePool.addString(runtime, obj.getProperty(runtime, "entryPoint"));
   auto constants = makeWGPUConstantEntries(runtime, autoReleasePool, obj);
@@ -132,7 +140,7 @@ WGPUProgrammableStageDescriptor wgpu::makeWGPUProgrammableStageDescriptor(Runtim
   };
 }
 
-WGPUExtent3D wgpu::makeGPUExtent3D(Runtime &runtime, const Object &obj) {
+WGPUExtent3D makeGPUExtent3D(Runtime &runtime, const Object &obj) {
   WGPUExtent3D extent = makeDefaultWGPUExtent3D();
   if (obj.isArray(runtime)) {
     auto array = obj.asArray(runtime);
@@ -155,7 +163,7 @@ WGPUExtent3D wgpu::makeGPUExtent3D(Runtime &runtime, const Object &obj) {
   return extent;
 }
 
-void wgpu::addWGPUBindingResource(Runtime &runtime, const Value &value, WGPUBindGroupEntry &entry) {
+void addWGPUBindingResource(Runtime &runtime, const Value &value, WGPUBindGroupEntry &entry) {
   if (value.isObject() && value.asObject(runtime).isHostObject<SamplerHostObject>(runtime)) {
     entry.sampler = value.asObject(runtime).asHostObject<SamplerHostObject>(runtime)->getValue();
   } else if (value.isObject() && value.asObject(runtime).isHostObject<TextureViewHostObject>(runtime)) {
@@ -173,7 +181,7 @@ void wgpu::addWGPUBindingResource(Runtime &runtime, const Value &value, WGPUBind
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/GPUCommandEncoder/beginRenderPass#color_attachment_object_structure
-WGPUColor wgpu::makeWGPUColor(Runtime &runtime, const Value &value) {
+WGPUColor makeWGPUColor(Runtime &runtime, const Value &value) {
   WGPUColor color = {.r = 0.0, .g = 0.0, .b = 0.0, .a = 0.0};
   if (isJSIArray(runtime, value)) {
     auto array = value.asObject(runtime).asArray(runtime);
@@ -192,7 +200,7 @@ WGPUColor wgpu::makeWGPUColor(Runtime &runtime, const Value &value) {
   return color;
 }
 
-WGPUColor wgpu::makeWGPUColorFromProp(Runtime &runtime, const Object &obj, const char *propName) {
+WGPUColor makeWGPUColorFromProp(Runtime &runtime, const Object &obj, const char *propName) {
   if (obj.hasProperty(runtime, propName)) {
     auto clearValueIn = obj.getProperty(runtime, propName);
     return makeWGPUColor(runtime, clearValueIn);
@@ -200,7 +208,7 @@ WGPUColor wgpu::makeWGPUColorFromProp(Runtime &runtime, const Object &obj, const
   return {.r = 0.0, .g = 0.0, .b = 0.0, .a = 0.0};
 }
 
-WGPUImageCopyTexture wgpu::makeWGPUImageCopyTexture(Runtime &runtime, const Object &obj) {
+WGPUImageCopyTexture makeWGPUImageCopyTexture(Runtime &runtime, const Object &obj) {
   auto textureIn = WGPU_HOST_OBJ(obj, texture, TextureHostObject)->getValue();
   auto textureOut = makeDefaultImageCopyTexture(textureIn);
   if (obj.hasProperty(runtime, "origin")) {
@@ -212,7 +220,7 @@ WGPUImageCopyTexture wgpu::makeWGPUImageCopyTexture(Runtime &runtime, const Obje
   return textureOut;
 }
 
-WGPUImageCopyBuffer wgpu::makeWGPUImageCopyBuffer(Runtime &runtime, const Object &obj, const WGPUExtent3D &extent) {
+WGPUImageCopyBuffer makeWGPUImageCopyBuffer(Runtime &runtime, const Object &obj, const WGPUExtent3D &extent) {
   return {
     .nextInChain = nullptr,
     .layout = makeWGPUTextureDataLayout(runtime, obj, extent),
@@ -220,7 +228,7 @@ WGPUImageCopyBuffer wgpu::makeWGPUImageCopyBuffer(Runtime &runtime, const Object
   };
 }
 
-WGPUOrigin3D wgpu::makeWGPUOrigin3D(Runtime &runtime, const Object &obj) {
+WGPUOrigin3D makeWGPUOrigin3D(Runtime &runtime, const Object &obj) {
   WGPUOrigin3D origin = {0};
   if (obj.isArray(runtime)) {
     auto array = obj.asArray(runtime);
@@ -236,7 +244,7 @@ WGPUOrigin3D wgpu::makeWGPUOrigin3D(Runtime &runtime, const Object &obj) {
   return origin;
 }
 
-Value wgpu::makeJsiLimits(Runtime &runtime, const WGPULimits &limits) {
+Value makeJsiLimits(Runtime &runtime, const WGPULimits &limits) {
   Object obj(runtime);
   obj.setProperty(runtime, "maxTextureDimension1D", Value((int)limits.maxTextureDimension1D));
   obj.setProperty(runtime, "maxTextureDimension2D", Value((int)limits.maxTextureDimension2D));
@@ -276,7 +284,7 @@ Value wgpu::makeJsiLimits(Runtime &runtime, const WGPULimits &limits) {
 }
 
 // wgpu returns undefined data along with supported features so we need to filter those out
-Value wgpu::makeJsiFeatures(Runtime &runtime, const std::vector<WGPUFeatureName> &features) {
+Value makeJsiFeatures(Runtime &runtime, const std::vector<WGPUFeatureName> &features) {
   std::vector<Value> values;
   values.reserve(features.size());
   for (WGPUFeatureName featureName : features) {
@@ -289,7 +297,7 @@ Value wgpu::makeJsiFeatures(Runtime &runtime, const std::vector<WGPUFeatureName>
 }
 
 // TODO: figure out defaults https://www.w3.org/TR/webgpu/#timestamp
-WGPUComputePassTimestampWrites wgpu::makeWGPUComputePassTimestampWrites(Runtime &runtime, const Object &obj) {
+WGPUComputePassTimestampWrites makeWGPUComputePassTimestampWrites(Runtime &runtime, const Object &obj) {
   return {
     .querySet = WGPU_HOST_OBJ(obj, querySet, QuerySetHostObject)->getValue(),
     .beginningOfPassWriteIndex = WGPU_NUMBER(obj, beginningOfPassWriteIndex, uint32_t),
@@ -298,7 +306,7 @@ WGPUComputePassTimestampWrites wgpu::makeWGPUComputePassTimestampWrites(Runtime 
 }
 
 // TODO: figure out defaults https://www.w3.org/TR/webgpu/#timestamp
-WGPURenderPassTimestampWrites wgpu::makeWGPURenderPassTimestampWrites(Runtime &runtime, const Object &obj) {
+WGPURenderPassTimestampWrites makeWGPURenderPassTimestampWrites(Runtime &runtime, const Object &obj) {
   return {
     .querySet = WGPU_HOST_OBJ(obj, querySet, QuerySetHostObject)->getValue(),
     .beginningOfPassWriteIndex = WGPU_NUMBER(obj, beginningOfPassWriteIndex, uint32_t),
@@ -306,7 +314,7 @@ WGPURenderPassTimestampWrites wgpu::makeWGPURenderPassTimestampWrites(Runtime &r
   };
 }
 
-WGPUTextureDataLayout wgpu::makeWGPUTextureDataLayout(Runtime &runtime, const Object &obj, const WGPUExtent3D &extent) {
+WGPUTextureDataLayout makeWGPUTextureDataLayout(Runtime &runtime, const Object &obj, const WGPUExtent3D &extent) {
   return {
     .nextInChain = nullptr,
     .offset = WGPU_NUMBER_OPT(obj, offset, uint64_t, 0),
@@ -315,3 +323,25 @@ WGPUTextureDataLayout wgpu::makeWGPUTextureDataLayout(Runtime &runtime, const Ob
     .rowsPerImage = WGPU_NUMBER_OPT(obj, rowsPerImage, uint32_t, extent.height),
   };
 }
+
+WGPUBlendState makeGPUBlendState(Runtime &runtime, Object &obj) {
+  auto color = WGPU_OBJ(obj, color);
+  auto alpha = WGPU_OBJ(obj, alpha);
+  return {
+    .color = makeGPUBlendComponent(runtime, color),
+    .alpha = makeGPUBlendComponent(runtime, alpha),
+  };
+}
+
+WGPUBlendComponent makeGPUBlendComponent(Runtime &runtime, Object &obj) {
+  auto operation = WGPU_UTF8_OPT(obj, operation, "add");
+  auto srcFactor = WGPU_UTF8_OPT(obj, srcFactor, "one");
+  auto dstFactor = WGPU_UTF8_OPT(obj, dstFactor, "zero");
+  return {
+    .operation = StringToWGPUBlendOperation(operation),
+    .srcFactor = StringToWGPUBlendFactor(srcFactor),
+    .dstFactor = StringToWGPUBlendFactor(dstFactor),
+  };
+}
+
+}  // namespace wgpu

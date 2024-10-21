@@ -4,212 +4,212 @@
 
 #include "WGPUJsiUtils.h"
 
+namespace wgpu {
+
 const char *WGPUTextureFormatToString(WGPUTextureFormat format) {
-  static std::unordered_map<WGPUTextureFormat, const char *> map;
-  if (map.size() == 0) {
-    map[WGPUTextureFormat_R8Unorm] = "r8unorm";
-    map[WGPUTextureFormat_R8Snorm] = "r8snorm";
-    map[WGPUTextureFormat_R8Uint] = "r8uint";
-    map[WGPUTextureFormat_R8Sint] = "r8sint";
-    map[WGPUTextureFormat_R16Uint] = "r16uint";
-    map[WGPUTextureFormat_R16Sint] = "r16sint";
-    map[WGPUTextureFormat_R16Float] = "r16float";
-    map[WGPUTextureFormat_RG8Unorm] = "rg8unorm";
-    map[WGPUTextureFormat_RG8Snorm] = "rg8snorm";
-    map[WGPUTextureFormat_RG8Uint] = "rg8uint";
-    map[WGPUTextureFormat_RG8Sint] = "rg8sint";
-    map[WGPUTextureFormat_R32Float] = "r32float";
-    map[WGPUTextureFormat_R32Uint] = "r32uint";
-    map[WGPUTextureFormat_R32Sint] = "r32sint";
-    map[WGPUTextureFormat_RG16Uint] = "rg16uint";
-    map[WGPUTextureFormat_RG16Sint] = "rg16sint";
-    map[WGPUTextureFormat_RG16Float] = "rg16float";
-    map[WGPUTextureFormat_RGBA8Unorm] = "rgba8unorm";
-    map[WGPUTextureFormat_RGBA8UnormSrgb] = "rgba8unorm-srgb";
-    map[WGPUTextureFormat_RGBA8Snorm] = "rgba8snorm";
-    map[WGPUTextureFormat_RGBA8Uint] = "rgba8uint";
-    map[WGPUTextureFormat_RGBA8Sint] = "rgba8sint";
-    map[WGPUTextureFormat_BGRA8Unorm] = "bgra8unorm";
-    map[WGPUTextureFormat_BGRA8UnormSrgb] = "bgra8unorm-srgb";
-    map[WGPUTextureFormat_RGB10A2Uint] = "rgb10a2uint";
-    map[WGPUTextureFormat_RGB10A2Unorm] = "rgb10a2unorm";
-    map[WGPUTextureFormat_RG11B10Ufloat] = "rg11b10ufloat";
-    map[WGPUTextureFormat_RGB9E5Ufloat] = "rgb9e5ufloat";
-    map[WGPUTextureFormat_RG32Float] = "rg32float";
-    map[WGPUTextureFormat_RG32Uint] = "rg32uint";
-    map[WGPUTextureFormat_RG32Sint] = "rg32sint";
-    map[WGPUTextureFormat_RGBA16Uint] = "rgba16uint";
-    map[WGPUTextureFormat_RGBA16Sint] = "rgba16sint";
-    map[WGPUTextureFormat_RGBA16Float] = "rgba16float";
-    map[WGPUTextureFormat_RGBA32Float] = "rgba32float";
-    map[WGPUTextureFormat_RGBA32Uint] = "rgba32uint";
-    map[WGPUTextureFormat_RGBA32Sint] = "rgba32sint";
-    map[WGPUTextureFormat_Stencil8] = "stencil8";
-    map[WGPUTextureFormat_Depth16Unorm] = "depth16unorm";
-    map[WGPUTextureFormat_Depth24Plus] = "depth24plus";
-    map[WGPUTextureFormat_Depth24PlusStencil8] = "depth24plus-stencil8";
-    map[WGPUTextureFormat_Depth32Float] = "depth32float";
-    map[WGPUTextureFormat_Depth32FloatStencil8] = "depth32float-stencil8";
-    map[WGPUTextureFormat_BC1RGBAUnorm] = "bc1-rgba-unorm";
-    map[WGPUTextureFormat_BC1RGBAUnormSrgb] = "bc1-rgba-unorm-srgb";
-    map[WGPUTextureFormat_BC2RGBAUnorm] = "bc2-rgba-unorm";
-    map[WGPUTextureFormat_BC2RGBAUnormSrgb] = "bc2-rgba-unorm-srgb";
-    map[WGPUTextureFormat_BC3RGBAUnorm] = "bc3-rgba-unorm";
-    map[WGPUTextureFormat_BC3RGBAUnormSrgb] = "bc3-rgba-unorm-srgb";
-    map[WGPUTextureFormat_BC4RUnorm] = "bc4-r-unorm";
-    map[WGPUTextureFormat_BC4RSnorm] = "bc4-r-snorm";
-    map[WGPUTextureFormat_BC5RGUnorm] = "bc5-rg-unorm";
-    map[WGPUTextureFormat_BC5RGSnorm] = "bc5-rg-snorm";
-    map[WGPUTextureFormat_BC6HRGBUfloat] = "bc6h-rgb-ufloat";
-    map[WGPUTextureFormat_BC6HRGBFloat] = "bc6h-rgb-float";
-    map[WGPUTextureFormat_BC7RGBAUnorm] = "bc7-rgba-unorm";
-    map[WGPUTextureFormat_BC7RGBAUnormSrgb] = "bc7-rgba-unorm-srgb";
-    map[WGPUTextureFormat_ETC2RGB8Unorm] = "etc2-rgb8unorm";
-    map[WGPUTextureFormat_ETC2RGB8UnormSrgb] = "etc2-rgb8unorm-srgb";
-    map[WGPUTextureFormat_ETC2RGB8A1Unorm] = "etc2-rgb8a1unorm";
-    map[WGPUTextureFormat_ETC2RGB8A1UnormSrgb] = "etc2-rgb8a1unorm-srgb";
-    map[WGPUTextureFormat_ETC2RGBA8Unorm] = "etc2-rgba8unorm";
-    map[WGPUTextureFormat_ETC2RGBA8UnormSrgb] = "etc2-rgba8unorm-srgb";
-    map[WGPUTextureFormat_EACR11Unorm] = "eac-r11unorm";
-    map[WGPUTextureFormat_EACR11Snorm] = "eac-r11snorm";
-    map[WGPUTextureFormat_EACRG11Unorm] = "eac-rg11unorm";
-    map[WGPUTextureFormat_EACRG11Snorm] = "eac-rg11snorm";
-    map[WGPUTextureFormat_ASTC4x4Unorm] = "astc-4x4-unorm";
-    map[WGPUTextureFormat_ASTC4x4UnormSrgb] = "astc-4x4-unorm-srgb";
-    map[WGPUTextureFormat_ASTC5x4Unorm] = "astc-5x4-unorm";
-    map[WGPUTextureFormat_ASTC5x4UnormSrgb] = "astc-5x4-unorm-srgb";
-    map[WGPUTextureFormat_ASTC5x5Unorm] = "astc-5x5-unorm";
-    map[WGPUTextureFormat_ASTC5x5UnormSrgb] = "astc-5x5-unorm-srgb";
-    map[WGPUTextureFormat_ASTC6x5Unorm] = "astc-6x5-unorm";
-    map[WGPUTextureFormat_ASTC6x5UnormSrgb] = "astc-6x5-unorm-srgb";
-    map[WGPUTextureFormat_ASTC6x6Unorm] = "astc-6x6-unorm";
-    map[WGPUTextureFormat_ASTC6x6UnormSrgb] = "astc-6x6-unorm-srgb";
-    map[WGPUTextureFormat_ASTC8x5Unorm] = "astc-8x5-unorm";
-    map[WGPUTextureFormat_ASTC8x5UnormSrgb] = "astc-8x5-unorm-srgb";
-    map[WGPUTextureFormat_ASTC8x6Unorm] = "astc-8x6-unorm";
-    map[WGPUTextureFormat_ASTC8x6UnormSrgb] = "astc-8x6-unorm-srgb";
-    map[WGPUTextureFormat_ASTC8x8Unorm] = "astc-8x8-unorm";
-    map[WGPUTextureFormat_ASTC8x8UnormSrgb] = "astc-8x8-unorm-srgb";
-    map[WGPUTextureFormat_ASTC10x5Unorm] = "astc-10x5-unorm";
-    map[WGPUTextureFormat_ASTC10x5UnormSrgb] = "astc-10x5-unorm-srgb";
-    map[WGPUTextureFormat_ASTC10x6Unorm] = "astc-10x6-unorm";
-    map[WGPUTextureFormat_ASTC10x6UnormSrgb] = "astc-10x6-unorm-srgb";
-    map[WGPUTextureFormat_ASTC10x8Unorm] = "astc-10x8-unorm";
-    map[WGPUTextureFormat_ASTC10x8UnormSrgb] = "astc-10x8-unorm-srgb";
-    map[WGPUTextureFormat_ASTC10x10Unorm] = "astc-10x10-unorm";
-    map[WGPUTextureFormat_ASTC10x10UnormSrgb] = "astc-10x10-unorm-srgb";
-    map[WGPUTextureFormat_ASTC12x10Unorm] = "astc-12x10-unorm";
-    map[WGPUTextureFormat_ASTC12x10UnormSrgb] = "astc-12x10-unorm-srgb";
-    map[WGPUTextureFormat_ASTC12x12Unorm] = "astc-12x12-unorm";
-    map[WGPUTextureFormat_ASTC12x12UnormSrgb] = "astc-12x12-unorm-srgb";
-  }
+  static std::unordered_map<WGPUTextureFormat, const char *> map = {
+    {WGPUTextureFormat_R8Unorm, "r8unorm"},
+    {WGPUTextureFormat_R8Snorm, "r8snorm"},
+    {WGPUTextureFormat_R8Uint, "r8uint"},
+    {WGPUTextureFormat_R8Sint, "r8sint"},
+    {WGPUTextureFormat_R16Uint, "r16uint"},
+    {WGPUTextureFormat_R16Sint, "r16sint"},
+    {WGPUTextureFormat_R16Float, "r16float"},
+    {WGPUTextureFormat_RG8Unorm, "rg8unorm"},
+    {WGPUTextureFormat_RG8Snorm, "rg8snorm"},
+    {WGPUTextureFormat_RG8Uint, "rg8uint"},
+    {WGPUTextureFormat_RG8Sint, "rg8sint"},
+    {WGPUTextureFormat_R32Float, "r32float"},
+    {WGPUTextureFormat_R32Uint, "r32uint"},
+    {WGPUTextureFormat_R32Sint, "r32sint"},
+    {WGPUTextureFormat_RG16Uint, "rg16uint"},
+    {WGPUTextureFormat_RG16Sint, "rg16sint"},
+    {WGPUTextureFormat_RG16Float, "rg16float"},
+    {WGPUTextureFormat_RGBA8Unorm, "rgba8unorm"},
+    {WGPUTextureFormat_RGBA8UnormSrgb, "rgba8unorm-srgb"},
+    {WGPUTextureFormat_RGBA8Snorm, "rgba8snorm"},
+    {WGPUTextureFormat_RGBA8Uint, "rgba8uint"},
+    {WGPUTextureFormat_RGBA8Sint, "rgba8sint"},
+    {WGPUTextureFormat_BGRA8Unorm, "bgra8unorm"},
+    {WGPUTextureFormat_BGRA8UnormSrgb, "bgra8unorm-srgb"},
+    {WGPUTextureFormat_RGB10A2Uint, "rgb10a2uint"},
+    {WGPUTextureFormat_RGB10A2Unorm, "rgb10a2unorm"},
+    {WGPUTextureFormat_RG11B10Ufloat, "rg11b10ufloat"},
+    {WGPUTextureFormat_RGB9E5Ufloat, "rgb9e5ufloat"},
+    {WGPUTextureFormat_RG32Float, "rg32float"},
+    {WGPUTextureFormat_RG32Uint, "rg32uint"},
+    {WGPUTextureFormat_RG32Sint, "rg32sint"},
+    {WGPUTextureFormat_RGBA16Uint, "rgba16uint"},
+    {WGPUTextureFormat_RGBA16Sint, "rgba16sint"},
+    {WGPUTextureFormat_RGBA16Float, "rgba16float"},
+    {WGPUTextureFormat_RGBA32Float, "rgba32float"},
+    {WGPUTextureFormat_RGBA32Uint, "rgba32uint"},
+    {WGPUTextureFormat_RGBA32Sint, "rgba32sint"},
+    {WGPUTextureFormat_Stencil8, "stencil8"},
+    {WGPUTextureFormat_Depth16Unorm, "depth16unorm"},
+    {WGPUTextureFormat_Depth24Plus, "depth24plus"},
+    {WGPUTextureFormat_Depth24PlusStencil8, "depth24plus-stencil8"},
+    {WGPUTextureFormat_Depth32Float, "depth32float"},
+    {WGPUTextureFormat_Depth32FloatStencil8, "depth32float-stencil8"},
+    {WGPUTextureFormat_BC1RGBAUnorm, "bc1-rgba-unorm"},
+    {WGPUTextureFormat_BC1RGBAUnormSrgb, "bc1-rgba-unorm-srgb"},
+    {WGPUTextureFormat_BC2RGBAUnorm, "bc2-rgba-unorm"},
+    {WGPUTextureFormat_BC2RGBAUnormSrgb, "bc2-rgba-unorm-srgb"},
+    {WGPUTextureFormat_BC3RGBAUnorm, "bc3-rgba-unorm"},
+    {WGPUTextureFormat_BC3RGBAUnormSrgb, "bc3-rgba-unorm-srgb"},
+    {WGPUTextureFormat_BC4RUnorm, "bc4-r-unorm"},
+    {WGPUTextureFormat_BC4RSnorm, "bc4-r-snorm"},
+    {WGPUTextureFormat_BC5RGUnorm, "bc5-rg-unorm"},
+    {WGPUTextureFormat_BC5RGSnorm, "bc5-rg-snorm"},
+    {WGPUTextureFormat_BC6HRGBUfloat, "bc6h-rgb-ufloat"},
+    {WGPUTextureFormat_BC6HRGBFloat, "bc6h-rgb-float"},
+    {WGPUTextureFormat_BC7RGBAUnorm, "bc7-rgba-unorm"},
+    {WGPUTextureFormat_BC7RGBAUnormSrgb, "bc7-rgba-unorm-srgb"},
+    {WGPUTextureFormat_ETC2RGB8Unorm, "etc2-rgb8unorm"},
+    {WGPUTextureFormat_ETC2RGB8UnormSrgb, "etc2-rgb8unorm-srgb"},
+    {WGPUTextureFormat_ETC2RGB8A1Unorm, "etc2-rgb8a1unorm"},
+    {WGPUTextureFormat_ETC2RGB8A1UnormSrgb, "etc2-rgb8a1unorm-srgb"},
+    {WGPUTextureFormat_ETC2RGBA8Unorm, "etc2-rgba8unorm"},
+    {WGPUTextureFormat_ETC2RGBA8UnormSrgb, "etc2-rgba8unorm-srgb"},
+    {WGPUTextureFormat_EACR11Unorm, "eac-r11unorm"},
+    {WGPUTextureFormat_EACR11Snorm, "eac-r11snorm"},
+    {WGPUTextureFormat_EACRG11Unorm, "eac-rg11unorm"},
+    {WGPUTextureFormat_EACRG11Snorm, "eac-rg11snorm"},
+    {WGPUTextureFormat_ASTC4x4Unorm, "astc-4x4-unorm"},
+    {WGPUTextureFormat_ASTC4x4UnormSrgb, "astc-4x4-unorm-srgb"},
+    {WGPUTextureFormat_ASTC5x4Unorm, "astc-5x4-unorm"},
+    {WGPUTextureFormat_ASTC5x4UnormSrgb, "astc-5x4-unorm-srgb"},
+    {WGPUTextureFormat_ASTC5x5Unorm, "astc-5x5-unorm"},
+    {WGPUTextureFormat_ASTC5x5UnormSrgb, "astc-5x5-unorm-srgb"},
+    {WGPUTextureFormat_ASTC6x5Unorm, "astc-6x5-unorm"},
+    {WGPUTextureFormat_ASTC6x5UnormSrgb, "astc-6x5-unorm-srgb"},
+    {WGPUTextureFormat_ASTC6x6Unorm, "astc-6x6-unorm"},
+    {WGPUTextureFormat_ASTC6x6UnormSrgb, "astc-6x6-unorm-srgb"},
+    {WGPUTextureFormat_ASTC8x5Unorm, "astc-8x5-unorm"},
+    {WGPUTextureFormat_ASTC8x5UnormSrgb, "astc-8x5-unorm-srgb"},
+    {WGPUTextureFormat_ASTC8x6Unorm, "astc-8x6-unorm"},
+    {WGPUTextureFormat_ASTC8x6UnormSrgb, "astc-8x6-unorm-srgb"},
+    {WGPUTextureFormat_ASTC8x8Unorm, "astc-8x8-unorm"},
+    {WGPUTextureFormat_ASTC8x8UnormSrgb, "astc-8x8-unorm-srgb"},
+    {WGPUTextureFormat_ASTC10x5Unorm, "astc-10x5-unorm"},
+    {WGPUTextureFormat_ASTC10x5UnormSrgb, "astc-10x5-unorm-srgb"},
+    {WGPUTextureFormat_ASTC10x6Unorm, "astc-10x6-unorm"},
+    {WGPUTextureFormat_ASTC10x6UnormSrgb, "astc-10x6-unorm-srgb"},
+    {WGPUTextureFormat_ASTC10x8Unorm, "astc-10x8-unorm"},
+    {WGPUTextureFormat_ASTC10x8UnormSrgb, "astc-10x8-unorm-srgb"},
+    {WGPUTextureFormat_ASTC10x10Unorm, "astc-10x10-unorm"},
+    {WGPUTextureFormat_ASTC10x10UnormSrgb, "astc-10x10-unorm-srgb"},
+    {WGPUTextureFormat_ASTC12x10Unorm, "astc-12x10-unorm"},
+    {WGPUTextureFormat_ASTC12x10UnormSrgb, "astc-12x10-unorm-srgb"},
+    {WGPUTextureFormat_ASTC12x12Unorm, "astc-12x12-unorm"},
+    {WGPUTextureFormat_ASTC12x12UnormSrgb, "astc-12x12-unorm-srgb"},
+  };
   return map.at(format);
 }
 
 WGPUTextureFormat StringToWGPUTextureFormat(const std::string &format) {
-  static std::unordered_map<std::string, WGPUTextureFormat> map;
-  if (map.empty()) {
-    map["r8unorm"] = WGPUTextureFormat_R8Unorm;
-    map["r8snorm"] = WGPUTextureFormat_R8Snorm;
-    map["r8uint"] = WGPUTextureFormat_R8Uint;
-    map["r8sint"] = WGPUTextureFormat_R8Sint;
-    map["r16uint"] = WGPUTextureFormat_R16Uint;
-    map["r16sint"] = WGPUTextureFormat_R16Sint;
-    map["r16float"] = WGPUTextureFormat_R16Float;
-    map["rg8unorm"] = WGPUTextureFormat_RG8Unorm;
-    map["rg8snorm"] = WGPUTextureFormat_RG8Snorm;
-    map["rg8uint"] = WGPUTextureFormat_RG8Uint;
-    map["rg8sint"] = WGPUTextureFormat_RG8Sint;
-    map["r32float"] = WGPUTextureFormat_R32Float;
-    map["r32uint"] = WGPUTextureFormat_R32Uint;
-    map["r32sint"] = WGPUTextureFormat_R32Sint;
-    map["rg16uint"] = WGPUTextureFormat_RG16Uint;
-    map["rg16sint"] = WGPUTextureFormat_RG16Sint;
-    map["rg16float"] = WGPUTextureFormat_RG16Float;
-    map["rgba8unorm"] = WGPUTextureFormat_RGBA8Unorm;
-    map["rgba8unorm-srgb"] = WGPUTextureFormat_RGBA8UnormSrgb;
-    map["rgba8snorm"] = WGPUTextureFormat_RGBA8Snorm;
-    map["rgba8uint"] = WGPUTextureFormat_RGBA8Uint;
-    map["rgba8sint"] = WGPUTextureFormat_RGBA8Sint;
-    map["bgra8unorm"] = WGPUTextureFormat_BGRA8Unorm;
-    map["bgra8unorm-srgb"] = WGPUTextureFormat_BGRA8UnormSrgb;
-    map["rgb10a2uint"] = WGPUTextureFormat_RGB10A2Uint;
-    map["rgb10a2unorm"] = WGPUTextureFormat_RGB10A2Unorm;
-    map["rg11b10ufloat"] = WGPUTextureFormat_RG11B10Ufloat;
-    map["rgb9e5ufloat"] = WGPUTextureFormat_RGB9E5Ufloat;
-    map["rg32float"] = WGPUTextureFormat_RG32Float;
-    map["rg32uint"] = WGPUTextureFormat_RG32Uint;
-    map["rg32sint"] = WGPUTextureFormat_RG32Sint;
-    map["rgba16uint"] = WGPUTextureFormat_RGBA16Uint;
-    map["rgba16sint"] = WGPUTextureFormat_RGBA16Sint;
-    map["rgba16float"] = WGPUTextureFormat_RGBA16Float;
-    map["rgba32float"] = WGPUTextureFormat_RGBA32Float;
-    map["rgba32uint"] = WGPUTextureFormat_RGBA32Uint;
-    map["rgba32sint"] = WGPUTextureFormat_RGBA32Sint;
-    map["stencil8"] = WGPUTextureFormat_Stencil8;
-    map["depth16unorm"] = WGPUTextureFormat_Depth16Unorm;
-    map["depth24plus"] = WGPUTextureFormat_Depth24Plus;
-    map["depth24plus-stencil8"] = WGPUTextureFormat_Depth24PlusStencil8;
-    map["depth32float"] = WGPUTextureFormat_Depth32Float;
-    map["depth32float-stencil8"] = WGPUTextureFormat_Depth32FloatStencil8;
-    map["bc1-rgba-unorm"] = WGPUTextureFormat_BC1RGBAUnorm;
-    map["bc1-rgba-unorm-srgb"] = WGPUTextureFormat_BC1RGBAUnormSrgb;
-    map["bc2-rgba-unorm"] = WGPUTextureFormat_BC2RGBAUnorm;
-    map["bc2-rgba-unorm-srgb"] = WGPUTextureFormat_BC2RGBAUnormSrgb;
-    map["bc3-rgba-unorm"] = WGPUTextureFormat_BC3RGBAUnorm;
-    map["bc3-rgba-unorm-srgb"] = WGPUTextureFormat_BC3RGBAUnormSrgb;
-    map["bc4-r-unorm"] = WGPUTextureFormat_BC4RUnorm;
-    map["bc4-r-snorm"] = WGPUTextureFormat_BC4RSnorm;
-    map["bc5-rg-unorm"] = WGPUTextureFormat_BC5RGUnorm;
-    map["bc5-rg-snorm"] = WGPUTextureFormat_BC5RGSnorm;
-    map["bc6h-rgb-ufloat"] = WGPUTextureFormat_BC6HRGBUfloat;
-    map["bc6h-rgb-float"] = WGPUTextureFormat_BC6HRGBFloat;
-    map["bc7-rgba-unorm"] = WGPUTextureFormat_BC7RGBAUnorm;
-    map["bc7-rgba-unorm-srgb"] = WGPUTextureFormat_BC7RGBAUnormSrgb;
-    map["etc2-rgb8unorm"] = WGPUTextureFormat_ETC2RGB8Unorm;
-    map["etc2-rgb8unorm-srgb"] = WGPUTextureFormat_ETC2RGB8UnormSrgb;
-    map["etc2-rgb8a1unorm"] = WGPUTextureFormat_ETC2RGB8A1Unorm;
-    map["etc2-rgb8a1unorm-srgb"] = WGPUTextureFormat_ETC2RGB8A1UnormSrgb;
-    map["etc2-rgba8unorm"] = WGPUTextureFormat_ETC2RGBA8Unorm;
-    map["etc2-rgba8unorm-srgb"] = WGPUTextureFormat_ETC2RGBA8UnormSrgb;
-    map["eac-r11unorm"] = WGPUTextureFormat_EACR11Unorm;
-    map["eac-r11snorm"] = WGPUTextureFormat_EACR11Snorm;
-    map["eac-rg11unorm"] = WGPUTextureFormat_EACRG11Unorm;
-    map["eac-rg11snorm"] = WGPUTextureFormat_EACRG11Snorm;
-    map["astc-4x4-unorm"] = WGPUTextureFormat_ASTC4x4Unorm;
-    map["astc-4x4-unorm-srgb"] = WGPUTextureFormat_ASTC4x4UnormSrgb;
-    map["astc-5x4-unorm"] = WGPUTextureFormat_ASTC5x4Unorm;
-    map["astc-5x4-unorm-srgb"] = WGPUTextureFormat_ASTC5x4UnormSrgb;
-    map["astc-5x5-unorm"] = WGPUTextureFormat_ASTC5x5Unorm;
-    map["astc-5x5-unorm-srgb"] = WGPUTextureFormat_ASTC5x5UnormSrgb;
-    map["astc-6x5-unorm"] = WGPUTextureFormat_ASTC6x5Unorm;
-    map["astc-6x5-unorm-srgb"] = WGPUTextureFormat_ASTC6x5UnormSrgb;
-    map["astc-6x6-unorm"] = WGPUTextureFormat_ASTC6x6Unorm;
-    map["astc-6x6-unorm-srgb"] = WGPUTextureFormat_ASTC6x6UnormSrgb;
-    map["astc-8x5-unorm"] = WGPUTextureFormat_ASTC8x5Unorm;
-    map["astc-8x5-unorm-srgb"] = WGPUTextureFormat_ASTC8x5UnormSrgb;
-    map["astc-8x6-unorm"] = WGPUTextureFormat_ASTC8x6Unorm;
-    map["astc-8x6-unorm-srgb"] = WGPUTextureFormat_ASTC8x6UnormSrgb;
-    map["astc-8x8-unorm"] = WGPUTextureFormat_ASTC8x8Unorm;
-    map["astc-8x8-unorm-srgb"] = WGPUTextureFormat_ASTC8x8UnormSrgb;
-    map["astc-10x5-unorm"] = WGPUTextureFormat_ASTC10x5Unorm;
-    map["astc-10x5-unorm-srgb"] = WGPUTextureFormat_ASTC10x5UnormSrgb;
-    map["astc-10x6-unorm"] = WGPUTextureFormat_ASTC10x6Unorm;
-    map["astc-10x6-unorm-srgb"] = WGPUTextureFormat_ASTC10x6UnormSrgb;
-    map["astc-10x8-unorm"] = WGPUTextureFormat_ASTC10x8Unorm;
-    map["astc-10x8-unorm-srgb"] = WGPUTextureFormat_ASTC10x8UnormSrgb;
-    map["astc-10x10-unorm"] = WGPUTextureFormat_ASTC10x10Unorm;
-    map["astc-10x10-unorm-srgb"] = WGPUTextureFormat_ASTC10x10UnormSrgb;
-    map["astc-12x10-unorm"] = WGPUTextureFormat_ASTC12x10Unorm;
-    map["astc-12x10-unorm-srgb"] = WGPUTextureFormat_ASTC12x10UnormSrgb;
-    map["astc-12x12-unorm"] = WGPUTextureFormat_ASTC12x12Unorm;
-    map["astc-12x12-unorm-srgb"] = WGPUTextureFormat_ASTC12x12UnormSrgb;
-    map["undefined"] = WGPUTextureFormat_Undefined;
-  }
-  if (map.find(format) == map.end()) {
+  static std::unordered_map<std::string, WGPUTextureFormat> map = {
+    {"r8unorm", WGPUTextureFormat_R8Unorm},
+    {"r8snorm", WGPUTextureFormat_R8Snorm},
+    {"r8uint", WGPUTextureFormat_R8Uint},
+    {"r8sint", WGPUTextureFormat_R8Sint},
+    {"r16uint", WGPUTextureFormat_R16Uint},
+    {"r16sint", WGPUTextureFormat_R16Sint},
+    {"r16float", WGPUTextureFormat_R16Float},
+    {"rg8unorm", WGPUTextureFormat_RG8Unorm},
+    {"rg8snorm", WGPUTextureFormat_RG8Snorm},
+    {"rg8uint", WGPUTextureFormat_RG8Uint},
+    {"rg8sint", WGPUTextureFormat_RG8Sint},
+    {"r32float", WGPUTextureFormat_R32Float},
+    {"r32uint", WGPUTextureFormat_R32Uint},
+    {"r32sint", WGPUTextureFormat_R32Sint},
+    {"rg16uint", WGPUTextureFormat_RG16Uint},
+    {"rg16sint", WGPUTextureFormat_RG16Sint},
+    {"rg16float", WGPUTextureFormat_RG16Float},
+    {"rgba8unorm", WGPUTextureFormat_RGBA8Unorm},
+    {"rgba8unorm-srgb", WGPUTextureFormat_RGBA8UnormSrgb},
+    {"rgba8snorm", WGPUTextureFormat_RGBA8Snorm},
+    {"rgba8uint", WGPUTextureFormat_RGBA8Uint},
+    {"rgba8sint", WGPUTextureFormat_RGBA8Sint},
+    {"bgra8unorm", WGPUTextureFormat_BGRA8Unorm},
+    {"bgra8unorm-srgb", WGPUTextureFormat_BGRA8UnormSrgb},
+    {"rgb10a2uint", WGPUTextureFormat_RGB10A2Uint},
+    {"rgb10a2unorm", WGPUTextureFormat_RGB10A2Unorm},
+    {"rg11b10ufloat", WGPUTextureFormat_RG11B10Ufloat},
+    {"rgb9e5ufloat", WGPUTextureFormat_RGB9E5Ufloat},
+    {"rg32float", WGPUTextureFormat_RG32Float},
+    {"rg32uint", WGPUTextureFormat_RG32Uint},
+    {"rg32sint", WGPUTextureFormat_RG32Sint},
+    {"rgba16uint", WGPUTextureFormat_RGBA16Uint},
+    {"rgba16sint", WGPUTextureFormat_RGBA16Sint},
+    {"rgba16float", WGPUTextureFormat_RGBA16Float},
+    {"rgba32float", WGPUTextureFormat_RGBA32Float},
+    {"rgba32uint", WGPUTextureFormat_RGBA32Uint},
+    {"rgba32sint", WGPUTextureFormat_RGBA32Sint},
+    {"stencil8", WGPUTextureFormat_Stencil8},
+    {"depth16unorm", WGPUTextureFormat_Depth16Unorm},
+    {"depth24plus", WGPUTextureFormat_Depth24Plus},
+    {"depth24plus-stencil8", WGPUTextureFormat_Depth24PlusStencil8},
+    {"depth32float", WGPUTextureFormat_Depth32Float},
+    {"depth32float-stencil8", WGPUTextureFormat_Depth32FloatStencil8},
+    {"bc1-rgba-unorm", WGPUTextureFormat_BC1RGBAUnorm},
+    {"bc1-rgba-unorm-srgb", WGPUTextureFormat_BC1RGBAUnormSrgb},
+    {"bc2-rgba-unorm", WGPUTextureFormat_BC2RGBAUnorm},
+    {"bc2-rgba-unorm-srgb", WGPUTextureFormat_BC2RGBAUnormSrgb},
+    {"bc3-rgba-unorm", WGPUTextureFormat_BC3RGBAUnorm},
+    {"bc3-rgba-unorm-srgb", WGPUTextureFormat_BC3RGBAUnormSrgb},
+    {"bc4-r-unorm", WGPUTextureFormat_BC4RUnorm},
+    {"bc4-r-snorm", WGPUTextureFormat_BC4RSnorm},
+    {"bc5-rg-unorm", WGPUTextureFormat_BC5RGUnorm},
+    {"bc5-rg-snorm", WGPUTextureFormat_BC5RGSnorm},
+    {"bc6h-rgb-ufloat", WGPUTextureFormat_BC6HRGBUfloat},
+    {"bc6h-rgb-float", WGPUTextureFormat_BC6HRGBFloat},
+    {"bc7-rgba-unorm", WGPUTextureFormat_BC7RGBAUnorm},
+    {"bc7-rgba-unorm-srgb", WGPUTextureFormat_BC7RGBAUnormSrgb},
+    {"etc2-rgb8unorm", WGPUTextureFormat_ETC2RGB8Unorm},
+    {"etc2-rgb8unorm-srgb", WGPUTextureFormat_ETC2RGB8UnormSrgb},
+    {"etc2-rgb8a1unorm", WGPUTextureFormat_ETC2RGB8A1Unorm},
+    {"etc2-rgb8a1unorm-srgb", WGPUTextureFormat_ETC2RGB8A1UnormSrgb},
+    {"etc2-rgba8unorm", WGPUTextureFormat_ETC2RGBA8Unorm},
+    {"etc2-rgba8unorm-srgb", WGPUTextureFormat_ETC2RGBA8UnormSrgb},
+    {"eac-r11unorm", WGPUTextureFormat_EACR11Unorm},
+    {"eac-r11snorm", WGPUTextureFormat_EACR11Snorm},
+    {"eac-rg11unorm", WGPUTextureFormat_EACRG11Unorm},
+    {"eac-rg11snorm", WGPUTextureFormat_EACRG11Snorm},
+    {"astc-4x4-unorm", WGPUTextureFormat_ASTC4x4Unorm},
+    {"astc-4x4-unorm-srgb", WGPUTextureFormat_ASTC4x4UnormSrgb},
+    {"astc-5x4-unorm", WGPUTextureFormat_ASTC5x4Unorm},
+    {"astc-5x4-unorm-srgb", WGPUTextureFormat_ASTC5x4UnormSrgb},
+    {"astc-5x5-unorm", WGPUTextureFormat_ASTC5x5Unorm},
+    {"astc-5x5-unorm-srgb", WGPUTextureFormat_ASTC5x5UnormSrgb},
+    {"astc-6x5-unorm", WGPUTextureFormat_ASTC6x5Unorm},
+    {"astc-6x5-unorm-srgb", WGPUTextureFormat_ASTC6x5UnormSrgb},
+    {"astc-6x6-unorm", WGPUTextureFormat_ASTC6x6Unorm},
+    {"astc-6x6-unorm-srgb", WGPUTextureFormat_ASTC6x6UnormSrgb},
+    {"astc-8x5-unorm", WGPUTextureFormat_ASTC8x5Unorm},
+    {"astc-8x5-unorm-srgb", WGPUTextureFormat_ASTC8x5UnormSrgb},
+    {"astc-8x6-unorm", WGPUTextureFormat_ASTC8x6Unorm},
+    {"astc-8x6-unorm-srgb", WGPUTextureFormat_ASTC8x6UnormSrgb},
+    {"astc-8x8-unorm", WGPUTextureFormat_ASTC8x8Unorm},
+    {"astc-8x8-unorm-srgb", WGPUTextureFormat_ASTC8x8UnormSrgb},
+    {"astc-10x5-unorm", WGPUTextureFormat_ASTC10x5Unorm},
+    {"astc-10x5-unorm-srgb", WGPUTextureFormat_ASTC10x5UnormSrgb},
+    {"astc-10x6-unorm", WGPUTextureFormat_ASTC10x6Unorm},
+    {"astc-10x6-unorm-srgb", WGPUTextureFormat_ASTC10x6UnormSrgb},
+    {"astc-10x8-unorm", WGPUTextureFormat_ASTC10x8Unorm},
+    {"astc-10x8-unorm-srgb", WGPUTextureFormat_ASTC10x8UnormSrgb},
+    {"astc-10x10-unorm", WGPUTextureFormat_ASTC10x10Unorm},
+    {"astc-10x10-unorm-srgb", WGPUTextureFormat_ASTC10x10UnormSrgb},
+    {"astc-12x10-unorm", WGPUTextureFormat_ASTC12x10Unorm},
+    {"astc-12x10-unorm-srgb", WGPUTextureFormat_ASTC12x10UnormSrgb},
+    {"astc-12x12-unorm", WGPUTextureFormat_ASTC12x12Unorm},
+    {"astc-12x12-unorm-srgb", WGPUTextureFormat_ASTC12x12UnormSrgb},
+  };
+  auto result = map.find(format);
+  if (result == map.end()) {
     throw JSINativeException("Unsupported texture format: " + format);
   }
-  return map.at(format);
+  return result->second;
 }
 
 const char *WGPUCompositeAlphaModeToString(WGPUCompositeAlphaMode alphaMode) {
@@ -284,43 +284,28 @@ WGPUStoreOp StringToWGPUStoreOp(const std::string &str) {
 }
 
 WGPUVertexFormat StringToWGPUVertexFormat(const std::string &str) {
-  static std::unordered_map<std::string, WGPUVertexFormat> map;
-  if (map.empty()) {
-    map["uint8x2"] = WGPUVertexFormat_Uint8x2;
-    map["uint8x4"] = WGPUVertexFormat_Uint8x4;
-    map["sint8x2"] = WGPUVertexFormat_Sint8x2;
-    map["sint8x4"] = WGPUVertexFormat_Sint8x4;
-    map["unorm8x2"] = WGPUVertexFormat_Unorm8x2;
-    map["unorm8x4"] = WGPUVertexFormat_Unorm8x4;
-    map["snorm8x2"] = WGPUVertexFormat_Snorm8x2;
-    map["snorm8x4"] = WGPUVertexFormat_Snorm8x4;
-    map["uint16x2"] = WGPUVertexFormat_Uint16x2;
-    map["uint16x4"] = WGPUVertexFormat_Uint16x4;
-    map["sint16x2"] = WGPUVertexFormat_Sint16x2;
-    map["sint16x4"] = WGPUVertexFormat_Sint16x4;
-    map["unorm16x2"] = WGPUVertexFormat_Unorm16x2;
-    map["unorm16x4"] = WGPUVertexFormat_Unorm16x4;
-    map["snorm16x2"] = WGPUVertexFormat_Snorm16x2;
-    map["snorm16x4"] = WGPUVertexFormat_Snorm16x4;
-    map["float16x2"] = WGPUVertexFormat_Float16x2;
-    map["float16x4"] = WGPUVertexFormat_Float16x4;
-    map["float32"] = WGPUVertexFormat_Float32;
-    map["float32x2"] = WGPUVertexFormat_Float32x2;
-    map["float32x3"] = WGPUVertexFormat_Float32x3;
-    map["float32x4"] = WGPUVertexFormat_Float32x4;
-    map["uint32"] = WGPUVertexFormat_Uint32;
-    map["uint32x2"] = WGPUVertexFormat_Uint32x2;
-    map["uint32x3"] = WGPUVertexFormat_Uint32x3;
-    map["uint32x4"] = WGPUVertexFormat_Uint32x4;
-    map["sint32"] = WGPUVertexFormat_Sint32;
-    map["sint32x2"] = WGPUVertexFormat_Sint32x2;
-    map["sint32x3"] = WGPUVertexFormat_Sint32x3;
-    map["sint32x4"] = WGPUVertexFormat_Sint32x4;
-  }
-  if (map.find(str) == map.end()) {
+  static std::unordered_map<std::string, WGPUVertexFormat> map = {
+    {"uint8x2", WGPUVertexFormat_Uint8x2},     {"uint8x4", WGPUVertexFormat_Uint8x4},
+    {"sint8x2", WGPUVertexFormat_Sint8x2},     {"sint8x4", WGPUVertexFormat_Sint8x4},
+    {"unorm8x2", WGPUVertexFormat_Unorm8x2},   {"unorm8x4", WGPUVertexFormat_Unorm8x4},
+    {"snorm8x2", WGPUVertexFormat_Snorm8x2},   {"snorm8x4", WGPUVertexFormat_Snorm8x4},
+    {"uint16x2", WGPUVertexFormat_Uint16x2},   {"uint16x4", WGPUVertexFormat_Uint16x4},
+    {"sint16x2", WGPUVertexFormat_Sint16x2},   {"sint16x4", WGPUVertexFormat_Sint16x4},
+    {"unorm16x2", WGPUVertexFormat_Unorm16x2}, {"unorm16x4", WGPUVertexFormat_Unorm16x4},
+    {"snorm16x2", WGPUVertexFormat_Snorm16x2}, {"snorm16x4", WGPUVertexFormat_Snorm16x4},
+    {"float16x2", WGPUVertexFormat_Float16x2}, {"float16x4", WGPUVertexFormat_Float16x4},
+    {"float32", WGPUVertexFormat_Float32},     {"float32x2", WGPUVertexFormat_Float32x2},
+    {"float32x3", WGPUVertexFormat_Float32x3}, {"float32x4", WGPUVertexFormat_Float32x4},
+    {"uint32", WGPUVertexFormat_Uint32},       {"uint32x2", WGPUVertexFormat_Uint32x2},
+    {"uint32x3", WGPUVertexFormat_Uint32x3},   {"uint32x4", WGPUVertexFormat_Uint32x4},
+    {"sint32", WGPUVertexFormat_Sint32},       {"sint32x2", WGPUVertexFormat_Sint32x2},
+    {"sint32x3", WGPUVertexFormat_Sint32x3},   {"sint32x4", WGPUVertexFormat_Sint32x4},
+  };
+  auto result = map.find(str);
+  if (result == map.end()) {
     throw JSINativeException("Unsupported vertex format: " + str);
   }
-  return map[str];
+  return result->second;
 }
 
 WGPUVertexStepMode StringToWGPUVertexStepMode(const std::string &str) {
@@ -637,3 +622,43 @@ WGPUStorageTextureAccess StringToWGPUStorageTextureAccess(const std::string &str
   }
   return WGPUStorageTextureAccess_Undefined;
 }
+
+WGPUBlendFactor StringToWGPUBlendFactor(const std::string &str) {
+  static std::unordered_map<std::string, WGPUBlendFactor> map = {
+    {"zero", WGPUBlendFactor_Zero},
+    {"one", WGPUBlendFactor_One},
+    {"src", WGPUBlendFactor_Src},
+    {"one-minus-src", WGPUBlendFactor_OneMinusSrc},
+    {"src-alpha", WGPUBlendFactor_SrcAlpha},
+    {"one-minus-src-alpha", WGPUBlendFactor_OneMinusSrcAlpha},
+    {"dst", WGPUBlendFactor_Dst},
+    {"one-minus-dst", WGPUBlendFactor_OneMinusDst},
+    {"dst-alpha", WGPUBlendFactor_DstAlpha},
+    {"one-minus-dst-alpha", WGPUBlendFactor_OneMinusDstAlpha},
+    {"src-alpha-saturated", WGPUBlendFactor_SrcAlphaSaturated},
+    {"constant", WGPUBlendFactor_Constant},
+    {"one-minus-constant", WGPUBlendFactor_OneMinusConstant},
+  };
+  auto result = map.find(str);
+  if (result == map.end()) {
+    throw JSINativeException("Unsupported blend factor: " + str);
+  }
+  return result->second;
+}
+
+WGPUBlendOperation StringToWGPUBlendOperation(const std::string &str) {
+  static std::unordered_map<std::string, WGPUBlendOperation> map = {
+    {"add", WGPUBlendOperation_Add},
+    {"subtract", WGPUBlendOperation_Subtract},
+    {"reverse-subtract", WGPUBlendOperation_ReverseSubtract},
+    {"min", WGPUBlendOperation_Min},
+    {"max", WGPUBlendOperation_Max},
+  };
+  auto result = map.find(str);
+  if (result == map.end()) {
+    throw JSINativeException("Unsupported blend operation: " + str);
+  }
+  return result->second;
+}
+
+}  // namespace wgpu

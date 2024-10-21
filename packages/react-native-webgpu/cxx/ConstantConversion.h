@@ -7,6 +7,8 @@
 // TODO: rename to WGPUConstantConverion (maybe also make it namespaced?)
 using namespace facebook::jsi;
 
+namespace wgpu {
+
 const char *WGPUTextureFormatToString(WGPUTextureFormat format);
 WGPUTextureFormat StringToWGPUTextureFormat(const std::string &format);
 const char *WGPUCompositeAlphaModeToString(WGPUCompositeAlphaMode alphaMode);
@@ -35,3 +37,7 @@ WGPUTextureSampleType StringToWGPUTextureSampleType(const std::string &str);
 WGPUAddressMode StringToWGPUAddressMode(const std::string &str);
 const char *WGPUBufferMapStateToString(WGPUBufferMapState state);
 WGPUStorageTextureAccess StringToWGPUStorageTextureAccess(const std::string &str);
+WGPUBlendFactor StringToWGPUBlendFactor(const std::string &str);
+WGPUBlendOperation StringToWGPUBlendOperation(const std::string &str);
+
+}  // namespace wgpu

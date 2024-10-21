@@ -405,6 +405,11 @@ describe('Gui', () => {
       ]),
     );
   });
+
+  it('adds name', () => {
+    gui.name = 'new name';
+    expect(gui.render().props.title).toBe('new name');
+  });
 });
 
 const rootFolder = (children: ControlComponent[], initialExpanded = false) => ({

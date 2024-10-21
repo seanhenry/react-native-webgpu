@@ -19,8 +19,13 @@ export class Gui {
   private _items: (Gui | Controller)[] = [];
   private _initialExpanded = false;
   private _observable = observable<ControlComponent<'folder'> | null>(null);
+  private _parent?: Gui;
+  public name?: string;
 
-  constructor(private params?: GuiParams) {}
+  constructor(params?: GuiParams) {
+    this.name = params?.name;
+    this._parent = params?.parent;
+  }
 
   addFolder(name: string) {
     const gui = new Gui({name, parent: this});
@@ -57,10 +62,10 @@ export class Gui {
       type: 'folder',
       props: {
         key: this._key,
-        title: this.params?.name ?? '',
+        title: this.name ?? '',
         disabled: false,
         initialExpanded: this._initialExpanded,
-        isRoot: !this.params?.parent,
+        isRoot: !this._parent,
         children: Object.values(this._items).map(c => c.render()),
       },
     };

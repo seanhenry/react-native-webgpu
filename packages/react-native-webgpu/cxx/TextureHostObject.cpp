@@ -24,6 +24,9 @@ Value TextureHostObject::get(Runtime &runtime, const PropNameID &propName) {
         label = WGPU_UTF8_OPT(desc, label, "");
         auto descriptor = makeDefaultWGPUTextureViewDescriptor(runtime, desc, _value);
         descriptor.label = label.data();
+        if (WGPU_HAS_PROP(desc, format)) {
+          descriptor.format = StringToWGPUTextureFormat(WGPU_UTF8(desc, format));
+        }
         view = wgpuTextureCreateView(_value, &descriptor);
       } else {
         view = wgpuTextureCreateView(_value, NULL);

@@ -83,28 +83,26 @@ type GPUStencilValue = number;
 type GPUTextureUsageFlags = number;
 type GPUAddressMode = 'clamp-to-edge' | 'repeat' | 'mirror-repeat';
 type GPUAutoLayoutMode = 'auto';
-// type GPUBlendFactor =
-//
-//   | "zero"
-//   | "one"
-//   | "src"
-//   | "one-minus-src"
-//   | "src-alpha"
-//   | "one-minus-src-alpha"
-//   | "dst"
-//   | "one-minus-dst"
-//   | "dst-alpha"
-//   | "one-minus-dst-alpha"
-//   | "src-alpha-saturated"
-//   | "constant"
-//   | "one-minus-constant";
-// type GPUBlendOperation =
-//
-//   | "add"
-//   | "subtract"
-//   | "reverse-subtract"
-//   | "min"
-//   | "max";
+type GPUBlendFactor =
+  | 'zero'
+  | 'one'
+  | 'src'
+  | 'one-minus-src'
+  | 'src-alpha'
+  | 'one-minus-src-alpha'
+  | 'dst'
+  | 'one-minus-dst'
+  | 'dst-alpha'
+  | 'one-minus-dst-alpha'
+  | 'src-alpha-saturated'
+  | 'constant'
+  | 'one-minus-constant';
+type GPUBlendOperation =
+  | 'add'
+  | 'subtract'
+  | 'reverse-subtract'
+  | 'min'
+  | 'max';
 type GPUBufferBindingType = 'uniform' | 'storage' | 'read-only-storage';
 type GPUBufferMapState = 'unmapped' | 'pending' | 'mapped';
 type GPUCanvasAlphaMode =
@@ -408,22 +406,22 @@ interface GPUBindGroupLayoutEntry {
   //   externalTexture?: GPUExternalTextureBindingLayout;
 }
 
-// interface GPUBlendComponent {
-//   /**
-//    * Defines the {@link GPUBlendOperation} used to calculate the values written to the target
-//    * attachment components.
-//    */
-//   operation?: GPUBlendOperation;
-//   /**
-//    * Defines the {@link GPUBlendFactor} operation to be performed on values from the fragment shader.
-//    */
-//   srcFactor?: GPUBlendFactor;
-//   /**
-//    * Defines the {@link GPUBlendFactor} operation to be performed on values from the target attachment.
-//    */
-//   dstFactor?: GPUBlendFactor;
-// }
-//
+interface GPUBlendComponent {
+  /**
+   * Defines the {@link GPUBlendOperation} used to calculate the values written to the target
+   * attachment components.
+   */
+  operation?: GPUBlendOperation;
+  /**
+   * Defines the {@link GPUBlendFactor} operation to be performed on values from the fragment shader.
+   */
+  srcFactor?: GPUBlendFactor;
+  /**
+   * Defines the {@link GPUBlendFactor} operation to be performed on values from the target attachment.
+   */
+  dstFactor?: GPUBlendFactor;
+}
+
 interface GPUBlendState {
   /**
    * Defines the blending behavior of the corresponding render target for color channels.
@@ -565,10 +563,10 @@ interface GPUColorTargetState {
    * corresponding color attachment.
    */
   format: GPUTextureFormat;
-  //   /**
-  //    * The blending behavior for this color target. If left undefined, disables blending for this
-  //    * color target.
-  //    */
+  /**
+   * The blending behavior for this color target. If left undefined, disables blending for this
+   * color target.
+   */
   blend?: GPUBlendState;
   /**
    * Bitmask controlling which channels are are written to when drawing to this color target.
@@ -1475,11 +1473,11 @@ interface GPUTextureDescriptor extends GPUObjectDescriptorBase {
 }
 
 interface GPUTextureViewDescriptor extends GPUObjectDescriptorBase {
-  //   /**
-  //    * The format of the texture view. Must be either the {@link GPUTextureDescriptor#format} of the
-  //    * texture or one of the {@link GPUTextureDescriptor#viewFormats} specified during its creation.
-  //    */
-  //   format?: GPUTextureFormat;
+  /**
+   * The format of the texture view. Must be either the {@link GPUTextureDescriptor#format} of the
+   * texture or one of the {@link GPUTextureDescriptor#viewFormats} specified during its creation.
+   */
+  format?: GPUTextureFormat;
   /**
    * The dimension to view the texture as.
    */

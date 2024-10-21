@@ -30,5 +30,7 @@ Value makeJsiFeatures(Runtime &runtime, const std::vector<WGPUFeatureName> &feat
 WGPUComputePassTimestampWrites makeWGPUComputePassTimestampWrites(Runtime &runtime, const Object &obj);
 WGPURenderPassTimestampWrites makeWGPURenderPassTimestampWrites(Runtime &runtime, const Object &obj);
 WGPUTextureDataLayout makeWGPUTextureDataLayout(Runtime &runtime, const Object &obj, const WGPUExtent3D &extent);
+WGPUBlendState makeGPUBlendState(Runtime &runtime, Object &obj);
+WGPUBlendComponent makeGPUBlendComponent(Runtime &runtime, Object &obj);
 
 }  // namespace wgpu

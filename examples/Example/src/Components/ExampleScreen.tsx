@@ -35,6 +35,7 @@ import {VolumeRendering} from '../WebGPUSamples/GraphicsTechniques/VolumeRenderi
 import {SkinnedMesh} from '../WebGPUSamples/GraphicsTechniques/SkinnedMesh/SkinnedMesh';
 import {Video} from '../InHouse/Video';
 import {Thread} from '../InHouse/Thread';
+import {ParticlesHDR} from '../WebGPUSamples/GraphicsTechniques/ParticlesHDR/ParticlesHDR';
 
 export type Examples = 'WebGPUSamples' | 'Three' | 'InHouse';
 
@@ -62,6 +63,7 @@ export type Example =
   | 'NormalMap'
   | 'ShadowMapping'
   | 'DeferredRendering'
+  | 'ParticlesHDR'
   | 'ImageBlur'
   | 'Cornell'
   | 'ABuffer'
@@ -107,6 +109,7 @@ const examples: Record<Example, ComponentType> = {
   NormalMap,
   ShadowMapping,
   DeferredRendering,
+  ParticlesHDR,
   ImageBlur,
   Cornell,
   ABuffer,

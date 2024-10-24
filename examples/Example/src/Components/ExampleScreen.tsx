@@ -38,6 +38,7 @@ import {Thread} from '../InHouse/Thread';
 import {ParticlesHDR} from '../WebGPUSamples/GraphicsTechniques/ParticlesHDR/ParticlesHDR';
 import {Wireframe} from '../WebGPUSamples/GraphicsTechniques/Wireframe/Wireframe';
 import {AdapterInfo} from '../InHouse/AdapterInfo';
+import {ExceedDeviceLimits} from '../InHouse/ExceedDeviceLimits';
 
 export type Examples = 'WebGPUSamples' | 'Three' | 'InHouse';
 
@@ -87,7 +88,8 @@ export type Example =
   | 'FlakesTexture'
   | 'Video'
   | 'Thread'
-  | 'AdapterInfo';
+  | 'AdapterInfo'
+  | 'ExceedDeviceLimits';
 
 const examples: Record<Example, ComponentType> = {
   // BasicGraphics
@@ -136,6 +138,7 @@ const examples: Record<Example, ComponentType> = {
   Video,
   Thread,
   AdapterInfo,
+  ExceedDeviceLimits,
 };
 
 export function ExampleScreen() {

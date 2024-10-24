@@ -1,15 +1,19 @@
-import {useCallback, useRef} from 'react';
-import {TextInput} from 'react-native';
+import {useCallback, useRef, useState} from 'react';
 import {HudText} from './HudText';
 
+type SetText = (text: string) => void;
+
 export const useHudText = () => {
-  const textRef = useRef<TextInput | null>(null);
+  const setTextRef = useRef<SetText | null>(null);
   const Component = () => {
-    return <HudText ref={textRef} />;
+    // Using state because `setNativeProps` doesn't trigger a layout
+    const [text, setText] = useState('');
+    setTextRef.current = setText;
+    return <HudText value={text} />;
   };
   Component.displayName = 'HudText';
   const setText = useCallback((text: string) => {
-    textRef.current?.setNativeProps({text});
+    setTextRef.current?.(text);
   }, []);
   return {
     setText,

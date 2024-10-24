@@ -175,7 +175,7 @@ static void wgpuHandleRequestAdapter(WGPURequestAdapterStatus status, WGPUAdapte
     std::ostringstream ss;
     ss << __FILE__ << ":" << __LINE__ << " navigator.gpu.requestAdapter() failed with status " << status << ". "
        << message;
-    promise->reject(String::createFromUtf8(runtime, ss.str()));
+    promise->reject(makeJSError(runtime, ss.str()));
   }
   delete promise;
 }

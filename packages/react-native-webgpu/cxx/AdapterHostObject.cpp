@@ -46,6 +46,7 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
           .jsiInstance = _jsiInstance,
         };
         std::vector<WGPUFeatureName> requiredFeatures;
+        auto requiredLimits = std::shared_ptr<WGPURequiredLimits>(nullptr);
         WGPUDeviceDescriptor descriptor = {nullptr};
         descriptor.uncapturedErrorCallbackInfo = {
           .nextInChain = nullptr,
@@ -57,8 +58,8 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
           auto &runtime = promise->runtime;
           auto obj = std::move(*sharedObj.get());
 
-          if (obj.hasProperty(runtime, "requiredFeatures")) {
-            auto requiredFeaturesIn = obj.getPropertyAsObject(runtime, "requiredFeatures").asArray(runtime);
+          if (WGPU_HAS_PROP(obj, requiredFeatures)) {
+            auto requiredFeaturesIn = WGPU_ARRAY(obj, requiredFeatures);
             requiredFeatures = jsiArrayToVector<WGPUFeatureName>(runtime, std::move(requiredFeaturesIn),
                                                                  [](Runtime &runtime, Value value) {
               auto str = value.asString(runtime).utf8(runtime);
@@ -66,6 +67,16 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
             });
             descriptor.requiredFeatures = requiredFeatures.data();
             descriptor.requiredFeatureCount = requiredFeatures.size();
+          }
+          if (WGPU_HAS_PROP(obj, requiredLimits)) {
+            auto requiredLimitsIn = WGPU_OBJ(obj, requiredLimits);
+            WGPUSupportedLimits supportedLimits;
+            wgpuAdapterGetLimits(_adapter->_adapter, &supportedLimits);
+            requiredLimits = std::make_shared<WGPURequiredLimits>((const WGPURequiredLimits){
+              .nextInChain = nullptr,
+              .limits = makeWGPULimits(runtime, requiredLimitsIn, supportedLimits),
+            });
+            descriptor.requiredLimits = requiredLimits.get();
           }
         }
         wgpuAdapterRequestDevice(_adapter->_adapter, &descriptor, wgpuHandleRequestDevice, promise);
@@ -132,7 +143,7 @@ static void wgpuHandleRequestDevice(WGPURequestDeviceStatus status, WGPUDevice d
   } else {
     std::ostringstream ss;
     ss << __FILE__ << ":" << __LINE__ << " Adapter.requestDevice() failed with status " << status << ". " << message;
-    promise->reject(String::createFromUtf8(runtime, ss.str()));
+    promise->reject(makeJSError(runtime, ss.str()));
   }
   delete promise;
 }

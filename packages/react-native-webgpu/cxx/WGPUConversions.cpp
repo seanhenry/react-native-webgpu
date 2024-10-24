@@ -247,45 +247,6 @@ WGPUOrigin3D makeWGPUOrigin3D(Runtime &runtime, const Object &obj) {
   return origin;
 }
 
-Value makeJsiLimits(Runtime &runtime, const WGPULimits &limits) {
-  Object obj(runtime);
-  obj.setProperty(runtime, "maxTextureDimension1D", Value((int)limits.maxTextureDimension1D));
-  obj.setProperty(runtime, "maxTextureDimension2D", Value((int)limits.maxTextureDimension2D));
-  obj.setProperty(runtime, "maxTextureDimension3D", Value((int)limits.maxTextureDimension3D));
-  obj.setProperty(runtime, "maxTextureArrayLayers", Value((int)limits.maxTextureArrayLayers));
-  obj.setProperty(runtime, "maxBindGroups", Value((int)limits.maxBindGroups));
-  obj.setProperty(runtime, "maxBindGroupsPlusVertexBuffers", Value((int)limits.maxBindGroupsPlusVertexBuffers));
-  obj.setProperty(runtime, "maxBindingsPerBindGroup", Value((int)limits.maxBindingsPerBindGroup));
-  obj.setProperty(runtime, "maxDynamicUniformBuffersPerPipelineLayout",
-                  Value((int)limits.maxDynamicUniformBuffersPerPipelineLayout));
-  obj.setProperty(runtime, "maxDynamicStorageBuffersPerPipelineLayout",
-                  Value((int)limits.maxDynamicStorageBuffersPerPipelineLayout));
-  obj.setProperty(runtime, "maxSampledTexturesPerShaderStage", Value((int)limits.maxSampledTexturesPerShaderStage));
-  obj.setProperty(runtime, "maxSamplersPerShaderStage", Value((int)limits.maxSamplersPerShaderStage));
-  obj.setProperty(runtime, "maxStorageBuffersPerShaderStage", Value((int)limits.maxStorageBuffersPerShaderStage));
-  obj.setProperty(runtime, "maxStorageTexturesPerShaderStage", Value((int)limits.maxStorageTexturesPerShaderStage));
-  obj.setProperty(runtime, "maxUniformBuffersPerShaderStage", Value((int)limits.maxUniformBuffersPerShaderStage));
-  obj.setProperty(runtime, "maxUniformBufferBindingSize", Value((int)limits.maxUniformBufferBindingSize));
-  obj.setProperty(runtime, "maxStorageBufferBindingSize", Value((int)limits.maxStorageBufferBindingSize));
-  obj.setProperty(runtime, "minUniformBufferOffsetAlignment", Value((int)limits.minUniformBufferOffsetAlignment));
-  obj.setProperty(runtime, "minStorageBufferOffsetAlignment", Value((int)limits.minStorageBufferOffsetAlignment));
-  obj.setProperty(runtime, "maxVertexBuffers", Value((int)limits.maxVertexBuffers));
-  obj.setProperty(runtime, "maxBufferSize", Value((int)limits.maxBufferSize));
-  obj.setProperty(runtime, "maxVertexAttributes", Value((int)limits.maxVertexAttributes));
-  obj.setProperty(runtime, "maxVertexBufferArrayStride", Value((int)limits.maxVertexBufferArrayStride));
-  obj.setProperty(runtime, "maxInterStageShaderComponents", Value((int)limits.maxInterStageShaderComponents));
-  obj.setProperty(runtime, "maxInterStageShaderVariables", Value((int)limits.maxInterStageShaderVariables));
-  obj.setProperty(runtime, "maxColorAttachments", Value((int)limits.maxColorAttachments));
-  obj.setProperty(runtime, "maxColorAttachmentBytesPerSample", Value((int)limits.maxColorAttachmentBytesPerSample));
-  obj.setProperty(runtime, "maxComputeWorkgroupStorageSize", Value((int)limits.maxComputeWorkgroupStorageSize));
-  obj.setProperty(runtime, "maxComputeInvocationsPerWorkgroup", Value((int)limits.maxComputeInvocationsPerWorkgroup));
-  obj.setProperty(runtime, "maxComputeWorkgroupSizeX", Value((int)limits.maxComputeWorkgroupSizeX));
-  obj.setProperty(runtime, "maxComputeWorkgroupSizeY", Value((int)limits.maxComputeWorkgroupSizeY));
-  obj.setProperty(runtime, "maxComputeWorkgroupSizeZ", Value((int)limits.maxComputeWorkgroupSizeZ));
-  obj.setProperty(runtime, "maxComputeWorkgroupsPerDimension", Value((int)limits.maxComputeWorkgroupsPerDimension));
-  return std::move(obj);
-}
-
 // wgpu returns undefined data along with supported features so we need to filter those out
 Value makeJsiFeatures(Runtime &runtime, const std::vector<WGPUFeatureName> &features) {
   std::vector<Value> values;
@@ -344,6 +305,57 @@ WGPUBlendComponent makeGPUBlendComponent(Runtime &runtime, Object &obj) {
     .operation = StringToWGPUBlendOperation(operation),
     .srcFactor = StringToWGPUBlendFactor(srcFactor),
     .dstFactor = StringToWGPUBlendFactor(dstFactor),
+  };
+}
+
+#define LIMITS                                                  \
+  __WGPU_PRINT_LIMIT(maxTextureDimension1D)                     \
+  __WGPU_PRINT_LIMIT(maxTextureDimension2D)                     \
+  __WGPU_PRINT_LIMIT(maxTextureDimension3D)                     \
+  __WGPU_PRINT_LIMIT(maxTextureArrayLayers)                     \
+  __WGPU_PRINT_LIMIT(maxBindGroups)                             \
+  __WGPU_PRINT_LIMIT(maxBindGroupsPlusVertexBuffers)            \
+  __WGPU_PRINT_LIMIT(maxBindingsPerBindGroup)                   \
+  __WGPU_PRINT_LIMIT(maxDynamicUniformBuffersPerPipelineLayout) \
+  __WGPU_PRINT_LIMIT(maxDynamicStorageBuffersPerPipelineLayout) \
+  __WGPU_PRINT_LIMIT(maxSampledTexturesPerShaderStage)          \
+  __WGPU_PRINT_LIMIT(maxSamplersPerShaderStage)                 \
+  __WGPU_PRINT_LIMIT(maxStorageBuffersPerShaderStage)           \
+  __WGPU_PRINT_LIMIT(maxStorageTexturesPerShaderStage)          \
+  __WGPU_PRINT_LIMIT(maxUniformBuffersPerShaderStage)           \
+  __WGPU_PRINT_LIMIT(maxUniformBufferBindingSize)               \
+  __WGPU_PRINT_LIMIT(maxStorageBufferBindingSize)               \
+  __WGPU_PRINT_LIMIT(minUniformBufferOffsetAlignment)           \
+  __WGPU_PRINT_LIMIT(minStorageBufferOffsetAlignment)           \
+  __WGPU_PRINT_LIMIT(maxVertexBuffers)                          \
+  __WGPU_PRINT_LIMIT(maxBufferSize)                             \
+  __WGPU_PRINT_LIMIT(maxVertexAttributes)                       \
+  __WGPU_PRINT_LIMIT(maxVertexBufferArrayStride)                \
+  __WGPU_PRINT_LIMIT(maxInterStageShaderComponents)             \
+  __WGPU_PRINT_LIMIT(maxInterStageShaderVariables)              \
+  __WGPU_PRINT_LIMIT(maxColorAttachments)                       \
+  __WGPU_PRINT_LIMIT(maxColorAttachmentBytesPerSample)          \
+  __WGPU_PRINT_LIMIT(maxComputeWorkgroupStorageSize)            \
+  __WGPU_PRINT_LIMIT(maxComputeInvocationsPerWorkgroup)         \
+  __WGPU_PRINT_LIMIT(maxComputeWorkgroupSizeX)                  \
+  __WGPU_PRINT_LIMIT(maxComputeWorkgroupSizeY)                  \
+  __WGPU_PRINT_LIMIT(maxComputeWorkgroupSizeZ)                  \
+  __WGPU_PRINT_LIMIT(maxComputeWorkgroupsPerDimension)
+
+Value makeJsiLimits(Runtime &runtime, const WGPULimits &limits) {
+  Object obj(runtime);
+#define __WGPU_PRINT_LIMIT(__limit) obj.setProperty(runtime, #__limit, Value((int)limits.__limit));
+  LIMITS
+#undef __WGPU_PRINT_LIMIT
+  return std::move(obj);
+}
+
+WGPULimits makeWGPULimits(Runtime &runtime, const Object &limits, WGPUSupportedLimits &supportedLimits) {
+  return {
+#define __WGPU_PRINT_LIMIT(__limit) \
+  .__limit = WGPU_NUMBER_OPT(limits, __limit, uint32_t, supportedLimits.limits.__limit),
+    LIMITS
+#undef __WGPU_PRINT_LIMIT
   };
 }
 

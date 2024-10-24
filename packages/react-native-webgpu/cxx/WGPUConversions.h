@@ -25,12 +25,14 @@ WGPUColor makeWGPUColorFromProp(Runtime &runtime, const Object &obj, const char 
 WGPUImageCopyTexture makeWGPUImageCopyTexture(Runtime &runtime, const Object &obj);
 WGPUImageCopyBuffer makeWGPUImageCopyBuffer(Runtime &runtime, const Object &obj, const WGPUExtent3D &extent);
 WGPUOrigin3D makeWGPUOrigin3D(Runtime &runtime, const Object &obj);
-Value makeJsiLimits(Runtime &runtime, const WGPULimits &limits);
 Value makeJsiFeatures(Runtime &runtime, const std::vector<WGPUFeatureName> &features);
 WGPUComputePassTimestampWrites makeWGPUComputePassTimestampWrites(Runtime &runtime, const Object &obj);
 WGPURenderPassTimestampWrites makeWGPURenderPassTimestampWrites(Runtime &runtime, const Object &obj);
 WGPUTextureDataLayout makeWGPUTextureDataLayout(Runtime &runtime, const Object &obj, const WGPUExtent3D &extent);
 WGPUBlendState makeGPUBlendState(Runtime &runtime, Object &obj);
 WGPUBlendComponent makeGPUBlendComponent(Runtime &runtime, Object &obj);
+
+Value makeJsiLimits(Runtime &runtime, const WGPULimits &limits);
+WGPULimits makeWGPULimits(Runtime &runtime, const Object &limits, WGPUSupportedLimits &supporedLimits);
 
 }  // namespace wgpu

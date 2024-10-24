@@ -13,5 +13,6 @@ export const hudStyles = StyleSheet.create({
     padding: 0,
     margin: 0,
     color: '#FFF',
+    flex: 1,
   },
 });

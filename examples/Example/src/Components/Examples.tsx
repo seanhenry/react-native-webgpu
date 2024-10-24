@@ -99,6 +99,7 @@ const sections: Record<Examples, ListProps<Example>['sections']> = {
         {title: 'Video'},
         {title: 'Thread'},
         {title: 'AdapterInfo'},
+        {title: 'ExceedDeviceLimits'},
       ],
     },
   ],

@@ -427,6 +427,34 @@ describe('Gui', () => {
     expect(render).toEqual(rootFolder([]));
   });
 
+  it('removes references from controllers', () => {
+    const mock = jest.fn();
+    const controller = gui
+      .add(object, 'string')
+      .onChange(mock)
+      .onFinishChange(mock);
+    // @ts-expect-error testing private api
+    controller._observable.add(mock);
+    gui.destroy();
+    controller.setValue('new value');
+    expect(mock).toBeCalledTimes(0);
+    // @ts-expect-error testing private api
+    expect(controller._onFinishChange).toBe(undefined);
+  });
+
+  it('removes references from gui', () => {
+    const mock = jest.fn();
+    const folder = gui.addFolder('name');
+    gui.observable.add(mock);
+    folder.observable.add(mock);
+
+    gui.destroy();
+    gui.draw();
+    expect(mock).toBeCalledTimes(0);
+    // @ts-expect-error testing private api
+    expect(folder._parent).toBe(undefined);
+  });
+
   it('adds name', () => {
     gui.name = 'new name';
     expect(gui.render().props.title).toBe('new name');

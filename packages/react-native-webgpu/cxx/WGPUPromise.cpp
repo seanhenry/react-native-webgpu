@@ -17,12 +17,12 @@ Value Promise::makeJSPromise(const std::shared_ptr<JSIInstance> &jsiInstance, Ca
 
   auto jsPromise = runtime.global()
                      .getPropertyAsFunction(runtime, "Promise")
-                     .callAsConstructor(runtime, promiseCallbackFn)
-                     .asObject(runtime);
+                     .callAsConstructor(runtime, promiseCallbackFn);
   // We are setting the host object to the promise to retain it and pass back a weak reference to the native promise.
   // This ensures that the jsi runtime fully owns the lifecycle and will destroy it when required.
-  // A strong reference to ResolveReject must only be retrieved on the JS thread. Otherwise, crashes may occur.
-  jsPromise.setProperty(runtime, "__wgpuNative", Object::createFromHostObject(runtime, resolveReject));
+  // A strong reference to ResolveReject must only be retrieved on the JS thread. Otherwise crashes may occur, especially during hot reloads.
+  jsPromise.asObject(runtime).setProperty(runtime, "__wgpuNative", Object::createFromHostObject(runtime, resolveReject));
+  resolveReject->_promise = std::make_shared<Object>(jsPromise.asObject(runtime));
   return jsPromise;
 }
 
@@ -40,6 +40,10 @@ void Promise::finalize(std::function<void(Runtime &runtime, Function &resolve, F
     auto resolveReject = rr.lock();
     if (resolveReject != nullptr) {
       callback(runtime, resolveReject->_resolve, resolveReject->_reject);
+      // Important to delete ResolveReject here:
+      // - Allows garbage collector to delete the promise
+      // - Prevents accidental additional resolve/rejects
+      resolveReject->_promise->setProperty(runtime, "__wgpuNative", Value::undefined());
     }
   });
 }

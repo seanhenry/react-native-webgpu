@@ -54,16 +54,19 @@ export const WebGpuView = ({
           nativeEvent.uuid
         );
         contextRef.current = webGPU.context;
-        Promise.resolve(
-          onCreateSurface({
-            ...webGPU,
-            createImageBitmap: reactNativeWebGPU.createImageBitmap,
-          })
-        )
-          .then((fn) => {
-            onDeleteSurfaceRef.current = fn ?? null;
-          })
-          .catch(rethrowError);
+        const onDelete = onCreateSurface({
+          ...webGPU,
+          createImageBitmap: reactNativeWebGPU.createImageBitmap,
+        });
+        if (typeof onDelete === 'function') {
+          onDeleteSurfaceRef.current = onDelete;
+        } else if (onDelete instanceof Promise) {
+          onDelete
+            .then((fn) => {
+              onDeleteSurfaceRef.current = fn ?? null;
+            })
+            .catch(rethrowError);
+        }
       } else {
         onErrorRef.current
           ? onErrorRef.current(new Error(nativeEvent.error))

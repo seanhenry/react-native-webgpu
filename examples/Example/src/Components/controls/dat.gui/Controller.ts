@@ -96,4 +96,10 @@ export abstract class Controller<
   remove() {
     this._parent?.removeItem(this);
   }
+
+  didRemove() {
+    this._observable.destroy();
+    this._onChange = undefined;
+    this._onFinishChange = undefined;
+  }
 }

@@ -35,6 +35,8 @@ export class Gui {
 
   destroy() {
     [...this._items].forEach(item => item.remove());
+    this._observable.destroy();
+    this._parent = undefined;
   }
 
   remove() {
@@ -44,8 +46,13 @@ export class Gui {
   removeItem(item: Gui | Controller) {
     const index = this._items.indexOf(item);
     if (index !== -1) {
-      this._items.splice(index, 1);
+      const [item] = this._items.splice(index, 1);
+      item.didRemove();
     }
+  }
+
+  didRemove() {
+    this.destroy();
   }
 
   get observable(): ReadonlyObservable<ControlComponent<'folder'> | null> {

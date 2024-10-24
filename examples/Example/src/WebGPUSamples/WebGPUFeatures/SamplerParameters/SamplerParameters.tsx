@@ -5,15 +5,10 @@ import showTextureWGSL from './showTexture.wgsl';
 import {globalStyles} from '../../../Components/globalStyles';
 import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
 import {Square} from '../../../Components/Square';
-import {useRef} from 'react';
 import {useControls} from '../../../Components/controls/react/useControls';
 
 export const SamplerParameters = () => {
   const {gui, Controls} = useControls();
-  const resetToInitial = useRef(() => {});
-  const checkeredFloor = useRef(() => {});
-  const smoothLinear = useRef(() => {});
-  const crunchyNearest = useRef(() => {});
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
     requestAnimationFrame,
     navigator,
@@ -78,31 +73,6 @@ export const SamplerParameters = () => {
     } as const;
     const samplerDescriptor: GPUSamplerDescriptor = {...kInitSamplerDescriptor};
 
-    resetToInitial.current = () => {
-      Object.assign(config, kInitConfig);
-      Object.assign(samplerDescriptor, kInitSamplerDescriptor);
-    };
-    checkeredFloor.current = () => {
-      Object.assign(config, {flangeLogSize: 10});
-      Object.assign(samplerDescriptor, {
-        addressModeU: 'repeat',
-        addressModeV: 'repeat',
-      });
-    };
-    smoothLinear.current = () => {
-      Object.assign(samplerDescriptor, {
-        magFilter: 'linear',
-        minFilter: 'linear',
-        mipmapFilter: 'linear',
-      });
-    };
-    crunchyNearest.current = () => {
-      Object.assign(samplerDescriptor, {
-        magFilter: 'nearest',
-        minFilter: 'nearest',
-        mipmapFilter: 'nearest',
-      });
-    };
     const buttons = {
       initial() {
         Object.assign(config, kInitConfig);

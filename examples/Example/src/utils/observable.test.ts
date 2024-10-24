@@ -40,6 +40,15 @@ describe('observable', () => {
     addObserverWithExpectation();
     ob.post('initial');
   });
+
+  it('removes all observers', () => {
+    expect.assertions(1);
+    addObserverWithExpectation();
+    addObserverWithExpectation();
+    ob.destroy();
+    expect(ob.value()).toBe(undefined);
+    ob.post('update');
+  });
 });
 
 describe('observable when reference type', () => {

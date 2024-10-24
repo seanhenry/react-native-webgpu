@@ -7,6 +7,7 @@ export type Reducer<T, U> = (value: T) => U;
 
 export interface ReadonlyObservable<T> {
   add(observer: Observer<T>): Unsubscribe;
+  destroy(): void;
   value(): T;
   useState(): T;
   useStateWithReducer<U>(reduce: Reducer<T, U>): U;
@@ -54,6 +55,14 @@ export class ObservableImpl<T> implements Observable<T> {
       }
     };
   }
+
+  destroy = () => {
+    this.observers = [];
+    if (this._value) {
+      // @ts-expect-error using this after destroy is undefined behaviour
+      delete this._value;
+    }
+  };
 
   post = (item: T) => {
     if (!this.options?.emitDuplicates && isEqual(item, this._value)) {

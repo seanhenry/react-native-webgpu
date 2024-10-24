@@ -46,6 +46,7 @@ class Promise : public std::enable_shared_from_this<Promise> {
     ResolveReject(Function &&resolve, Function &&reject) : _resolve(std::move(resolve)), _reject(std::move(reject)) {}
     Function _resolve;
     Function _reject;
+    std::shared_ptr<Object> _promise;
   };
 
   std::weak_ptr<ResolveReject> _resolveReject;

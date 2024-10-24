@@ -419,6 +419,14 @@ describe('Gui', () => {
     expect(render).toEqual(rootFolder([]));
   });
 
+  it('destroys gui', () => {
+    gui.add(object, 'string');
+    gui.addFolder('My folder');
+    gui.destroy();
+    const render = gui.render();
+    expect(render).toEqual(rootFolder([]));
+  });
+
   it('adds name', () => {
     gui.name = 'new name';
     expect(gui.render().props.title).toBe('new name');

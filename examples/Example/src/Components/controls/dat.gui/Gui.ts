@@ -33,6 +33,10 @@ export class Gui {
     return gui;
   }
 
+  destroy() {
+    [...this._items].forEach(item => item.remove());
+  }
+
   remove() {
     this._parent?.removeItem(this);
   }

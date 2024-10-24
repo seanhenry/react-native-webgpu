@@ -767,7 +767,6 @@ export class GLTFSkin {
       // 0,
       // Math.min(this.inverseBindMatrices.byteLength, skinGPUBufferUsage.size),
     );
-    console.log(this.inverseBindMatrices.byteLength, skinGPUBufferUsage.size);
     this.skinBindGroup = device.createBindGroup({
       layout: GLTFSkin.skinBindGroupLayout,
       label: 'StaticGLTFSkin.bindGroup',

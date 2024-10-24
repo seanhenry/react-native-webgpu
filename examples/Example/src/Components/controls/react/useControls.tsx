@@ -1,4 +1,4 @@
-import {useRef} from 'react';
+import {useEffect, useRef} from 'react';
 import {ControlsContainer} from './ControlsContainer';
 import {ControlSlider} from './ControlSlider';
 import {Gui} from '../dat.gui/Gui';
@@ -14,6 +14,9 @@ export const useControls = () => {
   const gui = useRef(new Gui()).current;
   const Controls = () => {
     const renderResult = gui.observable.useState();
+    useEffect(() => {
+      return () => gui.destroy();
+    }, []);
     const renderComponent = (component: ControlComponent) => {
       if (component.type === 'function') {
         return <ControlButton {...component.props} />;

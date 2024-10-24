@@ -35,7 +35,6 @@ export const ThreadWebGpuView = ({
     ({ nativeEvent }: NativeSyntheticEvent<OnCreateSurfaceEvent>) => {
       tearDown();
       if (nativeEvent?.uuid) {
-        console.log('>', threadId);
         reactNativeWebGPUThreads.attachSurface({
           uuid: nativeEvent.uuid,
           threadId,

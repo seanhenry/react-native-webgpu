@@ -7,29 +7,26 @@ import {
 import {globalStyles} from '../../Components/globalStyles';
 
 import * as THREE from 'three';
+import {Camera, Scene} from 'three';
 import {
+  ComputeNode,
+  float,
+  If,
+  instanceIndex,
+  SpriteNodeMaterial,
+  storage,
+  texture,
   tslFn,
   uniform,
-  texture,
-  instanceIndex,
-  float,
   vec3,
-  storage,
-  If,
-  SpriteNodeMaterial,
-  ComputeNode,
 } from 'three/examples/jsm/nodes/Nodes.js';
 
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import {Camera, Scene} from 'three';
 import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 import StorageInstancedBufferAttribute from 'three/examples/jsm/renderers/common/StorageInstancedBufferAttribute.js';
 import {useControls} from '../../Components/controls/react/useControls';
 import {useStats} from '../../Components/stats/useStats';
 import {HudContainer} from '../../Components/stats/HudContainer';
-import {HudText} from '../../Components/stats/HudText';
-import {useRef} from 'react';
-import {TextInput} from 'react-native';
 import {THREE_EXAMPLES_BASE_URL} from '../../utils/constants';
 import {useHudText} from '../../Components/stats/useHudText';
 
@@ -37,7 +34,6 @@ export const ComputeParticles = () => {
   const {gui, Controls} = useControls();
   const {stats, Stats} = useStats();
   const {setText, HudText} = useHudText();
-  const textRef = useRef<TextInput | null>(null);
   const onCreateSurface: ThreeWebGpuViewProps['onCreateSurface'] = ({
     context,
     rendererParameters,

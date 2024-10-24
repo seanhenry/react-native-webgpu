@@ -1773,20 +1773,20 @@ interface GPUAdapter {
    * The limits in `this`.{@link GPUAdapter#[[adapter]]}.{@link adapter#[[limits]]}.
    */
   readonly limits: GPUSupportedLimits;
-  //   /**
-  //    * Information about the physical adapter underlying this {@link GPUAdapter}.
-  //    * For a given {@link GPUAdapter}, the {@link GPUAdapterInfo} values exposed are constant over time.
-  //    * The same object is returned each time. To create that object for the first time:
-  //    * <div algorithm=GPUAdapter.info>
-  //    * <div data-timeline=content>
-  //    * **Called on:** {@link GPUAdapter} `this`.
-  //    * **Returns:** {@link GPUAdapterInfo}
-  //    * Content timeline steps:
-  //    * 1. Return a [$new adapter info$] for `this.adapter`.
-  //    * </div>
-  //    * </div>
-  //    */
-  //   readonly info: GPUAdapterInfo;
+  /**
+   * Information about the physical adapter underlying this {@link GPUAdapter}.
+   * For a given {@link GPUAdapter}, the {@link GPUAdapterInfo} values exposed are constant over time.
+   * The same object is returned each time. To create that object for the first time:
+   * <div algorithm=GPUAdapter.info>
+   * <div data-timeline=content>
+   * **Called on:** {@link GPUAdapter} `this`.
+   * **Returns:** {@link GPUAdapterInfo}
+   * Content timeline steps:
+   * 1. Return a [$new adapter info$] for `this.adapter`.
+   * </div>
+   * </div>
+   */
+  readonly info: GPUAdapterInfo;
   //   /**
   //    * Returns the value of {@link GPUAdapter#[[adapter]]}.{@link adapter#[[fallback]]}.
   //    */
@@ -1798,8 +1798,8 @@ interface GPUAdapter {
    * @param descriptor - Description of the {@link GPUDevice} to request.
    */
   requestDevice(descriptor?: GPUDeviceDescriptor): Promise<GPUDevice>;
-  //   /** @deprecated Use `adapter.info` instead (once available in browsers). */
-  //   requestAdapterInfo(): Promise<GPUAdapterInfo>;
+  /** @deprecated Use `adapter.info` instead (once available in browsers). */
+  requestAdapterInfo(): Promise<GPUAdapterInfo>;
 }
 
 declare var GPUAdapter: {
@@ -1807,39 +1807,39 @@ declare var GPUAdapter: {
   new (): never;
 };
 
-// interface GPUAdapterInfo {
-//   /**
-//    * Nominal type branding.
-//    * https://github.com/microsoft/TypeScript/pull/33038
-//    * @internal
-//    */
-//   readonly __brand: "GPUAdapterInfo";
-//   /**
-//    * The name of the vendor of the adapter, if available. Empty string otherwise.
-//    */
-//   readonly vendor: string;
-//   /**
-//    * The name of the family or class of GPUs the adapter belongs to, if available. Empty
-//    * string otherwise.
-//    */
-//   readonly architecture: string;
-//   /**
-//    * A vendor-specific identifier for the adapter, if available. Empty string otherwise.
-//    * Note: This is a value that represents the type of adapter. For example, it may be a
-//    * [PCI device ID](https://pcisig.com/). It does not uniquely identify a given piece of
-//    * hardware like a serial number.
-//    */
-//   readonly device: string;
-//   /**
-//    * A human readable string describing the adapter as reported by the driver, if available.
-//    * Empty string otherwise.
-//    * Note: Because no formatting is applied to {@link GPUAdapterInfo#description} attempting to parse
-//    * this value is not recommended. Applications which change their behavior based on the
-//    * {@link GPUAdapterInfo}, such as applying workarounds for known driver issues, should rely on the
-//    * other fields when possible.
-//    */
-//   readonly description: string;
-// }
+interface GPUAdapterInfo {
+  // /**
+  //  * Nominal type branding.
+  //  * https://github.com/microsoft/TypeScript/pull/33038
+  //  * @internal
+  //  */
+  // readonly __brand: "GPUAdapterInfo";
+  /**
+   * The name of the vendor of the adapter, if available. Empty string otherwise.
+   */
+  readonly vendor: string;
+  /**
+   * The name of the family or class of GPUs the adapter belongs to, if available. Empty
+   * string otherwise.
+   */
+  readonly architecture: string;
+  /**
+   * A vendor-specific identifier for the adapter, if available. Empty string otherwise.
+   * Note: This is a value that represents the type of adapter. For example, it may be a
+   * [PCI device ID](https://pcisig.com/). It does not uniquely identify a given piece of
+   * hardware like a serial number.
+   */
+  readonly device: string;
+  /**
+   * A human readable string describing the adapter as reported by the driver, if available.
+   * Empty string otherwise.
+   * Note: Because no formatting is applied to {@link GPUAdapterInfo#description} attempting to parse
+   * this value is not recommended. Applications which change their behavior based on the
+   * {@link GPUAdapterInfo}, such as applying workarounds for known driver issues, should rely on the
+   * other fields when possible.
+   */
+  readonly description: string;
+}
 
 declare var GPUAdapterInfo: {
   prototype: GPUAdapterInfo;

@@ -17,6 +17,8 @@ using namespace wgpu;
 static void wgpuErrorCallback(WGPUErrorType type, char const *message, void *userdata);
 static void wgpuHandleRequestDevice(WGPURequestDeviceStatus status, WGPUDevice device, char const *message,
                                     void *userdata);
+static Object wgpuMakeJsAdapterInfo(Runtime &runtime, WGPUAdapter adapter);
+
 typedef struct HandleRequestDeviceUserData {
   std::shared_ptr<AdapterWrapper> adapter;
   std::shared_ptr<ErrorHandler> errorHandler;
@@ -85,13 +87,28 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
     return makeJsiLimits(runtime, limits.limits);
   }
 
+  if (name == "info") {
+    return wgpuMakeJsAdapterInfo(runtime, _adapter->_adapter);
+  }
+
+  if (name == "requestAdapterInfo") {
+    return WGPU_FUNC_FROM_HOST_FUNC(requestAdapterInfo, 0, [this]) {
+      auto promise = new Promise<void *>(runtime);
+      return promise->jsPromise([this, promise]() {
+        auto &runtime = promise->runtime;
+        promise->resolve(wgpuMakeJsAdapterInfo(runtime, _adapter->_adapter));
+        delete promise;
+      });
+    });
+  }
+
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
   return Value::undefined();
 }
 
 std::vector<PropNameID> AdapterHostObject::getPropertyNames(Runtime &runtime) {
-  return PropNameID::names(runtime, "requestDevice", "features", "limits");
+  return PropNameID::names(runtime, "requestDevice", "features", "limits", "info", "requestAdapterInfo");
 }
 
 static void wgpuErrorCallback(WGPUErrorType type, char const *message, void *userdata) {
@@ -118,4 +135,15 @@ static void wgpuHandleRequestDevice(WGPURequestDeviceStatus status, WGPUDevice d
     promise->reject(String::createFromUtf8(runtime, ss.str()));
   }
   delete promise;
+}
+
+static Object wgpuMakeJsAdapterInfo(Runtime &runtime, WGPUAdapter adapter) {
+  WGPUAdapterInfo info;
+  wgpuAdapterGetInfo(adapter, &info);
+  Object jsInfo(runtime);
+  WGPU_SET_UTF8(jsInfo, vendor, info.vendor);
+  WGPU_SET_UTF8(jsInfo, architecture, info.architecture);
+  WGPU_SET_UTF8(jsInfo, device, info.device);
+  WGPU_SET_UTF8(jsInfo, description, info.description);
+  return jsInfo;
 }

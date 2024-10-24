@@ -31,10 +31,12 @@ import {HudText} from '../../Components/stats/HudText';
 import {useRef} from 'react';
 import {TextInput} from 'react-native';
 import {THREE_EXAMPLES_BASE_URL} from '../../utils/constants';
+import {useHudText} from '../../Components/stats/useHudText';
 
 export const ComputeParticles = () => {
   const {gui, Controls} = useControls();
   const {stats, Stats} = useStats();
+  const {setText, HudText} = useHudText();
   const textRef = useRef<TextInput | null>(null);
   const onCreateSurface: ThreeWebGpuViewProps['onCreateSurface'] = ({
     context,
@@ -267,20 +269,15 @@ export const ComputeParticles = () => {
 
       if (renderer.hasFeature('timestamp-query')) {
         if (renderer.info.render.calls % 5 === 0) {
-          textRef.current?.setNativeProps({
-            text: `
-							Compute ${
-                renderer.info.compute.frameCalls
-              } pass in ${renderer.info.compute.timestamp.toFixed(6)}ms<br>
-							Draw ${
-                renderer.info.render.drawCalls
-              } pass in ${renderer.info.render.timestamp.toFixed(6)}ms`,
-          });
+          setText(`Compute ${
+            renderer.info.compute.frameCalls
+          } pass in ${renderer.info.compute.timestamp.toFixed(6)}ms<br>
+Draw ${
+            renderer.info.render.drawCalls
+          } pass in ${renderer.info.render.timestamp.toFixed(6)}ms`);
         }
       } else {
-        textRef.current?.setNativeProps({
-          text: 'Timestamp queries not supported',
-        });
+        setText('Timestamp queries not supported');
       }
       context.presentSurface();
       stats.end();
@@ -300,7 +297,7 @@ export const ComputeParticles = () => {
       </Square>
       <HudContainer>
         <Stats />
-        <HudText ref={textRef} />
+        <HudText />
       </HudContainer>
       <Controls />
     </>

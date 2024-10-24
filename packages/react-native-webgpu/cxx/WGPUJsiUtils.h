@@ -33,6 +33,10 @@
   __obj.getPropertyAsObject(runtime, #__propName).asHostObject<__type>(runtime)
 #define WGPU_ARRAY(__obj, __propName) __obj.getPropertyAsObject(runtime, #__propName).asArray(runtime)
 
+// Jsi setters
+#define WGPU_SET_UTF8(__obj, __propName, __str) \
+  __obj.setProperty(runtime, #__propName, String::createFromUtf8(runtime, __str))
+
 // Uncomment to display JSI logs
 // #define WGPU_DEBUG_LOG_PROPS
 // #define WGPU_DEBUG_LOG_UNIMPLEMENTED_PROPS

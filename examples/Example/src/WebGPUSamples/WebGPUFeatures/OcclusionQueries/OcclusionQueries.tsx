@@ -4,17 +4,13 @@ import solidColorLitWGSL from './solidColorLit.wgsl';
 import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
 import {Square} from '../../../Components/Square';
 import {globalStyles} from '../../../Components/globalStyles';
-import {useRef} from 'react';
-import {TextInput} from 'react-native';
 import {useControls} from '../../../Components/controls/react/useControls';
 import {HudContainer} from '../../../Components/stats/HudContainer';
-import {HudText} from '../../../Components/stats/HudText';
+import {useHudText} from '../../../Components/stats/useHudText';
 
 export const OcclusionQueries = () => {
   const {gui, Controls} = useControls();
-  const perfDisplayRef = useRef<TextInput | null>(null);
-  const setText = (text: string) =>
-    perfDisplayRef.current?.setNativeProps({text});
+  const {setText, HudText} = useHudText();
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
     navigator,
     context,
@@ -372,7 +368,7 @@ export const OcclusionQueries = () => {
         />
       </Square>
       <HudContainer>
-        <HudText ref={perfDisplayRef} />
+        <HudText />
       </HudContainer>
       <Controls />
     </>

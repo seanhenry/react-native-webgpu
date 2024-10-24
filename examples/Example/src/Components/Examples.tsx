@@ -94,7 +94,12 @@ const sections: Record<Examples, ListProps<Example>['sections']> = {
   InHouse: [
     {
       title: 'InHouse',
-      data: [{title: 'FlakesTexture'}, {title: 'Video'}, {title: 'Thread'}],
+      data: [
+        {title: 'FlakesTexture'},
+        {title: 'Video'},
+        {title: 'Thread'},
+        {title: 'AdapterInfo'},
+      ],
     },
   ],
 };

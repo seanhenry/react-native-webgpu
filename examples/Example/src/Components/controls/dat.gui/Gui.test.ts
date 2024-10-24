@@ -406,6 +406,19 @@ describe('Gui', () => {
     );
   });
 
+  it('removes a folder', () => {
+    gui.addFolder('My folder').remove();
+    const render = gui.render();
+    expect(render).toEqual(rootFolder([]));
+  });
+
+  it('removes a controller', () => {
+    const controller = gui.add(object, 'string');
+    controller.remove();
+    const render = gui.render();
+    expect(render).toEqual(rootFolder([]));
+  });
+
   it('adds name', () => {
     gui.name = 'new name';
     expect(gui.render().props.title).toBe('new name');

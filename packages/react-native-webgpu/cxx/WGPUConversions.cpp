@@ -22,6 +22,9 @@ WGPUDepthStencilState makeWGPUDepthStencilState(Runtime &runtime, const Object &
     .depthCompare = StringToWGPUCompareFunction(WGPU_UTF8_OPT(obj, depthCompare, "always")),
     .stencilFront = makeDefaultWGPUStencilFaceState(),
     .stencilBack = makeDefaultWGPUStencilFaceState(),
+    .depthBias = WGPU_NUMBER_OPT(obj, depthBias, int32_t, 0),
+    .depthBiasClamp = WGPU_NUMBER_OPT(obj, depthBiasClamp, float, 0),
+    .depthBiasSlopeScale = WGPU_NUMBER_OPT(obj, depthBiasSlopeScale, float, 0),
   };
 }
 

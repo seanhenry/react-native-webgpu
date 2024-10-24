@@ -33,6 +33,17 @@ export class Gui {
     return gui;
   }
 
+  remove() {
+    this._parent?.removeItem(this);
+  }
+
+  removeItem(item: Gui | Controller) {
+    const index = this._items.indexOf(item);
+    if (index !== -1) {
+      this._items.splice(index, 1);
+    }
+  }
+
   get observable(): ReadonlyObservable<ControlComponent<'folder'> | null> {
     return this._observable;
   }
@@ -119,6 +130,7 @@ export class Gui {
         `Input type ${typeof value} not supported. Prop: ${String(property)}`,
       );
     }
+    controller.setParent(this);
     this._items.push(controller);
     return controller;
   }

@@ -36,6 +36,7 @@ import {SkinnedMesh} from '../WebGPUSamples/GraphicsTechniques/SkinnedMesh/Skinn
 import {Video} from '../InHouse/Video';
 import {Thread} from '../InHouse/Thread';
 import {ParticlesHDR} from '../WebGPUSamples/GraphicsTechniques/ParticlesHDR/ParticlesHDR';
+import {Wireframe} from '../WebGPUSamples/GraphicsTechniques/Wireframe/Wireframe';
 
 export type Examples = 'WebGPUSamples' | 'Three' | 'InHouse';
 
@@ -69,6 +70,7 @@ export type Example =
   | 'ABuffer'
   | 'SkinnedMesh'
   | 'VolumeRendering'
+  | 'Wireframe'
   // Three
   | 'HelloThree'
   | 'Clearcoat'
@@ -115,6 +117,7 @@ const examples: Record<Example, ComponentType> = {
   ABuffer,
   SkinnedMesh,
   VolumeRendering,
+  Wireframe,
   // Three.js
   HelloThree,
   Clearcoat,

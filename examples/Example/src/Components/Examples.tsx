@@ -68,6 +68,7 @@ const sections: Record<Examples, ListProps<Example>['sections']> = {
         {title: 'ABuffer'},
         {title: 'SkinnedMesh'},
         {title: 'VolumeRendering'},
+        {title: 'Wireframe'},
       ],
     },
   ],

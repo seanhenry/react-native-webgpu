@@ -645,18 +645,18 @@ interface GPUDepthStencilState {
   //    * bits are written to when performing stencil operations.
   //    */
   //   stencilWriteMask?: GPUStencilValue;
-  //   /**
-  //    * Constant depth bias added to each fragment. See [$biased fragment depth$] for details.
-  //    */
-  //   depthBias?: GPUDepthBias;
-  //   /**
-  //    * Depth bias that scales with the fragment’s slope. See [$biased fragment depth$] for details.
-  //    */
-  //   depthBiasSlopeScale?: number;
-  //   /**
-  //    * The maximum depth bias of a fragment. See [$biased fragment depth$] for details.
-  //    */
-  //   depthBiasClamp?: number;
+  /**
+   * Constant depth bias added to each fragment. See [$biased fragment depth$] for details.
+   */
+  depthBias?: GPUDepthBias;
+  /**
+   * Depth bias that scales with the fragment’s slope. See [$biased fragment depth$] for details.
+   */
+  depthBiasSlopeScale?: number;
+  /**
+   * The maximum depth bias of a fragment. See [$biased fragment depth$] for details.
+   */
+  depthBiasClamp?: number;
 }
 
 interface GPUDeviceDescriptor extends GPUObjectDescriptorBase {

@@ -1,6 +1,7 @@
 import {ControlComponent, ControlComponentType} from './types';
 import {getId} from './incrementingId';
 import {Observable, observable} from '../../../utils/observable';
+import {Gui} from './Gui';
 
 export abstract class Controller<
   T = any,
@@ -11,6 +12,7 @@ export abstract class Controller<
   private readonly _observable: Observable<Value>;
   private _name: string;
   private _disabled = false;
+  private _parent?: Gui;
   private _onChange?: (value: Value) => void;
   private _onFinishChange?: (value: Value) => void;
 
@@ -86,4 +88,12 @@ export abstract class Controller<
   }
 
   abstract render(): ControlComponent<Component>;
+
+  setParent(parent: Gui) {
+    this._parent = parent;
+  }
+
+  remove() {
+    this._parent?.removeItem(this);
+  }
 }

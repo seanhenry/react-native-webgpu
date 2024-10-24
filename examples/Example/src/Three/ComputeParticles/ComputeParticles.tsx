@@ -271,7 +271,7 @@ export const ComputeParticles = () => {
         if (renderer.info.render.calls % 5 === 0) {
           setText(`Compute ${
             renderer.info.compute.frameCalls
-          } pass in ${renderer.info.compute.timestamp.toFixed(6)}ms<br>
+          } pass in ${renderer.info.compute.timestamp.toFixed(6)}ms
 Draw ${
             renderer.info.render.drawCalls
           } pass in ${renderer.info.render.timestamp.toFixed(6)}ms`);

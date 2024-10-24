@@ -15,7 +15,15 @@ export const ThreeWebGpuView = ({onCreateSurface, ...props}) => {
   const threeOnCreateSurface = useCallback(
     async payload => {
       const adapter = await payload.navigator.gpu.requestAdapter();
-      const device = await adapter.requestDevice();
+      const supportedFeatures = [];
+      for (const name of adapter.features) {
+        if (adapter.features.has(name)) {
+          supportedFeatures.push(name);
+        }
+      }
+      const device = await adapter.requestDevice({
+        requiredFeatures: supportedFeatures,
+      });
       const eventsAdapter = new TouchEventsAdapter(touchEventsRef);
       const canvas = makeCanvasProxy({eventsAdapter, payload});
 

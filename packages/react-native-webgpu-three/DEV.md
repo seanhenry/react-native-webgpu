@@ -89,3 +89,10 @@ See: `src/constNodePatch.js`
 
 Solution: Use document proxy to return `Image` class. Image is loaded and picked up in `QueueHostObject.copyExternalImageToTexture`
 See: `src/index.js`, `src/Image.js`, `QueueHostObject.cpp`
+
+### Adapter supported features
+
+Three automatically requests all available features. See `WebGPUBackend.js:91`. We're bypassing this setup.
+
+Solution: Copy implementation from Three
+See: `src/ThreeWebGpuView.js`

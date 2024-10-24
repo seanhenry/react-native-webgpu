@@ -107,7 +107,7 @@ android {
     buildConfig true
     if (!isNewArchitectureEnabled()) {
       prefab true
-      prefabPublishing true
+//      prefabPublishing true
     }
   }
 

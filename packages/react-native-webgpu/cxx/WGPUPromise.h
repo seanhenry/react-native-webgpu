@@ -67,7 +67,7 @@ void *Promise::toCDataWithExtras(const T data) {
 template <typename T>
 void Promise::fromCDataWithExtras(void *data, CDataCallbackWithExtras<T> &&fn) {
   auto cData = static_cast<WGPUPromise_CData<T> *>(data);
-  fn(cData->promise, std::move(cData->data));
+  fn(cData->promise, cData->data);
   delete cData;
 }
 

@@ -28,7 +28,7 @@ class WebgpuModule(reactContext: ReactApplicationContext) :
       val jsiRuntimeRef = context.javaScriptContextHolder!!.get()
       val jsCallInvokerHolder = context.catalystInstance.jsCallInvokerHolder
       val blobModule = context.getNativeModule(BlobModule::class.java)
-      val factory = BitmapLoaderFactory(blobModule)
+      val factory = BitmapLoaderFactory(blobModule, context)
       return CxxBridge.installJsi(threadId, jsiRuntimeRef, jsCallInvokerHolder, factory)
     } catch (exception: Exception) {
       Log.e(NAME, "Failed to initialize react-native-webgpu", exception)

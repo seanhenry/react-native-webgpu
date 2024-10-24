@@ -15,13 +15,14 @@ Value Promise::makeJSPromise(const std::shared_ptr<JSIInstance> &jsiInstance, Ca
     return Value::undefined();
   });
 
-  auto jsPromise = runtime.global()
-                     .getPropertyAsFunction(runtime, "Promise")
-                     .callAsConstructor(runtime, promiseCallbackFn);
+  auto jsPromise =
+    runtime.global().getPropertyAsFunction(runtime, "Promise").callAsConstructor(runtime, promiseCallbackFn);
   // We are setting the host object to the promise to retain it and pass back a weak reference to the native promise.
   // This ensures that the jsi runtime fully owns the lifecycle and will destroy it when required.
-  // A strong reference to ResolveReject must only be retrieved on the JS thread. Otherwise crashes may occur, especially during hot reloads.
-  jsPromise.asObject(runtime).setProperty(runtime, "__wgpuNative", Object::createFromHostObject(runtime, resolveReject));
+  // A strong reference to ResolveReject must only be retrieved on the JS thread. Otherwise crashes may occur,
+  // especially during hot reloads.
+  jsPromise.asObject(runtime).setProperty(runtime, "__wgpuNative",
+                                          Object::createFromHostObject(runtime, resolveReject));
   resolveReject->_promise = std::make_shared<Object>(jsPromise.asObject(runtime));
   return jsPromise;
 }

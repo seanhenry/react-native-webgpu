@@ -62,15 +62,32 @@ Value wgpu::fetchImageBitmap(std::string uri, std::shared_ptr<JSIInstance> jsiIn
         return;
       }
 
-      auto bitmapLoader = WGPUAndroidInstance::instance->getImageLoaderFactory()->makeHttpBitmapLoader(env, uri);
-      bitmapLoader->fetchBitmap(env);
+      jobject sharedMemory;
+      jint width;
+      jint height;
+      jstring errorMessageIn;
 
-      auto sharedMemory = bitmapLoader->getSharedMemory(env);
-      auto width = bitmapLoader->getWidth(env);
-      auto height = bitmapLoader->getHeight(env);
+      if (uri.find("https://") == 0 || uri.find("http://") == 0) {
+        auto bitmapLoader = WGPUAndroidInstance::instance->getImageLoaderFactory()->makeHttpBitmapLoader(env, uri);
+        bitmapLoader->fetchBitmap(env);
+
+        sharedMemory = bitmapLoader->getSharedMemory(env);
+        width = bitmapLoader->getWidth(env);
+        height = bitmapLoader->getHeight(env);
+
+        errorMessageIn = bitmapLoader->getErrorMessage(env);
+      } else {
+        auto bitmapLoader = WGPUAndroidInstance::instance->getImageLoaderFactory()->makeDrawableBitmapLoader(env, uri);
+        bitmapLoader->fetchBitmap(env);
+
+        sharedMemory = bitmapLoader->getSharedMemory(env);
+        width = bitmapLoader->getWidth(env);
+        height = bitmapLoader->getHeight(env);
+
+        errorMessageIn = bitmapLoader->getErrorMessage(env);
+      }
 
       std::shared_ptr<std::string> errorMessage;
-      auto errorMessageIn = bitmapLoader->getErrorMessage(env);
       if (errorMessageIn != nullptr) {
         const char *uuidChars = env->GetStringUTFChars(errorMessageIn, nullptr);
         errorMessage = std::make_shared<std::string>(uuidChars);

@@ -7,7 +7,8 @@
 #include <utility>
 
 #include "JNIBlobBitmapLoader.h"
-#include "JSIHTTPBitmapLoader.h"
+#include "JNIDrawableBitmapLoader.h"
+#include "JNIHTTPBitmapLoader.h"
 
 namespace wgpu {
 
@@ -20,10 +21,13 @@ class JNIImageLoaderFactoryMethodIDs {
     }
     makeHttpBitmapLoaderId =
       env->GetMethodID(factoryClass, "makeHttpBitmapLoader", "(Ljava/lang/String;)Lcom/webgpu/HTTPBitmapLoader;");
+    makeDrawableBitmapLoaderId = env->GetMethodID(factoryClass, "makeDrawableBitmapLoader",
+                                                  "(Ljava/lang/String;)Lcom/webgpu/DrawableBitmapLoader;");
     makeBlobBitmapLoaderId = env->GetMethodID(factoryClass, "makeBlobBitmapLoader", "()Lcom/webgpu/BlobBitmapLoader;");
   }
 
   jmethodID makeHttpBitmapLoaderId;
+  jmethodID makeDrawableBitmapLoaderId;
   jmethodID makeBlobBitmapLoaderId;
 };
 
@@ -31,9 +35,11 @@ class JNIImageLoaderFactory {
  public:
   JNIImageLoaderFactory(std::shared_ptr<JNIImageLoaderFactoryMethodIDs> factoryMethodIDs,
                         std::shared_ptr<JNIHTTPBitmapLoaderMethodIDs> httpMethodIDs,
+                        std::shared_ptr<JNIDrawableBitmapLoaderMethodIDs> drawableMethodIDs,
                         std::shared_ptr<JNIBlobBitmapLoaderMethodIDs> blobMethodIDs, jobject instance)
     : _factoryMethodIDs(std::move(factoryMethodIDs)),
       _httpMethodIDs(std::move(httpMethodIDs)),
+      _drawableMethodIDs(std::move(drawableMethodIDs)),
       _blobMethodIDs(std::move(blobMethodIDs)),
       _instance(instance) {}
 
@@ -41,6 +47,12 @@ class JNIImageLoaderFactory {
     auto uriString = env->NewStringUTF(uri.data());
     auto instance = env->CallObjectMethod(_instance, _factoryMethodIDs->makeHttpBitmapLoaderId, uriString);
     return std::make_shared<JNIHTTPBitmapLoader>(_httpMethodIDs, instance);
+  }
+
+  std::shared_ptr<JNIDrawableBitmapLoader> makeDrawableBitmapLoader(JNIEnv *env, std::string uri) {
+    auto uriString = env->NewStringUTF(uri.data());
+    auto instance = env->CallObjectMethod(_instance, _factoryMethodIDs->makeDrawableBitmapLoaderId, uriString);
+    return std::make_shared<JNIDrawableBitmapLoader>(_drawableMethodIDs, instance);
   }
 
   std::shared_ptr<JNIBlobBitmapLoader> makeBlobBitmapLoader(JNIEnv *env) {
@@ -51,6 +63,7 @@ class JNIImageLoaderFactory {
  private:
   std::shared_ptr<JNIImageLoaderFactoryMethodIDs> _factoryMethodIDs;
   std::shared_ptr<JNIHTTPBitmapLoaderMethodIDs> _httpMethodIDs;
+  std::shared_ptr<JNIDrawableBitmapLoaderMethodIDs> _drawableMethodIDs;
   std::shared_ptr<JNIBlobBitmapLoaderMethodIDs> _blobMethodIDs;
   jobject _instance;
 };

@@ -22,7 +22,6 @@ static Object wgpuMakeJsAdapterInfo(Runtime &runtime, WGPUAdapter adapter);
 typedef struct HandleRequestDeviceUserData {
   std::shared_ptr<AdapterWrapper> adapter;
   std::shared_ptr<ErrorHandler> errorHandler;
-  std::shared_ptr<JSIInstance> jsiInstance;
 } HandleRequestDeviceUserData;
 
 Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
@@ -37,13 +36,9 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
       if (count > 0 && arguments[0].isObject()) {
         sharedObj = std::make_shared<Object>(arguments[0].asObject(runtime));
       }
-      return Promise::makeJSPromise(_jsiInstance, [this, sharedObj](auto &runtime, auto &promise) {
+      return Promise::makeJSPromise(_jsiInstance,
+                                    [adapterWrapper = this->_adapter, sharedObj](auto &runtime, auto &promise) {
         auto errorHandler = std::make_shared<ErrorHandler>();
-        const HandleRequestDeviceUserData data = {
-          .adapter = _adapter,
-          .errorHandler = errorHandler,
-          .jsiInstance = _jsiInstance,
-        };
         std::vector<WGPUFeatureName> requiredFeatures;
         auto requiredLimits = std::shared_ptr<WGPURequiredLimits>(nullptr);
         WGPUDeviceDescriptor descriptor = {nullptr};
@@ -69,7 +64,7 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
           if (WGPU_HAS_PROP(obj, requiredLimits)) {
             auto requiredLimitsIn = WGPU_OBJ(obj, requiredLimits);
             WGPUSupportedLimits supportedLimits;
-            wgpuAdapterGetLimits(_adapter->_adapter, &supportedLimits);
+            wgpuAdapterGetLimits(adapterWrapper->_adapter, &supportedLimits);
             requiredLimits = std::make_shared<WGPURequiredLimits>((const WGPURequiredLimits){
               .nextInChain = nullptr,
               .limits = makeWGPULimits(runtime, requiredLimitsIn, supportedLimits),
@@ -77,14 +72,18 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
             descriptor.requiredLimits = requiredLimits.get();
           }
         }
-        wgpuAdapterRequestDevice(_adapter->_adapter, &descriptor, wgpuHandleRequestDevice,
-                                 promise->toCDataWithExtras(data));
+        HandleRequestDeviceUserData data = {
+          .adapter = adapterWrapper,
+          .errorHandler = errorHandler,
+        };
+        wgpuAdapterRequestDevice(adapterWrapper->_adapter, &descriptor, wgpuHandleRequestDevice,
+                                 promise->toCDataWithExtras(std::move(data)));
       });
     });
   }
 
   if (name == "features") {
-    auto size = wgpuAdapterEnumerateFeatures(_adapter->_adapter, NULL);
+    auto size = wgpuAdapterEnumerateFeatures(_adapter->_adapter, nullptr);
     std::vector<WGPUFeatureName> features;
     features.resize(size);
     wgpuAdapterEnumerateFeatures(_adapter->_adapter, features.data());
@@ -92,7 +91,7 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
   }
 
   if (name == "limits") {
-    WGPUSupportedLimits limits = {0};
+    WGPUSupportedLimits limits = {};
     wgpuAdapterGetLimits(_adapter->_adapter, &limits);
     return makeJsiLimits(runtime, limits.limits);
   }

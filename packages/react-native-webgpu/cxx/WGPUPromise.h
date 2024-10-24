@@ -29,7 +29,7 @@ class Promise : public std::enable_shared_from_this<Promise> {
   static void fromCDataWithExtras(void *data, CDataCallbackWithExtras<T> &&fn);
   static void fromCData(void *data, CDataCallback &&fn);
 
-  explicit Promise(Runtime &runtime) : _runtime(runtime) {}
+  explicit Promise(const std::shared_ptr<JSIInstance> &jsiInstance) : _jsiInstance(jsiInstance) {}
 
   void *toCData();
   template <typename T>
@@ -50,22 +50,22 @@ class Promise : public std::enable_shared_from_this<Promise> {
 
   std::weak_ptr<ResolveReject> _resolveReject;
   std::shared_ptr<JSIInstance> _jsiInstance;
-  Runtime &_runtime;
 };
 
 #pragma mark - C data interop
 
 template <typename T>
 void *Promise::toCDataWithExtras(const T data) {
-  auto cData = (WGPUPromise_CData<T> *)malloc(sizeof(WGPUPromise_CData<T>));
-  cData->promise = this->shared_from_this();
-  cData->data = data;
+  auto cData = new WGPUPromise_CData<T>{
+    .promise = this->shared_from_this(),
+    .data = data,
+  };
   return (void *)cData;
 }
 
 template <typename T>
 void Promise::fromCDataWithExtras(void *data, CDataCallbackWithExtras<T> &&fn) {
-  auto cData = (WGPUPromise_CData<T> *)data;
+  auto cData = static_cast<WGPUPromise_CData<T> *>(data);
   fn(cData->promise, std::move(cData->data));
   delete cData;
 }

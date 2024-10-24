@@ -7,8 +7,7 @@ Value Promise::makeJSPromise(const std::shared_ptr<JSIInstance> &jsiInstance, Ca
   std::shared_ptr<ResolveReject> resolveReject;
   auto promiseCallbackFn =
     WGPU_FUNC_FROM_HOST_FUNC(promiseCallbackFn, 2, [&resolveReject, jsiInstance, fn = std::move(fn) ]) {
-    auto promise = std::make_shared<Promise>(runtime);
-    promise->_jsiInstance = jsiInstance;
+    auto promise = std::make_shared<Promise>(jsiInstance);
     resolveReject = std::make_shared<ResolveReject>(arguments[0].asObject(runtime).asFunction(runtime),
                                                     arguments[1].asObject(runtime).asFunction(runtime));
     promise->_resolveReject = resolveReject;
@@ -36,7 +35,8 @@ void Promise::reject(std::function<Value(Runtime &)> &&fn) {
 }
 
 void Promise::finalize(std::function<void(Runtime &runtime, Function &resolve, Function &reject)> &&callback) {
-  _jsiInstance->jsThread->run([&runtime = _runtime, rr = this->_resolveReject, callback = std::move(callback)] {
+  _jsiInstance->jsThread->run(
+    [&runtime = _jsiInstance->runtime, rr = this->_resolveReject, callback = std::move(callback)] {
     auto resolveReject = rr.lock();
     if (resolveReject != nullptr) {
       callback(runtime, resolveReject->_resolve, resolveReject->_reject);

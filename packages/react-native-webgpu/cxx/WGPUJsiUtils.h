@@ -36,6 +36,7 @@
 // Jsi setters
 #define WGPU_SET_UTF8(__obj, __propName, __str) \
   __obj.setProperty(runtime, #__propName, String::createFromUtf8(runtime, __str))
+#define WGPU_SET_INT(__obj, __propName, __value) __obj.setProperty(runtime, #__propName, Value((int)__value))
 
 // Uncomment to display JSI logs
 // #define WGPU_DEBUG_LOG_PROPS

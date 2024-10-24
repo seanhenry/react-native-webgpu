@@ -7,9 +7,9 @@
 #include "ConstantConversion.h"
 #include "DeviceHostObject.h"
 #include "ErrorHandler.h"
-#include "Promise.h"
 #include "WGPUContext.h"
 #include "WGPUConversions.h"
+#include "WGPUPromise.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
@@ -37,10 +37,9 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
       if (count > 0 && arguments[0].isObject()) {
         sharedObj = std::make_shared<Object>(arguments[0].asObject(runtime));
       }
-      auto promise = new Promise<HandleRequestDeviceUserData>(runtime);
-      return promise->jsPromise([this, promise, sharedObj]() {
+      return Promise::makeJSPromise(_jsiInstance, [this, sharedObj](auto &runtime, auto &promise) {
         auto errorHandler = std::make_shared<ErrorHandler>();
-        promise->data = (const HandleRequestDeviceUserData){
+        const HandleRequestDeviceUserData data = {
           .adapter = _adapter,
           .errorHandler = errorHandler,
           .jsiInstance = _jsiInstance,
@@ -55,7 +54,6 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
         };
 
         if (sharedObj != nullptr) {
-          auto &runtime = promise->runtime;
           auto obj = std::move(*sharedObj.get());
 
           if (WGPU_HAS_PROP(obj, requiredFeatures)) {
@@ -79,7 +77,8 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
             descriptor.requiredLimits = requiredLimits.get();
           }
         }
-        wgpuAdapterRequestDevice(_adapter->_adapter, &descriptor, wgpuHandleRequestDevice, promise);
+        wgpuAdapterRequestDevice(_adapter->_adapter, &descriptor, wgpuHandleRequestDevice,
+                                 promise->toCDataWithExtras(data));
       });
     });
   }
@@ -104,11 +103,9 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
 
   if (name == "requestAdapterInfo") {
     return WGPU_FUNC_FROM_HOST_FUNC(requestAdapterInfo, 0, [this]) {
-      auto promise = new Promise<void *>(runtime);
-      return promise->jsPromise([this, promise]() {
-        auto &runtime = promise->runtime;
-        promise->resolve(wgpuMakeJsAdapterInfo(runtime, _adapter->_adapter));
-        delete promise;
+      return Promise::makeJSPromise(_jsiInstance, [this](auto &runtime, auto &promise) {
+        promise->resolve(
+          [adapter = _adapter->_adapter](auto &runtime) { return wgpuMakeJsAdapterInfo(runtime, adapter); });
       });
     });
   }
@@ -130,22 +127,22 @@ static void wgpuErrorCallback(WGPUErrorType type, char const *message, void *use
 
 static void wgpuHandleRequestDevice(WGPURequestDeviceStatus status, WGPUDevice device, char const *message,
                                     void *userdata) {
-  auto promise = (Promise<HandleRequestDeviceUserData> *)userdata;
-  Runtime &runtime = promise->runtime;
+  Promise::fromCDataWithExtras<HandleRequestDeviceUserData>(userdata,
+                                                            [status, device, message](auto &promise, auto data) {
+    if (status == WGPURequestDeviceStatus_Success) {
+      auto deviceWrapper = std::make_shared<DeviceWrapper>(device);
+      auto context =
+        std::make_shared<WGPUContext>(data.adapter, deviceWrapper, data.errorHandler, promise->getJSIInstance());
+      auto deviceHostObject = std::make_shared<DeviceHostObject>(deviceWrapper, context);
 
-  if (status == WGPURequestDeviceStatus_Success) {
-    auto deviceWrapper = std::make_shared<DeviceWrapper>(device);
-    auto context = std::make_shared<WGPUContext>(promise->data.adapter, deviceWrapper, promise->data.errorHandler,
-                                                 promise->data.jsiInstance);
-    auto deviceHostObject =
-      Object::createFromHostObject(runtime, std::make_shared<DeviceHostObject>(deviceWrapper, context));
-    promise->resolve(std::move(deviceHostObject));
-  } else {
-    std::ostringstream ss;
-    ss << __FILE__ << ":" << __LINE__ << " Adapter.requestDevice() failed with status " << status << ". " << message;
-    promise->reject(makeJSError(runtime, ss.str()));
-  }
-  delete promise;
+      promise->resolve(
+        [deviceHostObject](auto &runtime) { return Object::createFromHostObject(runtime, deviceHostObject); });
+    } else {
+      std::ostringstream ss;
+      ss << __FILE__ << ":" << __LINE__ << " Adapter.requestDevice() failed with status " << status << ". " << message;
+      promise->reject([message = ss.str()](auto &runtime) { return makeJSError(runtime, message); });
+    }
+  });
 }
 
 static Object wgpuMakeJsAdapterInfo(Runtime &runtime, WGPUAdapter adapter) {

@@ -4,7 +4,7 @@
 
 @implementation UIImage (Bitmap)
 
-- (BOOL)createBitmapImage:(BitmapImage *)bitmapImage runtime:(Runtime &)runtime {
+- (BOOL)createBitmapImage:(BitmapImage *)bitmapImage {
   CGImageRef imageRef = [self CGImage];
   NSUInteger width = CGImageGetWidth(imageRef);
   NSUInteger height = CGImageGetHeight(imageRef);

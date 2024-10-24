@@ -1,35 +1,21 @@
 #include "ShaderModuleHostObject.h"
 
-#include "Promise.h"
+#include "WGPUPromise.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
 
+struct WGPUShaderCompilationMessage {
+  std::string message;
+  uint64_t lineNum;
+  uint64_t linePos;
+  uint64_t offset;
+  uint64_t length;
+};
+
 void wgpuShaderModuleGetCompilationInfoCallback(WGPUCompilationInfoRequestStatus status,
                                                 struct WGPUCompilationInfo const *compilationInfo,
-                                                WGPU_NULLABLE void *userdata) {
-  auto promise = (Promise<void *> *)userdata;
-  Runtime &runtime = promise->runtime;
-  if (status == WGPUCompilationInfoRequestStatus_Success) {
-    auto messages = cArrayToJsi(runtime, compilationInfo->messages, compilationInfo->messageCount,
-                                [](Runtime &runtime, WGPUCompilationMessage item) {
-      auto obj = Object(runtime);
-      obj.setProperty(runtime, "message", String::createFromUtf8(runtime, item.message));
-      obj.setProperty(runtime, "lineNum", Value((int)item.lineNum));
-      obj.setProperty(runtime, "linePos", Value((int)item.linePos));
-      obj.setProperty(runtime, "offset", Value((int)item.offset));
-      obj.setProperty(runtime, "length", Value((int)item.length));
-      return obj;
-    });
-
-    auto result = Object(runtime);
-    result.setProperty(runtime, "messages", messages);
-    promise->resolve(std::move(result));
-  } else {
-    promise->reject(makeJSError(runtime, "getCompilationInfo failed"));
-  }
-  delete promise;
-}
+                                                WGPU_NULLABLE void *userdata);
 
 Value ShaderModuleHostObject::get(Runtime &runtime, const PropNameID &propName) {
   auto name = propName.utf8(runtime);
@@ -39,9 +25,8 @@ Value ShaderModuleHostObject::get(Runtime &runtime, const PropNameID &propName) 
   if (name == "getCompilationInfo") {
     return WGPU_FUNC_FROM_HOST_FUNC(getCompilationInfo, 0, [this]) {
       WGPU_LOG_FUNC_ARGS(getCompilationInfo);
-      auto promise = new Promise<void *>(runtime);
-      return promise->jsPromise([this, promise]() {
-        wgpuShaderModuleGetCompilationInfo(_value, wgpuShaderModuleGetCompilationInfoCallback, promise);
+      return Promise::makeJSPromise(_context->getJSIInstance(), [this](auto &runtime, auto &promise) {
+        wgpuShaderModuleGetCompilationInfo(_value, wgpuShaderModuleGetCompilationInfoCallback, promise->toCData());
       });
     });
   }
@@ -57,4 +42,42 @@ Value ShaderModuleHostObject::get(Runtime &runtime, const PropNameID &propName) 
 
 std::vector<PropNameID> ShaderModuleHostObject::getPropertyNames(Runtime &runtime) {
   return PropNameID::names(runtime, "getCompilationInfo", "label");
+}
+
+void wgpuShaderModuleGetCompilationInfoCallback(WGPUCompilationInfoRequestStatus status,
+                                                struct WGPUCompilationInfo const *compilationInfo,
+                                                WGPU_NULLABLE void *userdata) {
+  Promise::fromCData(userdata, [status, compilationInfo](auto &promise) {
+    if (status == WGPUCompilationInfoRequestStatus_Success) {
+      std::vector<WGPUShaderCompilationMessage> messages;
+      for (auto i = 0; i < compilationInfo->messageCount; i++) {
+        auto message = compilationInfo->messages[i];
+        messages.emplace_back((WGPUShaderCompilationMessage const){
+          .message = message.message,
+          .lineNum = message.lineNum,
+          .linePos = message.linePos,
+          .offset = message.offset,
+          .length = message.length,
+        });
+      }
+      promise->resolve([messagesIn = std::move(messages)](auto &runtime) {
+        auto messages = cArrayToJsi(runtime, messagesIn.data(), messagesIn.size(),
+                                    [](Runtime &runtime, WGPUShaderCompilationMessage item) {
+          auto obj = Object(runtime);
+          WGPU_SET_UTF8(obj, message, item.message);
+          WGPU_SET_INT(obj, lineNum, item.lineNum);
+          WGPU_SET_INT(obj, linePos, item.linePos);
+          WGPU_SET_INT(obj, offset, item.offset);
+          WGPU_SET_INT(obj, length, item.length);
+          return obj;
+        });
+
+        auto result = Object(runtime);
+        result.setProperty(runtime, "messages", messages);
+        return result;
+      });
+    } else {
+      promise->reject([](auto &runtime) { return makeJSError(runtime, "getCompilationInfo failed"); });
+    }
+  });
 }

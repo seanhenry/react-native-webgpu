@@ -5,8 +5,8 @@
 #include "ArrayBufferUtils.h"
 #include "ConstantConversion.h"
 #include "JSIInstance.h"
-#include "Promise.h"
 #include "WGPUContext.h"
+#include "WGPUPromise.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
@@ -44,19 +44,19 @@ Value BufferHostObject::get(Runtime &runtime, const PropNameID &propName) {
   if (name == "mapAsync") {
     return WGPU_FUNC_FROM_HOST_FUNC(mapAsync, 3, [this]) {
       WGPU_LOG_FUNC_ARGS(mapAsync);
-      WGPUMapModeFlags mode = (WGPUMapModeFlags)arguments[0].asNumber();
+      auto mode = (WGPUMapModeFlags)arguments[0].asNumber();
       uint64_t offset = count > 1 ? (uint64_t)arguments[1].asNumber() : 0;
       uint64_t size = count > 2 ? (uint64_t)arguments[2].asNumber() : (wgpuBufferGetSize(_value) - offset);
 
-      auto promise = new Promise<HandleMapAsyncData>(runtime);
-      return promise->jsPromise([this, mode, offset, size, promise]() {
-        auto thread = std::thread([this, mode, offset, size, promise]() {
-          volatile bool isReady = false;
-          promise->data = {
-            .isReady = &isReady,
-            .context = _context,
-          };
-          wgpuBufferMapAsync(_value, mode, offset, size, wgpuHandleMapAsync, promise);
+      return Promise::makeJSPromise(_context->getJSIInstance(),
+                                    [this, mode, offset, size](auto &runtime, auto &promise) {
+        volatile bool isReady = false;
+        const HandleMapAsyncData data = {
+          .isReady = &isReady,
+          .context = _context,
+        };
+        wgpuBufferMapAsync(_value, mode, offset, size, wgpuHandleMapAsync, promise->toCDataWithExtras(data));
+        auto thread = std::thread([this, &isReady]() {
           while (!isReady) {
             _context->poll(true);
           }
@@ -124,16 +124,13 @@ static std::string mapAsyncStatusToString(WGPUBufferMapAsyncStatus status) {
 }
 
 static void wgpuHandleMapAsync(WGPUBufferMapAsyncStatus status, void *userdata) {
-  auto promise = (Promise<HandleMapAsyncData> *)userdata;
-  *promise->data.isReady = true;
-  promise->data.context->runOnJsThread([status, promise]() {
+  Promise::fromCDataWithExtras<HandleMapAsyncData>(userdata, [status](auto &promise, auto data) {
+    *data.isReady = true;
     if (status == WGPUBufferMapAsyncStatus_Success) {
-      promise->resolve(Value::undefined());
+      promise->resolve([](auto &runtime) { return Value::undefined(); });
     } else {
       auto message = "GPUBuffer.mapAsync error: " + mapAsyncStatusToString(status);
-      auto error = makeJSError(promise->runtime, message);
-      promise->reject(std::move(error));
+      promise->reject([message = std::move(message)](auto &runtime) { return makeJSError(runtime, message); });
     }
-    delete promise;
   });
 }

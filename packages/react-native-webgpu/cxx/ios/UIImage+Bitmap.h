@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UIImage (Bitmap)
 
-- (BOOL)createBitmapImage:(BitmapImage*)bitmapImage runtime:(Runtime&)runtime;
+- (BOOL)createBitmapImage:(BitmapImage*)bitmapImage;
 
 @end
 

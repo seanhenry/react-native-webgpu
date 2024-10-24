@@ -7,11 +7,11 @@
 #include "ConstantConversion.h"
 #include "ContextHostObject.h"
 #include "CreateImageBitmap.h"
-#include "Promise.h"
 #include "Surface.h"
 #include "SurfacesManager.h"
 #include "VideoPlayer.h"
 #include "WGPUJsiUtils.h"
+#include "WGPUPromise.h"
 
 #ifdef ANDROID
 const char *defaultTextureFormat = "rgba8unorm-srgb";
@@ -23,10 +23,7 @@ using namespace facebook::jsi;
 
 static void wgpuHandleRequestAdapter(WGPURequestAdapterStatus status, WGPUAdapter adapter, char const *message,
                                      void *userdata);
-typedef struct HandleRequestAdapterData {
-  std::weak_ptr<Surface> optionalSurface;
-  std::shared_ptr<JSIInstance> jsiInstance;
-} HandleRequestAdapterData;
+using OptionalSurface = std::weak_ptr<Surface>;
 
 void wgpu::installRootJSI(Runtime &runtime, std::shared_ptr<JSIInstance> jsiInstance) {
   auto getSurfaceBackedWebGPU = WGPU_FUNC_FROM_HOST_FUNC(getWebGPUForSurface, 1, [jsiInstance]) {
@@ -50,18 +47,12 @@ void wgpu::installRootJSI(Runtime &runtime, std::shared_ptr<JSIInstance> jsiInst
 
     auto gpu = Object(runtime);
     gpu.setProperty(runtime, "requestAdapter", WGPU_FUNC_FROM_HOST_FUNC(requestAdapter, 1, [weakSurface, jsiInstance]) {
-      auto promise = new Promise<HandleRequestAdapterData>(runtime);
-      return promise->jsPromise([promise, weakSurface, jsiInstance]() {
+      return Promise::makeJSPromise(jsiInstance, [weakSurface](auto &runtime, auto &promise) {
         auto surface = weakSurface.lock();
         if (surface == nullptr) {
-          promise->reject(makeJSError(promise->runtime, "Surface was released from memory"));
-          delete promise;
+          promise->reject([](auto &runtime) { return makeJSError(runtime, "Surface was released from memory"); });
           return;
         }
-        promise->data = {
-          .optionalSurface = weakSurface,
-          .jsiInstance = jsiInstance,
-        };
         WGPURequestAdapterOptions adapterOptions = {
           .nextInChain = nullptr,
           .compatibleSurface = surface->getWGPUSurface(),
@@ -70,7 +61,8 @@ void wgpu::installRootJSI(Runtime &runtime, std::shared_ptr<JSIInstance> jsiInst
           .forceFallbackAdapter = false,
         };
 
-        wgpuInstanceRequestAdapter(surface->getWGPUInstance(), &adapterOptions, wgpuHandleRequestAdapter, promise);
+        wgpuInstanceRequestAdapter(surface->getWGPUInstance(), &adapterOptions, wgpuHandleRequestAdapter,
+                                   promise->toCDataWithExtras(weakSurface));
       });
     }));
     gpu.setProperty(runtime, "getPreferredCanvasFormat", WGPU_FUNC_FROM_HOST_FUNC(getPreferredCanvasFormat, 0, [weakSurface]) {
@@ -112,17 +104,11 @@ void wgpu::installRootJSI(Runtime &runtime, std::shared_ptr<JSIInstance> jsiInst
 
     auto gpu = Object(runtime);
     gpu.setProperty(runtime, "requestAdapter", WGPU_FUNC_FROM_HOST_FUNC(requestAdapter, 1, [jsiInstance]) {
-      auto promise = new Promise<HandleRequestAdapterData>(runtime);
-      promise->data = {
-        .optionalSurface = std::shared_ptr<Surface>(),
-        .jsiInstance = jsiInstance,
-      };
-      return promise->jsPromise([promise]() {
+      return Promise::makeJSPromise(jsiInstance, [](auto &runtime, auto &promise) {
         auto instance = wgpuCreateInstance(nullptr);
 
         if (instance == nullptr) {
-          promise->reject(makeJSError(promise->runtime, "Failed to make wgpu instance"));
-          delete promise;
+          promise->reject([](auto &runtime) { return makeJSError(runtime, "Failed to make wgpu instance"); });
           return;
         }
 
@@ -134,7 +120,8 @@ void wgpu::installRootJSI(Runtime &runtime, std::shared_ptr<JSIInstance> jsiInst
           .forceFallbackAdapter = false,
         };
 
-        wgpuInstanceRequestAdapter(instance, &adapterOptions, wgpuHandleRequestAdapter, promise);
+        wgpuInstanceRequestAdapter(instance, &adapterOptions, wgpuHandleRequestAdapter,
+                                   promise->toCDataWithExtras((OptionalSurface)std::shared_ptr<Surface>()));
       });
     }));
     auto navigator = Object(runtime);
@@ -159,23 +146,23 @@ void wgpu::installRootJSI(Runtime &runtime, std::shared_ptr<JSIInstance> jsiInst
 
 static void wgpuHandleRequestAdapter(WGPURequestAdapterStatus status, WGPUAdapter adapter, char const *message,
                                      void *userdata) {
-  auto promise = (Promise<HandleRequestAdapterData> *)userdata;
-  Runtime &runtime = promise->runtime;
-
-  if (status == WGPURequestAdapterStatus_Success) {
-    auto adapterWrapper = std::make_shared<AdapterWrapper>(adapter);
-    auto surface = promise->data.optionalSurface.lock();
-    if (surface != nullptr) {
-      surface->setAdapter(adapterWrapper);
+  Promise::fromCDataWithExtras<OptionalSurface>(userdata,
+                                                [status, adapter, message](auto &promise, auto optionalSurface) {
+    if (status == WGPURequestAdapterStatus_Success) {
+      promise->resolve([promise, adapter, optionalSurface](auto &runtime) {
+        auto adapterWrapper = std::make_shared<AdapterWrapper>(adapter);
+        auto surface = optionalSurface.lock();
+        if (surface != nullptr) {
+          surface->setAdapter(adapterWrapper);
+        }
+        return Object::createFromHostObject(
+          runtime, std::make_shared<AdapterHostObject>(adapterWrapper, promise->getJSIInstance()));
+      });
+    } else {
+      std::ostringstream ss;
+      ss << __FILE__ << ":" << __LINE__ << " navigator.gpu.requestAdapter() failed with status " << status << ". "
+         << message;
+      promise->reject([message = ss.str()](auto &runtime) { return makeJSError(runtime, message); });
     }
-    auto adapterHostObject = Object::createFromHostObject(
-      runtime, std::make_shared<AdapterHostObject>(adapterWrapper, promise->data.jsiInstance));
-    promise->resolve(std::move(adapterHostObject));
-  } else {
-    std::ostringstream ss;
-    ss << __FILE__ << ":" << __LINE__ << " navigator.gpu.requestAdapter() failed with status " << status << ". "
-       << message;
-    promise->reject(makeJSError(runtime, ss.str()));
-  }
-  delete promise;
+  });
 }

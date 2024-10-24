@@ -18,8 +18,8 @@ class ImageBitmapHostObject : public HostObject {
 
   void destroy() {
     if (_data != nullptr) {
-      _data = nullptr;
       free(_data);
+      _data = nullptr;
     }
   }
 

@@ -3,7 +3,6 @@
 #include <jsi/jsi.h>
 
 #include "JSIInstance.h"
-#include "Promise.h"
 
 using namespace facebook::jsi;
 

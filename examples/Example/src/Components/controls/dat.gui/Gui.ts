@@ -46,7 +46,7 @@ export class Gui {
   removeItem(item: Gui | Controller) {
     const index = this._items.indexOf(item);
     if (index !== -1) {
-      const [item] = this._items.splice(index, 1);
+      this._items.splice(index, 1);
       item.didRemove();
     }
   }

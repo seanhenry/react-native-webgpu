@@ -1,6 +1,7 @@
 #include "TextureHostObject.h"
 
 #include "ConstantConversion.h"
+#include "Mixins.h"
 #include "TextureViewHostObject.h"
 #include "WGPUContext.h"
 #include "WGPUDefaults.h"
@@ -55,10 +56,6 @@ Value TextureHostObject::get(Runtime &runtime, const PropNameID &propName) {
     return Value((int)wgpuTextureGetHeight(_value));
   }
 
-  if (name == "label") {
-    return String::createFromUtf8(runtime, _label);
-  }
-
   if (name == "format") {
     auto format = wgpuTextureGetFormat(_value);
     return String::createFromUtf8(runtime, WGPUTextureFormatToString(format));
@@ -85,6 +82,10 @@ Value TextureHostObject::get(Runtime &runtime, const PropNameID &propName) {
     return Value((int)wgpuTextureGetDepthOrArrayLayers(_value));
   }
 
+  WGPU_GET_LABEL()
+
+  WGPU_GET_BRAND(GPUTexture)
+
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
   return Value::undefined();
@@ -92,5 +93,5 @@ Value TextureHostObject::get(Runtime &runtime, const PropNameID &propName) {
 
 std::vector<PropNameID> TextureHostObject::getPropertyNames(Runtime &runtime) {
   return PropNameID::names(runtime, "createView", "destroy", "width", "height", "label", "format", "mipLevelCount",
-                           "sampleCount", "usage", "depthOrArrayLayers");
+                           "sampleCount", "usage", "depthOrArrayLayers", "__brand");
 }

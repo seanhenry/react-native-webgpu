@@ -32,7 +32,7 @@ WGPUTextureDataLayout makeWGPUTextureDataLayout(Runtime &runtime, const Object &
 WGPUBlendState makeGPUBlendState(Runtime &runtime, Object &obj);
 WGPUBlendComponent makeGPUBlendComponent(Runtime &runtime, Object &obj);
 
-Value makeJsiLimits(Runtime &runtime, const WGPULimits &limits);
+Value makeJsiSupportedLimits(Runtime &runtime, const WGPULimits &limits);
 WGPULimits makeWGPULimits(Runtime &runtime, const Object &limits, WGPUSupportedLimits &supporedLimits);
 
 }  // namespace wgpu

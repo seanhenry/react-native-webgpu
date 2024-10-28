@@ -46,6 +46,7 @@ void wgpu::installRootJSI(Runtime &runtime, std::shared_ptr<JSIInstance> jsiInst
     }));
 
     auto gpu = Object(runtime);
+    WGPU_SET_BRAND(gpu, "GPU");
     gpu.setProperty(runtime, "requestAdapter", WGPU_FUNC_FROM_HOST_FUNC(requestAdapter, 1, [weakSurface, jsiInstance]) {
       return Promise::makeJSPromise(jsiInstance, [weakSurface](auto &runtime, auto &promise) {
         auto surface = weakSurface.lock();
@@ -103,6 +104,7 @@ void wgpu::installRootJSI(Runtime &runtime, std::shared_ptr<JSIInstance> jsiInst
     auto result = Object(runtime);
 
     auto gpu = Object(runtime);
+    WGPU_SET_BRAND(gpu, "GPU");
     gpu.setProperty(runtime, "requestAdapter", WGPU_FUNC_FROM_HOST_FUNC(requestAdapter, 1, [jsiInstance]) {
       return Promise::makeJSPromise(jsiInstance, [](auto &runtime, auto &promise) {
         auto instance = wgpuCreateInstance(nullptr);

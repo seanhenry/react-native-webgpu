@@ -13,9 +13,7 @@ Value RenderBundleEncoderHostObject::get(Runtime &runtime, const PropNameID &pro
 
   WGPU_LOG_GET_PROP;
 
-  if (name == "label") {
-    return String::createFromUtf8(runtime, _label);
-  }
+  WGPU_GET_LABEL()
 
   WGPU_GPU_RENDER_COMMANDS_MIXIN_SET_PIPELINE(wgpuRenderBundleEncoderSetPipeline, RenderPipelineHostObject)
   WGPU_GPU_RENDER_COMMANDS_MIXIN_SET_INDEX_BUFFER(wgpuRenderBundleEncoderSetIndexBuffer)
@@ -26,12 +24,14 @@ Value RenderBundleEncoderHostObject::get(Runtime &runtime, const PropNameID &pro
   WGPU_GPU_BINDING_COMMANDS_MIXIN_SET_BIND_GROUP(wgpuRenderBundleEncoderSetBindGroup)
   WGPU_ENCODER_MIXIN_FINISH(wgpuRenderBundleEncoderFinish, WGPURenderBundleDescriptor, RenderBundleHostObject)
 
+  WGPU_GET_BRAND(GPURenderBundleEncoder)
+
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
   return Value::undefined();
 }
 
 std::vector<PropNameID> RenderBundleEncoderHostObject::getPropertyNames(Runtime &runtime) {
-  return PropNameID::names(runtime, "label", "finish", WGPU_GPU_RENDER_COMMANDS_MIXIN_PROP_NAMES,
+  return PropNameID::names(runtime, "label", "finish", "__brand", WGPU_GPU_RENDER_COMMANDS_MIXIN_PROP_NAMES,
                            WGPU_GPU_BINDING_COMMANDS_MIXIN_PROP_NAMES);
 }

@@ -1,4 +1,5 @@
 // #include "ExampleHostObject.h"
+// #include "Mixins.h"
 // #include "WGPUJsiUtils.h"
 // #include "WGPUContext.h"
 //
@@ -10,9 +11,8 @@
 //
 //     WGPU_LOG_GET_PROP;
 //
-//     if (name == "label") {
-//         return String::createFromUtf8(runtime, _label);
-//     }
+//     WGPU_GET_LABEL()
+//     WGPU_GET_BRAND(GPUExample)
 //
 //     WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 //
@@ -20,5 +20,5 @@
 // }
 //
 // std::vector<PropNameID> ExampleHostObject::getPropertyNames(Runtime& runtime) {
-//     return PropNameID::names(runtime, "label");
+//     return PropNameID::names(runtime, "label", "__brand");
 // }

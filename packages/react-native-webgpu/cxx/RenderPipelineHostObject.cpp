@@ -1,6 +1,7 @@
 #include "RenderPipelineHostObject.h"
 
 #include "BindGroupLayoutHostObject.h"
+#include "Mixins.h"
 #include "WGPUContext.h"
 #include "WGPUJsiUtils.h"
 
@@ -22,9 +23,9 @@ Value RenderPipelineHostObject::get(Runtime &runtime, const PropNameID &propName
     });
   }
 
-  if (name == "label") {
-    return String::createFromUtf8(runtime, _label);
-  }
+  WGPU_GET_LABEL()
+
+  WGPU_GET_BRAND(GPURenderPipeline)
 
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
@@ -32,5 +33,5 @@ Value RenderPipelineHostObject::get(Runtime &runtime, const PropNameID &propName
 }
 
 std::vector<PropNameID> RenderPipelineHostObject::getPropertyNames(Runtime &runtime) {
-  return PropNameID::names(runtime, "getBindGroupLayout", "label");
+  return PropNameID::names(runtime, "getBindGroupLayout", "label", "__brand");
 }

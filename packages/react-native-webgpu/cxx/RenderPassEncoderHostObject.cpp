@@ -36,10 +36,6 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
     });
   }
 
-  if (name == "label") {
-    return String::createFromUtf8(runtime, _label);
-  }
-
   if (name == "setViewport") {
     return WGPU_FUNC_FROM_HOST_FUNC(setViewport, 6, [this]) {
       WGPU_LOG_FUNC_ARGS(setViewport);
@@ -102,6 +98,10 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
     });
   }
 
+  WGPU_GET_LABEL()
+
+  WGPU_GET_BRAND(GPURenderPassEncoder)
+
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
   return Value::undefined();
@@ -109,6 +109,6 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
 
 std::vector<PropNameID> RenderPassEncoderHostObject::getPropertyNames(Runtime &runtime) {
   return PropNameID::names(runtime, "end", "label", "setViewport", "executeBundles", "beginOcclusionQuery",
-                           "endOcclusionQuery", "setScissorRect", WGPU_GPU_RENDER_COMMANDS_MIXIN_PROP_NAMES,
+                           "endOcclusionQuery", "setScissorRect", "__brand", WGPU_GPU_RENDER_COMMANDS_MIXIN_PROP_NAMES,
                            WGPU_GPU_BINDING_COMMANDS_MIXIN_PROP_NAMES);
 }

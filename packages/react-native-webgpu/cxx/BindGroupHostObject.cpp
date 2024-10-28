@@ -1,5 +1,6 @@
 #include "BindGroupHostObject.h"
 
+#include "Mixins.h"
 #include "WGPUContext.h"
 #include "WGPUJsiUtils.h"
 
@@ -11,9 +12,9 @@ Value BindGroupHostObject::get(Runtime &runtime, const PropNameID &propName) {
 
   WGPU_LOG_GET_PROP;
 
-  if (name == "label") {
-    return String::createFromUtf8(runtime, _label);
-  }
+  WGPU_GET_LABEL()
+
+  WGPU_GET_BRAND(GPUBindGroup)
 
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
@@ -21,5 +22,5 @@ Value BindGroupHostObject::get(Runtime &runtime, const PropNameID &propName) {
 }
 
 std::vector<PropNameID> BindGroupHostObject::getPropertyNames(Runtime &runtime) {
-  return PropNameID::names(runtime, "label");
+  return PropNameID::names(runtime, "label", "__brand");
 }

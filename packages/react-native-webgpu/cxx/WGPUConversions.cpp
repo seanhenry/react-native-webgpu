@@ -342,8 +342,9 @@ WGPUBlendComponent makeGPUBlendComponent(Runtime &runtime, Object &obj) {
   __WGPU_PRINT_LIMIT(maxComputeWorkgroupSizeZ)                  \
   __WGPU_PRINT_LIMIT(maxComputeWorkgroupsPerDimension)
 
-Value makeJsiLimits(Runtime &runtime, const WGPULimits &limits) {
+Value makeJsiSupportedLimits(Runtime &runtime, const WGPULimits &limits) {
   Object obj(runtime);
+  WGPU_SET_BRAND(obj, GPUSupportedLimits);
 #define __WGPU_PRINT_LIMIT(__limit) obj.setProperty(runtime, #__limit, Value((int)limits.__limit));
   LIMITS
 #undef __WGPU_PRINT_LIMIT

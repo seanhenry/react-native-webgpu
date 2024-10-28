@@ -6,6 +6,16 @@
 #include "RenderPipelineHostObject.h"
 #include "WGPUJsiUtils.h"
 
+// Common
+#define WGPU_GET_BRAND(__brand)                       \
+  if (name == "__brand") {                            \
+    return String::createFromUtf8(runtime, #__brand); \
+  }
+#define WGPU_GET_LABEL()                            \
+  if (name == "label") {                            \
+    return String::createFromUtf8(runtime, _label); \
+  }
+
 // GPURenderCommandsMixin
 #define WGPU_GPU_RENDER_COMMANDS_MIXIN_SET_PIPELINE(__func, __pipeline)                 \
   if (name == "setPipeline") {                                                          \

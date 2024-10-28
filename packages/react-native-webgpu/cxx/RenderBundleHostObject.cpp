@@ -1,5 +1,6 @@
 #include "RenderBundleHostObject.h"
 
+#include "Mixins.h"
 #include "WGPUContext.h"
 #include "WGPUJsiUtils.h"
 
@@ -11,9 +12,9 @@ Value RenderBundleHostObject::get(Runtime &runtime, const PropNameID &propName) 
 
   WGPU_LOG_GET_PROP;
 
-  if (name == "label") {
-    return String::createFromUtf8(runtime, _label);
-  }
+  WGPU_GET_LABEL()
+
+  WGPU_GET_BRAND(GPURenderBundle)
 
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
@@ -21,5 +22,5 @@ Value RenderBundleHostObject::get(Runtime &runtime, const PropNameID &propName) 
 }
 
 std::vector<PropNameID> RenderBundleHostObject::getPropertyNames(Runtime &runtime) {
-  return PropNameID::names(runtime, "label");
+  return PropNameID::names(runtime, "label", "__brand");
 }

@@ -41,9 +41,9 @@ Value ComputePassEncoderHostObject::get(Runtime &runtime, const PropNameID &prop
     });
   }
 
-  if (name == "label") {
-    return String::createFromUtf8(runtime, _label);
-  }
+  WGPU_GET_LABEL()
+
+  WGPU_GET_BRAND(GPUComputePassEncoder)
 
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
@@ -51,6 +51,6 @@ Value ComputePassEncoderHostObject::get(Runtime &runtime, const PropNameID &prop
 }
 
 std::vector<PropNameID> ComputePassEncoderHostObject::getPropertyNames(Runtime &runtime) {
-  return PropNameID::names(runtime, "setPipeline", "dispatchWorkgroups", "end", "label",
+  return PropNameID::names(runtime, "setPipeline", "dispatchWorkgroups", "end", "label", "__brand",
                            WGPU_GPU_BINDING_COMMANDS_MIXIN_PROP_NAMES);
 }

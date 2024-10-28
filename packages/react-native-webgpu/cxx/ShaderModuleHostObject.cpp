@@ -1,5 +1,6 @@
 #include "ShaderModuleHostObject.h"
 
+#include "Mixins.h"
 #include "WGPUPromise.h"
 
 using namespace facebook::jsi;
@@ -31,9 +32,9 @@ Value ShaderModuleHostObject::get(Runtime &runtime, const PropNameID &propName) 
     });
   }
 
-  if (name == "label") {
-    return String::createFromUtf8(runtime, _label);
-  }
+  WGPU_GET_LABEL()
+
+  WGPU_GET_BRAND(GPUShaderModule)
 
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
@@ -41,7 +42,7 @@ Value ShaderModuleHostObject::get(Runtime &runtime, const PropNameID &propName) 
 }
 
 std::vector<PropNameID> ShaderModuleHostObject::getPropertyNames(Runtime &runtime) {
-  return PropNameID::names(runtime, "getCompilationInfo", "label");
+  return PropNameID::names(runtime, "getCompilationInfo", "label", "__brand");
 }
 
 void wgpuShaderModuleGetCompilationInfoCallback(WGPUCompilationInfoRequestStatus status,
@@ -64,6 +65,7 @@ void wgpuShaderModuleGetCompilationInfoCallback(WGPUCompilationInfoRequestStatus
         auto messages = cArrayToJsi(runtime, messagesIn.data(), messagesIn.size(),
                                     [](Runtime &runtime, WGPUShaderCompilationMessage item) {
           auto obj = Object(runtime);
+          WGPU_SET_BRAND(obj, GPUCompilationMessage);
           WGPU_SET_UTF8(obj, message, item.message);
           WGPU_SET_INT(obj, lineNum, item.lineNum);
           WGPU_SET_INT(obj, linePos, item.linePos);
@@ -73,6 +75,7 @@ void wgpuShaderModuleGetCompilationInfoCallback(WGPUCompilationInfoRequestStatus
         });
 
         auto result = Object(runtime);
+        WGPU_SET_BRAND(result, GPUCompilationInfo);
         result.setProperty(runtime, "messages", messages);
         return result;
       });

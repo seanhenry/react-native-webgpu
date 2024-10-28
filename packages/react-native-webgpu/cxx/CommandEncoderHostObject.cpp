@@ -183,9 +183,9 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
     });
   }
 
-  if (name == "label") {
-    return String::createFromUtf8(runtime, _label);
-  }
+  WGPU_GET_LABEL()
+
+  WGPU_GET_BRAND(GPUCommandEncoder)
 
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
@@ -194,5 +194,5 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
 
 std::vector<PropNameID> CommandEncoderHostObject::getPropertyNames(Runtime &runtime) {
   return PropNameID::names(runtime, "beginRenderPass", "finish", "copyTextureToTexture", "beginComputePass",
-                           "copyTextureToBuffer", "copyBufferToBuffer", "resolveQuerySet", "label");
+                           "copyTextureToBuffer", "copyBufferToBuffer", "resolveQuerySet", "label", "__brand");
 }

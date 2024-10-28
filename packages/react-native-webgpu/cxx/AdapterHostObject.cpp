@@ -7,6 +7,7 @@
 #include "ConstantConversion.h"
 #include "DeviceHostObject.h"
 #include "ErrorHandler.h"
+#include "Mixins.h"
 #include "WGPUContext.h"
 #include "WGPUConversions.h"
 #include "WGPUPromise.h"
@@ -93,7 +94,7 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
   if (name == "limits") {
     WGPUSupportedLimits limits = {};
     wgpuAdapterGetLimits(_adapter->_adapter, &limits);
-    return makeJsiLimits(runtime, limits.limits);
+    return makeJsiSupportedLimits(runtime, limits.limits);
   }
 
   if (name == "info") {
@@ -109,13 +110,15 @@ Value AdapterHostObject::get(Runtime &runtime, const PropNameID &propName) {
     });
   }
 
+  WGPU_GET_BRAND(GPUAdapter)
+
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
   return Value::undefined();
 }
 
 std::vector<PropNameID> AdapterHostObject::getPropertyNames(Runtime &runtime) {
-  return PropNameID::names(runtime, "requestDevice", "features", "limits", "info", "requestAdapterInfo");
+  return PropNameID::names(runtime, "requestDevice", "features", "limits", "info", "requestAdapterInfo", "__brand");
 }
 
 static void wgpuErrorCallback(WGPUErrorType type, char const *message, void *userdata) {
@@ -148,6 +151,7 @@ static Object wgpuMakeJsAdapterInfo(Runtime &runtime, WGPUAdapter adapter) {
   WGPUAdapterInfo info;
   wgpuAdapterGetInfo(adapter, &info);
   Object jsInfo(runtime);
+  WGPU_SET_BRAND(jsInfo, GPUAdapterInfo);
   WGPU_SET_UTF8(jsInfo, vendor, info.vendor);
   WGPU_SET_UTF8(jsInfo, architecture, info.architecture);
   WGPU_SET_UTF8(jsInfo, device, info.device);

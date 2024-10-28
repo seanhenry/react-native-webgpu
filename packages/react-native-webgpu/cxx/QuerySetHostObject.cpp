@@ -1,6 +1,7 @@
 #include "QuerySetHostObject.h"
 
 #include "ConstantConversion.h"
+#include "Mixins.h"
 #include "WGPUContext.h"
 #include "WGPUJsiUtils.h"
 
@@ -29,9 +30,9 @@ Value QuerySetHostObject::get(Runtime &runtime, const PropNameID &propName) {
     return Value((int)wgpuQuerySetGetCount(_value));
   }
 
-  if (name == "label") {
-    return String::createFromUtf8(runtime, _label);
-  }
+  WGPU_GET_LABEL()
+
+  WGPU_GET_BRAND(GPUQuerySet)
 
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
@@ -39,5 +40,5 @@ Value QuerySetHostObject::get(Runtime &runtime, const PropNameID &propName) {
 }
 
 std::vector<PropNameID> QuerySetHostObject::getPropertyNames(Runtime &runtime) {
-  return PropNameID::names(runtime, "destroy", "type", "count", "label");
+  return PropNameID::names(runtime, "destroy", "type", "count", "label", "__brand");
 }

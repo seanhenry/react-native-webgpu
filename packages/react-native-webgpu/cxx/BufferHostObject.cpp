@@ -5,6 +5,7 @@
 #include "ArrayBufferUtils.h"
 #include "ConstantConversion.h"
 #include "JSIInstance.h"
+#include "Mixins.h"
 #include "WGPUContext.h"
 #include "WGPUPromise.h"
 
@@ -66,10 +67,6 @@ Value BufferHostObject::get(Runtime &runtime, const PropNameID &propName) {
     });
   }
 
-  if (name == "label") {
-    return String::createFromUtf8(runtime, _label);
-  }
-
   if (name == "size") {
     return Value((int)wgpuBufferGetSize(_value));
   }
@@ -90,13 +87,17 @@ Value BufferHostObject::get(Runtime &runtime, const PropNameID &propName) {
     });
   }
 
+  WGPU_GET_LABEL()
+  WGPU_GET_BRAND(GPUBuffer)
+
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
   return Value::undefined();
 }
 
 std::vector<PropNameID> BufferHostObject::getPropertyNames(Runtime &runtime) {
-  return PropNameID::names(runtime, "getMappedRange", "unmap", "mapAsync", "label", "size", "usage", "destroy");
+  return PropNameID::names(runtime, "getMappedRange", "unmap", "mapAsync", "label", "size", "usage", "destroy",
+                           "__brand");
 }
 
 static std::string mapAsyncStatusToString(WGPUBufferMapAsyncStatus status) {

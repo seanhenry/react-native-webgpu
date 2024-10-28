@@ -5,6 +5,7 @@
 #include "AdapterHostObject.h"
 #include "ConstantConversion.h"
 #include "DeviceHostObject.h"
+#include "Mixins.h"
 #include "TextureHostObject.h"
 #include "WGPUContext.h"
 #include "WGPUJsiUtils.h"
@@ -214,6 +215,8 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
     return Value(surface != nullptr ? surface->getScale() : 1);
   }
 
+  WGPU_GET_BRAND(GPUCanvasContext)
+
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
   return Value::undefined();
@@ -221,7 +224,7 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
 
 std::vector<PropNameID> ContextHostObject::getPropertyNames(Runtime &runtime) {
   return PropNameID::names(runtime, "presentSurface", "configure", "surfaceCapabilities", "getCurrentTexture", "width",
-                           "height", "destroy", "scale", "pointWidth", "pointHeight");
+                           "height", "destroy", "scale", "pointWidth", "pointHeight", "__brand");
 }
 
 void ContextHostObject::throwPendingJSIError() {

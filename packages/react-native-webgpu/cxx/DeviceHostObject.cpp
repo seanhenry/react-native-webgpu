@@ -7,6 +7,7 @@
 #include "CommandEncoderHostObject.h"
 #include "ComputePipelineHostObject.h"
 #include "ConstantConversion.h"
+#include "Mixins.h"
 #include "PipelineLayoutHostObject.h"
 #include "QuerySetHostObject.h"
 #include "QueueHostObject.h"
@@ -365,7 +366,7 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
   if (name == "limits") {
     WGPUSupportedLimits limits = {nullptr};
     wgpuDeviceGetLimits(getValue(), &limits);
-    return makeJsiLimits(runtime, limits.limits);
+    return makeJsiSupportedLimits(runtime, limits.limits);
   }
 
   if (name == "createQuerySet") {
@@ -414,6 +415,8 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
     });
   }
 
+  WGPU_GET_BRAND(GPUDevice)
+
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
   return Value::undefined();
@@ -422,5 +425,6 @@ Value DeviceHostObject::get(Runtime &runtime, const PropNameID &propName) {
 std::vector<PropNameID> DeviceHostObject::getPropertyNames(Runtime &runtime) {
   return PropNameID::names(runtime, "createRenderPipeline", "createShaderModule", "createCommandEncoder", "queue",
                            "createBuffer", "createTexture", "createBindGroup", "createSampler", "createBindGroupLayout",
-                           "createPipelineLayout", "features", "limits", "createQuerySet", "createRenderBundleEncoder");
+                           "createPipelineLayout", "features", "limits", "createQuerySet", "createRenderBundleEncoder",
+                           "__brand");
 }

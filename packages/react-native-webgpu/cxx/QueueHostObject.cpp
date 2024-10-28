@@ -4,6 +4,7 @@
 #include "BufferHostObject.h"
 #include "CommandBufferHostObject.h"
 #include "ImageBitmapHostObject.h"
+#include "Mixins.h"
 #include "TextureHostObject.h"
 #include "VideoPlayer.h"
 #include "WGPUContext.h"
@@ -142,11 +143,13 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
     });
   }
 
+  WGPU_GET_BRAND(GPUQueue)
+
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
 
   return Value::undefined();
 }
 
 std::vector<PropNameID> QueueHostObject::getPropertyNames(Runtime &runtime) {
-  return PropNameID::names(runtime, "submit", "writeBuffer", "copyExternalImageToTexture");
+  return PropNameID::names(runtime, "submit", "writeBuffer", "copyExternalImageToTexture", "__brand");
 }

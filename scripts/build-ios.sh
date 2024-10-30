@@ -24,7 +24,17 @@ popd
 
 OUT_DIR="packages/react-native-webgpu/bin"
 TARGET_DIR="submodules/wgpu-native/target"
+HEADERS_DIR="submodules/wgpu-native/ffi"
 
-mkdir -p "$OUT_DIR"
-lipo "$TARGET_DIR/aarch64-apple-ios-sim/release/libwgpu_native.a" "$TARGET_DIR/x86_64-apple-ios/release/libwgpu_native.a" -create -output "$OUT_DIR/libwgpu_native_iossim_x86_64_aarch64.a"
-cp "$TARGET_DIR/aarch64-apple-ios/release/libwgpu_native.a" "$OUT_DIR/libwgpu_native_ios_aarch64.a"
+rm -rf "$OUT_DIR/ios" "$OUT_DIR/ios-simulator" "$OUT_DIR/wgpu_native.xcframework"
+mkdir -p "$OUT_DIR/ios" "$OUT_DIR/ios-simulator"
+
+lipo "$TARGET_DIR/aarch64-apple-ios-sim/release/libwgpu_native.a" "$TARGET_DIR/x86_64-apple-ios/release/libwgpu_native.a" -create -output "$OUT_DIR/ios-simulator/libwgpu_native.a"
+cp "$TARGET_DIR/aarch64-apple-ios/release/libwgpu_native.a" "$OUT_DIR/ios/libwgpu_native.a"
+
+xcodebuild -create-xcframework \
+ -library "$OUT_DIR/ios-simulator/libwgpu_native.a" -headers "$HEADERS_DIR/wgpu.h" -headers "$HEADERS_DIR/webgpu-headers/webgpu.h" \
+ -library "$OUT_DIR/ios/libwgpu_native.a" -headers "$HEADERS_DIR/wgpu.h" -headers "$HEADERS_DIR/webgpu-headers/webgpu.h" \
+ -output "$OUT_DIR/wgpu_native.xcframework" \
+
+rm -rf "$OUT_DIR/ios" "$OUT_DIR/ios-simulator"

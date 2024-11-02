@@ -455,6 +455,18 @@ describe('Gui', () => {
     expect(folder._parent).toBe(undefined);
   });
 
+  it('removes all items', () => {
+    const folder = gui.addFolder('name');
+    const nestedController = folder.add(object, 'func');
+    gui.add(object, 'numOpts');
+    gui.removeItems();
+    expect(gui.render()).toEqual(rootFolder([]));
+    // @ts-expect-error testing private api
+    expect(folder._items.length).toBe(0);
+    // @ts-expect-error testing private api
+    expect(nestedController._parent).toBe(undefined);
+  });
+
   it('adds name', () => {
     gui.name = 'new name';
     expect(gui.render().props.title).toBe('new name');

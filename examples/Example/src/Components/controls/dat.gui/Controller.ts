@@ -101,5 +101,6 @@ export abstract class Controller<
     this._observable.destroy();
     this._onChange = undefined;
     this._onFinishChange = undefined;
+    this._parent = undefined;
   }
 }

@@ -24,30 +24,20 @@ export const ExceedDeviceLimits = () => {
         setText(`The device reported the error: ${error}`);
       }
     };
-    const controllers: Controller[] = [];
-    const resetLimits = () => {
+    const resetGui = () => {
       const limits = adapter!.limits;
-      controllers.push(
-        ...Object.keys(limits).map(key =>
+      gui.removeItems();
+      gui.add({resetGui}, 'resetGui').name('reset');
+      Object.keys(limits)
+        .filter(key => key !== '__brand')
+        .forEach(key =>
           gui
             .add(limits, key as keyof GPUSupportedLimits)
             .onChange(newValue => onChange(key, newValue)),
-        ),
-      );
+        );
+      gui.draw();
     };
-    const controls = {
-      reset: () => {
-        controllers.forEach(controller => {
-          controller.remove();
-        });
-        resetLimits();
-        gui.draw();
-      },
-    };
-    gui.add(controls, 'reset');
-    resetLimits();
-
-    gui.draw();
+    resetGui();
   };
   return (
     <>

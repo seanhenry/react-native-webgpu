@@ -168,16 +168,15 @@ type GPUPrimitiveTopology =
   | 'triangle-strip';
 type GPUQueryType = 'occlusion' | 'timestamp';
 type GPUSamplerBindingType = 'filtering' | 'non-filtering' | 'comparison';
-// type GPUStencilOperation =
-//
-//   | "keep"
-//   | "zero"
-//   | "replace"
-//   | "invert"
-//   | "increment-clamp"
-//   | "decrement-clamp"
-//   | "increment-wrap"
-//   | "decrement-wrap";
+type GPUStencilOperation =
+  | 'keep'
+  | 'zero'
+  | 'replace'
+  | 'invert'
+  | 'increment-clamp'
+  | 'decrement-clamp'
+  | 'increment-wrap'
+  | 'decrement-wrap';
 type GPUStorageTextureAccess = 'write-only' | 'read-only' | 'read-write';
 type GPUStoreOp = 'store' | 'discard';
 // type GPUTextureAspect =
@@ -623,24 +622,24 @@ interface GPUDepthStencilState {
    * {@link GPURenderPassDescriptor#depthStencilAttachment} depth values.
    */
   depthCompare?: GPUCompareFunction;
-  //   /**
-  //    * Defines how stencil comparisons and operations are performed for front-facing primitives.
-  //    */
-  //   stencilFront?: GPUStencilFaceState;
-  //   /**
-  //    * Defines how stencil comparisons and operations are performed for back-facing primitives.
-  //    */
-  //   stencilBack?: GPUStencilFaceState;
-  //   /**
-  //    * Bitmask controlling which {@link GPURenderPassDescriptor#depthStencilAttachment} stencil value
-  //    * bits are read when performing stencil comparison tests.
-  //    */
-  //   stencilReadMask?: GPUStencilValue;
-  //   /**
-  //    * Bitmask controlling which {@link GPURenderPassDescriptor#depthStencilAttachment} stencil value
-  //    * bits are written to when performing stencil operations.
-  //    */
-  //   stencilWriteMask?: GPUStencilValue;
+  /**
+   * Defines how stencil comparisons and operations are performed for front-facing primitives.
+   */
+  stencilFront?: GPUStencilFaceState;
+  /**
+   * Defines how stencil comparisons and operations are performed for back-facing primitives.
+   */
+  stencilBack?: GPUStencilFaceState;
+  /**
+   * Bitmask controlling which {@link GPURenderPassDescriptor#depthStencilAttachment} stencil value
+   * bits are read when performing stencil comparison tests.
+   */
+  stencilReadMask?: GPUStencilValue;
+  /**
+   * Bitmask controlling which {@link GPURenderPassDescriptor#depthStencilAttachment} stencil value
+   * bits are written to when performing stencil operations.
+   */
+  stencilWriteMask?: GPUStencilValue;
   /**
    * Constant depth bias added to each fragment. See [$biased fragment depth$] for details.
    */
@@ -1359,28 +1358,28 @@ interface GPUShaderModuleDescriptor extends GPUObjectDescriptorBase {
   //   compilationHints?: Array<GPUShaderModuleCompilationHint>;
 }
 
-// interface GPUStencilFaceState {
-//   /**
-//    * The {@link GPUCompareFunction} used when testing fragments against
-//    * {@link GPURenderPassDescriptor#depthStencilAttachment} stencil values.
-//    */
-//   compare?: GPUCompareFunction;
-//   /**
-//    * The {@link GPUStencilOperation} performed if the fragment stencil comparison test described by
-//    * {@link GPUStencilFaceState#compare} fails.
-//    */
-//   failOp?: GPUStencilOperation;
-//   /**
-//    * The {@link GPUStencilOperation} performed if the fragment depth comparison described by
-//    * {@link GPUDepthStencilState#depthCompare} fails.
-//    */
-//   depthFailOp?: GPUStencilOperation;
-//   /**
-//    * The {@link GPUStencilOperation} performed if the fragment stencil comparison test described by
-//    * {@link GPUStencilFaceState#compare} passes.
-//    */
-//   passOp?: GPUStencilOperation;
-// }
+interface GPUStencilFaceState {
+  /**
+   * The {@link GPUCompareFunction} used when testing fragments against
+   * {@link GPURenderPassDescriptor#depthStencilAttachment} stencil values.
+   */
+  compare?: GPUCompareFunction;
+  /**
+   * The {@link GPUStencilOperation} performed if the fragment stencil comparison test described by
+   * {@link GPUStencilFaceState#compare} fails.
+   */
+  failOp?: GPUStencilOperation;
+  /**
+   * The {@link GPUStencilOperation} performed if the fragment depth comparison described by
+   * {@link GPUDepthStencilState#depthCompare} fails.
+   */
+  depthFailOp?: GPUStencilOperation;
+  /**
+   * The {@link GPUStencilOperation} performed if the fragment stencil comparison test described by
+   * {@link GPUStencilFaceState#compare} passes.
+   */
+  passOp?: GPUStencilOperation;
+}
 
 interface GPUStorageTextureBindingLayout {
   /**
@@ -2725,14 +2724,12 @@ interface GPURenderPassEncoder
   //   setBlendConstant(
   //     color: GPUColor
   //   ): undefined;
-  //   /**
-  //    * Sets the {@link RenderState#[[stencilReference]]} value used during stencil tests with
-  //    * the {@link GPUStencilOperation#"replace"} {@link GPUStencilOperation}.
-  //    * @param reference - The new stencil reference value.
-  //    */
-  //   setStencilReference(
-  //     reference: GPUStencilValue
-  //   ): undefined;
+  /**
+   * Sets the {@link RenderState#[[stencilReference]]} value used during stencil tests with
+   * the {@link GPUStencilOperation#"replace"} {@link GPUStencilOperation}.
+   * @param reference - The new stencil reference value.
+   */
+  setStencilReference(reference: GPUStencilValue): undefined;
   /**
    * @param queryIndex - The index of the query in the query set.
    */

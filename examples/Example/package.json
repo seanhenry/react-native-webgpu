@@ -14,6 +14,7 @@
     "pod:install:newArch": "cd ios; RCT_NEW_ARCH_ENABLED=1 bundle exec pod install"
   },
   "dependencies": {
+    "@gltf-transform/core": "^4.0.10",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.11.0",
     "lodash": "^4.17.21",

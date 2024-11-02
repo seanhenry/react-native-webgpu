@@ -34,5 +34,6 @@ WGPUBlendComponent makeGPUBlendComponent(Runtime &runtime, Object &obj);
 
 Value makeJsiSupportedLimits(Runtime &runtime, const WGPULimits &limits);
 WGPULimits makeWGPULimits(Runtime &runtime, const Object &limits, WGPUSupportedLimits &supporedLimits);
+WGPUStencilFaceState makeWGPUStencilFaceState(Runtime &runtime, Object &obj);
 
 }  // namespace wgpu

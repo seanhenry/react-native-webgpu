@@ -39,5 +39,6 @@ const char *WGPUBufferMapStateToString(WGPUBufferMapState state);
 WGPUStorageTextureAccess StringToWGPUStorageTextureAccess(const std::string &str);
 WGPUBlendFactor StringToWGPUBlendFactor(const std::string &str);
 WGPUBlendOperation StringToWGPUBlendOperation(const std::string &str);
+WGPUStencilOperation StringToWGPUStencilOperation(const std::string &str);
 
 }  // namespace wgpu

@@ -20,6 +20,7 @@ class ContextHostObject : public HostObject {
 
  private:
   std::weak_ptr<Surface> _surface;
+  std::shared_ptr<Surface> _strongSurface;
   std::shared_ptr<WGPUContext> _configuredContext;
   WGPUTexture _texture = nullptr;
 };

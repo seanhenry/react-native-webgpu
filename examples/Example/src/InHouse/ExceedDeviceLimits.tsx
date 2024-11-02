@@ -4,7 +4,6 @@ import {globalStyles} from '../Components/globalStyles';
 import {HudContainer} from '../Components/stats/HudContainer';
 import {useHudText} from '../Components/stats/useHudText';
 import {useControls} from '../Components/controls/react/useControls';
-import {Controller} from '../Components/controls/dat.gui/Controller';
 
 export const ExceedDeviceLimits = () => {
   const {gui, Controls} = useControls();

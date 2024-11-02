@@ -661,4 +661,22 @@ WGPUBlendOperation StringToWGPUBlendOperation(const std::string &str) {
   return result->second;
 }
 
+WGPUStencilOperation StringToWGPUStencilOperation(const std::string &str) {
+  static std::unordered_map<std::string, WGPUStencilOperation> map = {
+    {"keep", WGPUStencilOperation_Keep},
+    {"zero", WGPUStencilOperation_Zero},
+    {"replace", WGPUStencilOperation_Replace},
+    {"invert", WGPUStencilOperation_Invert},
+    {"increment-clamp", WGPUStencilOperation_IncrementClamp},
+    {"decrement-clamp", WGPUStencilOperation_DecrementClamp},
+    {"increment-wrap", WGPUStencilOperation_IncrementWrap},
+    {"decrement-wrap", WGPUStencilOperation_DecrementWrap},
+  };
+  auto result = map.find(str);
+  if (result == map.end()) {
+    throw JSINativeException("Unsupported stencil operation: " + str);
+  }
+  return result->second;
+}
+
 }  // namespace wgpu

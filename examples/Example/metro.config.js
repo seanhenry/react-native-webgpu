@@ -20,7 +20,11 @@ const config = {
     sourceExts: [
       ...defaultConfig.resolver.sourceExts,
       ...webGpuConfig.resolver.sourceExts,
+      'gltf',
     ],
+  },
+  transformer: {
+    babelTransformerPath: require.resolve('./babel/gltf-babel-transformer'),
   },
 };
 

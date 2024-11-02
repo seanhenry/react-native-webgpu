@@ -2,7 +2,7 @@
   "private": true,
   "workspaces": [
     "packages/react-native-webgpu",
-    "packages/react-native-webgpu/babel-plugin-transform-wgsl",
+    "packages/react-native-webgpu/wgsl-babel-transformer",
     "packages/react-native-webgpu/metro",
     "packages/react-native-webgpu-three",
     "examples/Example"

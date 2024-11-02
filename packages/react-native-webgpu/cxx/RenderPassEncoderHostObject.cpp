@@ -98,6 +98,13 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
     });
   }
 
+  if (name == "setStencilReference") {
+    return WGPU_FUNC_FROM_HOST_FUNC(setStencilReference, 1, [this]) {
+      wgpuRenderPassEncoderSetStencilReference(_value, arguments[0].asNumber());
+      return Value::undefined();
+    });
+  }
+
   WGPU_GET_LABEL()
 
   WGPU_GET_BRAND(GPURenderPassEncoder)
@@ -109,6 +116,6 @@ Value RenderPassEncoderHostObject::get(Runtime &runtime, const PropNameID &propN
 
 std::vector<PropNameID> RenderPassEncoderHostObject::getPropertyNames(Runtime &runtime) {
   return PropNameID::names(runtime, "end", "label", "setViewport", "executeBundles", "beginOcclusionQuery",
-                           "endOcclusionQuery", "setScissorRect", "__brand", WGPU_GPU_RENDER_COMMANDS_MIXIN_PROP_NAMES,
-                           WGPU_GPU_BINDING_COMMANDS_MIXIN_PROP_NAMES);
+                           "endOcclusionQuery", "setScissorRect", "setStencilReference", "__brand",
+                           WGPU_GPU_RENDER_COMMANDS_MIXIN_PROP_NAMES, WGPU_GPU_BINDING_COMMANDS_MIXIN_PROP_NAMES);
 }

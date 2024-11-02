@@ -16,16 +16,27 @@ using namespace wgpu;
 namespace wgpu {
 
 WGPUDepthStencilState makeWGPUDepthStencilState(Runtime &runtime, const Object &obj) {
-  return {
+  WGPUDepthStencilState state{
     .format = StringToWGPUTextureFormat(WGPU_UTF8(obj, format)),
     .depthWriteEnabled = WGPU_BOOL_OPT(obj, depthWriteEnabled, false),
     .depthCompare = StringToWGPUCompareFunction(WGPU_UTF8_OPT(obj, depthCompare, "always")),
     .stencilFront = makeDefaultWGPUStencilFaceState(),
     .stencilBack = makeDefaultWGPUStencilFaceState(),
+    .stencilReadMask = WGPU_NUMBER_OPT(obj, stencilReadMask, uint32_t, 0xFFFFFFFF),
+    .stencilWriteMask = WGPU_NUMBER_OPT(obj, stencilWriteMask, uint32_t, 0xFFFFFFFF),
     .depthBias = WGPU_NUMBER_OPT(obj, depthBias, int32_t, 0),
     .depthBiasClamp = WGPU_NUMBER_OPT(obj, depthBiasClamp, float, 0),
     .depthBiasSlopeScale = WGPU_NUMBER_OPT(obj, depthBiasSlopeScale, float, 0),
   };
+  if (WGPU_HAS_PROP(obj, stencilBack)) {
+    auto stencilBack = WGPU_OBJ(obj, stencilBack);
+    state.stencilBack = makeWGPUStencilFaceState(runtime, stencilBack);
+  }
+  if (WGPU_HAS_PROP(obj, stencilFront)) {
+    auto stencilFront = WGPU_OBJ(obj, stencilFront);
+    state.stencilFront = makeWGPUStencilFaceState(runtime, stencilFront);
+  }
+  return state;
 }
 
 WGPUVertexAttribute makeWGPUVertexAttribute(Runtime &runtime, const Value &value) {
@@ -305,6 +316,19 @@ WGPUBlendComponent makeGPUBlendComponent(Runtime &runtime, Object &obj) {
     .operation = StringToWGPUBlendOperation(operation),
     .srcFactor = StringToWGPUBlendFactor(srcFactor),
     .dstFactor = StringToWGPUBlendFactor(dstFactor),
+  };
+}
+
+WGPUStencilFaceState makeWGPUStencilFaceState(Runtime &runtime, Object &obj) {
+  auto compare = WGPU_UTF8_OPT(obj, compare, "always");
+  auto failOp = WGPU_UTF8_OPT(obj, failOp, "keep");
+  auto depthFailOp = WGPU_UTF8_OPT(obj, depthFailOp, "keep");
+  auto passOp = WGPU_UTF8_OPT(obj, passOp, "keep");
+  return {
+    .compare = StringToWGPUCompareFunction(compare),
+    .failOp = StringToWGPUStencilOperation(failOp),
+    .depthFailOp = StringToWGPUStencilOperation(depthFailOp),
+    .passOp = StringToWGPUStencilOperation(passOp),
   };
 }
 

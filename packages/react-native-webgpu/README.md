@@ -46,15 +46,6 @@ cd ..
 import 'react-native-webgpu';
 ```
 
-- Add plugin to `babel.config.js` to support `.wgsl` files
-
-```javascript
-// babel.config.js
-modules.exports = {
-  plugins: ['react-native-webgpu/babel-plugin-transform-wgsl'],
-};
-```
-
 - Add to `metro.config.js` to support `.wgsl` files
 
 ```javascript
@@ -67,6 +58,9 @@ const config = {
       ...defaultConfig.resolver.sourceExts,
       ...webGpuConfig.resolver.sourceExts,
     ],
+  },
+  transformer: {
+    babelTransformerPath: require.resolve('react-native-webgpu/wgsl-babel-transformer'),
   },
 };
 ```

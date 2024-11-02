@@ -40,6 +40,7 @@ import {Wireframe} from '../WebGPUSamples/GraphicsTechniques/Wireframe/Wireframe
 import {AdapterInfo} from '../InHouse/AdapterInfo';
 import {ExceedDeviceLimits} from '../InHouse/ExceedDeviceLimits';
 import {Crop} from '../InHouse/Crop';
+import {Outlines} from '../InHouse/Outlines/Outlines';
 
 export type Examples = 'WebGPUSamples' | 'Three' | 'InHouse';
 
@@ -89,6 +90,7 @@ export type Example =
   | 'FlakesTexture'
   | 'Crop'
   | 'Video'
+  | 'Outlines'
   | 'Thread'
   | 'AdapterInfo'
   | 'ExceedDeviceLimits';
@@ -139,6 +141,7 @@ const examples: Record<Example, ComponentType> = {
   FlakesTexture,
   Crop,
   Video,
+  Outlines,
   Thread,
   AdapterInfo,
   ExceedDeviceLimits,

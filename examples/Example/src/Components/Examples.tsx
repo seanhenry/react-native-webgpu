@@ -98,6 +98,7 @@ const sections: Record<Examples, ListProps<Example>['sections']> = {
         {title: 'FlakesTexture'},
         {title: 'Crop'},
         {title: 'Video'},
+        {title: 'Outlines'},
         {title: 'Thread'},
         {title: 'AdapterInfo'},
         {title: 'ExceedDeviceLimits'},

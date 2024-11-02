@@ -1,5 +1,5 @@
 {
-  "name": "babel-plugin-transform-wgsl",
+  "name": "wgsl-babel-transformer",
   "version": "1.0.0",
   "private": true,
   "main": "index"

@@ -2108,6 +2108,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@gltf-transform/core@npm:^4.0.10":
+  version: 4.0.10
+  resolution: "@gltf-transform/core@npm:4.0.10"
+  dependencies:
+    property-graph: ^2.0.0
+  checksum: 1eb5b2aa38f1a1fb61b6c974ce7bf9130c6e6d49d87cda8e800afc21c0014f7a07557b3761d4b7c0b000de342431556d8c090299cdb616b1ddc5023ec82c259f
+  languageName: node
+  linkType: hard
+
 "@hapi/hoek@npm:^9.0.0, @hapi/hoek@npm:^9.3.0":
   version: 9.3.0
   resolution: "@hapi/hoek@npm:9.3.0"
@@ -3893,6 +3902,7 @@ __metadata:
     "@babel/plugin-transform-export-namespace-from": ^7.24.7
     "@babel/preset-env": ^7.20.0
     "@babel/runtime": ^7.20.0
+    "@gltf-transform/core": ^4.0.10
     "@react-native/babel-preset": 0.75.4
     "@react-native/eslint-config": 0.75.4
     "@react-native/metro-config": 0.75.4
@@ -4457,12 +4467,6 @@ __metadata:
   checksum: fd52aef54448e01948a9d1cca0c8f87d064970c8682458962b7a222c372704bc2ce26ae8109e0ab2566e7ea5106856460f04c1a5ed794ab3bcd2f42cae1d9845
   languageName: node
   linkType: hard
-
-"babel-plugin-transform-wgsl@workspace:packages/react-native-webgpu/babel-plugin-transform-wgsl":
-  version: 0.0.0-use.local
-  resolution: "babel-plugin-transform-wgsl@workspace:packages/react-native-webgpu/babel-plugin-transform-wgsl"
-  languageName: unknown
-  linkType: soft
 
 "babel-preset-current-node-syntax@npm:^1.0.0":
   version: 1.0.1
@@ -11145,6 +11149,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"property-graph@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "property-graph@npm:2.0.0"
+  checksum: 373879ca21022cba28fafd82c9cb3dc8b99f671c678167de830d80a4a58e33ece7fcf231531a952e9f7c18dcb565bd32003c6d838b0a7dc722e4c2863bccc732
+  languageName: node
+  linkType: hard
+
 "proto-list@npm:~1.2.1":
   version: 1.2.4
   resolution: "proto-list@npm:1.2.4"
@@ -13694,6 +13705,12 @@ __metadata:
   checksum: 0a5ecdc4cc83af4db84e359e60ef234d66b4e56126d80134bdf18e440a8aa29f721c016329755c2d747fb624515ef3728f2c94cfddb77b0c7aa71c1179ea42ae
   languageName: node
   linkType: hard
+
+"wgsl-babel-transformer@workspace:packages/react-native-webgpu/wgsl-babel-transformer":
+  version: 0.0.0-use.local
+  resolution: "wgsl-babel-transformer@workspace:packages/react-native-webgpu/wgsl-babel-transformer"
+  languageName: unknown
+  linkType: soft
 
 "whatwg-fetch@npm:^3.0.0":
   version: 3.6.20

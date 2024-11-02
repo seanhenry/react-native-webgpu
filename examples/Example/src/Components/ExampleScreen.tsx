@@ -39,6 +39,7 @@ import {ParticlesHDR} from '../WebGPUSamples/GraphicsTechniques/ParticlesHDR/Par
 import {Wireframe} from '../WebGPUSamples/GraphicsTechniques/Wireframe/Wireframe';
 import {AdapterInfo} from '../InHouse/AdapterInfo';
 import {ExceedDeviceLimits} from '../InHouse/ExceedDeviceLimits';
+import {Crop} from '../InHouse/Crop';
 
 export type Examples = 'WebGPUSamples' | 'Three' | 'InHouse';
 
@@ -86,6 +87,7 @@ export type Example =
   | 'GLTFLoader'
   // InHouse
   | 'FlakesTexture'
+  | 'Crop'
   | 'Video'
   | 'Thread'
   | 'AdapterInfo'
@@ -135,6 +137,7 @@ const examples: Record<Example, ComponentType> = {
   GLTFLoader,
   // InHouse
   FlakesTexture,
+  Crop,
   Video,
   Thread,
   AdapterInfo,

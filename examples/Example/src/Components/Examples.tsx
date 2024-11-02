@@ -96,6 +96,7 @@ const sections: Record<Examples, ListProps<Example>['sections']> = {
       title: 'InHouse',
       data: [
         {title: 'FlakesTexture'},
+        {title: 'Crop'},
         {title: 'Video'},
         {title: 'Thread'},
         {title: 'AdapterInfo'},

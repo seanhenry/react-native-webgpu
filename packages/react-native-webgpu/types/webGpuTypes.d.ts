@@ -24,16 +24,12 @@ type BufferSource = ArrayBufferLike;
 // // Defined as an empty interface here to prevent errors when using these types in a worker.
 // interface HTMLVideoElement {}
 //
-// type GPUOrigin2DStrict =
-//
-//   | Iterable<GPUIntegerCoordinate>
-//   | GPUOrigin2DDictStrict;
-//
-// interface GPUOrigin2DDictStrict
-//   extends GPUOrigin2DDict {
-//   /** @deprecated Does not exist for GPUOrigin2D. */
-//   z?: undefined;
-// }
+type GPUOrigin2DStrict = Iterable<GPUIntegerCoordinate> | GPUOrigin2DDictStrict;
+
+interface GPUOrigin2DDictStrict extends GPUOrigin2DDict {
+  /** @deprecated Does not exist for GPUOrigin2D. */
+  z?: undefined;
+}
 
 type GPUExtent3DStrict = Iterable<GPUIntegerCoordinate> | GPUExtent3DDictStrict;
 
@@ -785,11 +781,11 @@ interface GPUImageCopyExternalImage {
    * </table>
    */
   source: GPUImageCopyExternalImageSource;
-  //   /**
-  //    * Defines the origin of the copy - the minimum (top-left) corner of the source sub-region to copy from.
-  //    * Together with `copySize`, defines the full copy sub-region.
-  //    */
-  //   origin?: GPUOrigin2DStrict;
+  /**
+   * Defines the origin of the copy - the minimum (top-left) corner of the source sub-region to copy from.
+   * Together with `copySize`, defines the full copy sub-region.
+   */
+  origin?: GPUOrigin2DStrict;
   /**
    * Describes whether the source image is vertically flipped, or not.
    * If this option is set to `true`, the copy is flipped vertically: the bottom row of the source
@@ -891,10 +887,10 @@ interface GPUObjectDescriptorBase {
   label?: string;
 }
 
-// interface GPUOrigin2DDict {
-//   x?: GPUIntegerCoordinate;
-//   y?: GPUIntegerCoordinate;
-// }
+interface GPUOrigin2DDict {
+  x?: GPUIntegerCoordinate;
+  y?: GPUIntegerCoordinate;
+}
 
 interface GPUOrigin3DDict {
   x?: GPUIntegerCoordinate;

@@ -56,72 +56,94 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
       auto sourceParam = arguments[0].asObject(runtime);
       auto source = sourceParam.getPropertyAsObject(runtime, "source");
       auto flipY = WGPU_BOOL_OPT(sourceParam, flipY, false);
+      WGPUOrigin3D origin{.x = 0, .y = 0, .z = 0};
+      if (WGPU_HAS_PROP(sourceParam, origin)) {
+        auto originIn = WGPU_OBJ(sourceParam, origin);
+        origin = makeWGPUOrigin3D(runtime, originIn);
+      }
 
       auto destination = arguments[1].asObject(runtime);
       auto copyTexture = makeWGPUImageCopyTexture(runtime, std::move(destination));
 
       auto copySize = makeGPUExtent3D(runtime, arguments[2].asObject(runtime));
 
-      uint8_t *data = nullptr;
-      size_t dataSize = 0;
-      uint32_t width = 0;
-      uint32_t height = 0;
+      uint8_t *sourceData = nullptr;
+      size_t sourceDataSize = 0;
+      uint32_t sourceWidth = 0;
+      uint32_t sourceHeight = 0;
       // TODO: Support other sources
       if (source.isHostObject<ImageBitmapHostObject>(runtime)) {
         auto imageBitmap = source.asHostObject<ImageBitmapHostObject>(runtime);
-        data = imageBitmap->_data;
-        dataSize = imageBitmap->_size;
-        width = imageBitmap->_width;
-        height = imageBitmap->_height;
+        sourceData = imageBitmap->_data;
+        sourceDataSize = imageBitmap->_size;
+        sourceWidth = imageBitmap->_width;
+        sourceHeight = imageBitmap->_height;
       } else if (WGPU_HAS_PROP(source, _threeImageBitmap) &&
                  WGPU_OBJ(source, _threeImageBitmap).isHostObject<ImageBitmapHostObject>(runtime)) {
         auto imageBitmap = WGPU_HOST_OBJ(source, _threeImageBitmap, ImageBitmapHostObject);
-        data = imageBitmap->_data;
-        dataSize = imageBitmap->_size;
-        width = imageBitmap->_width;
-        height = imageBitmap->_height;
+        sourceData = imageBitmap->_data;
+        sourceDataSize = imageBitmap->_size;
+        sourceWidth = imageBitmap->_width;
+        sourceHeight = imageBitmap->_height;
       } else if (WGPU_HAS_PROP(source, data)) {  // ImageData
         auto rgbaArray = WGPU_OBJ(source, data);
         auto arrayBuffer = rgbaArray.getPropertyAsObject(runtime, "buffer").getArrayBuffer(runtime);
-        data = arrayBuffer.data(runtime);
-        dataSize = arrayBuffer.size(runtime);
-        width = WGPU_NUMBER(source, width, uint32_t);
-        height = WGPU_NUMBER(source, height, uint32_t);
+        sourceData = arrayBuffer.data(runtime);
+        sourceDataSize = arrayBuffer.size(runtime);
+        sourceWidth = WGPU_NUMBER(source, width, uint32_t);
+        sourceHeight = WGPU_NUMBER(source, height, uint32_t);
       } else if ((WGPU_BOOL_OPT(source, __isCopyExternalImageToTextureCompatible, false))) {
         auto arrayBuffer = WGPU_OBJ(source, arrayBuffer).getArrayBuffer(runtime);
-        data = arrayBuffer.data(runtime);
-        dataSize = arrayBuffer.size(runtime);
-        width = WGPU_NUMBER(source, width, uint32_t);
-        height = WGPU_NUMBER(source, height, uint32_t);
+        sourceData = arrayBuffer.data(runtime);
+        sourceDataSize = arrayBuffer.size(runtime);
+        sourceWidth = WGPU_NUMBER(source, width, uint32_t);
+        sourceHeight = WGPU_NUMBER(source, height, uint32_t);
       }
-      if (data == nullptr) {
+      if (sourceData == nullptr) {
         throw JSINativeException("Only supports ImageBitmap and ImageData");
       }
-      uint32_t bytesPerPixel = dataSize / (width * height);
-      uint32_t bytesPerRow = width * bytesPerPixel;
+
+      uint32_t bytesPerPixel = sourceDataSize / (sourceWidth * sourceHeight);
+      uint32_t sourceBytesPerRow = sourceWidth * bytesPerPixel;
       WGPUTextureDataLayout dataLayout = {
         .nextInChain = nullptr,
         .offset = 0,
-        .bytesPerRow = bytesPerRow,
-        .rowsPerImage = height,
+        .bytesPerRow = sourceBytesPerRow,
+        .rowsPerImage = sourceHeight,
       };
 
-      uint8_t *flipped = nullptr;
-      if (flipY) {
-        flipped = (uint8_t *)malloc(dataSize);
-        for (auto y = 0; y < height; y++) {
-          auto flippedIndex = (height - y - 1) * bytesPerRow;
-          auto originalIndex = y * bytesPerRow;
-          memcpy(flipped + flippedIndex, data + originalIndex, bytesPerRow);
-        }
+      if (!flipY && origin.x == 0 && origin.y == 0 && copySize.width == sourceWidth) {
+        wgpuQueueWriteTexture(_value, &copyTexture, sourceData, sourceDataSize, &dataLayout, &copySize);
+        _context->getErrorHandler()->throwPendingJSIError();
+        return Value::undefined();
       }
 
-      wgpuQueueWriteTexture(_value, &copyTexture, flipped ?: data, dataSize, &dataLayout, &copySize);
+      if (origin.x < 0 || origin.y < 0) {
+        throw JSError(runtime, "Origin was negative");
+      }
+      if (copySize.width < 0 || copySize.height < 0) {
+        throw JSError(runtime, "Copy image size was negative");
+      }
+      if (sourceWidth < origin.x + copySize.width || sourceHeight < origin.y + copySize.height) {
+        throw JSError(runtime, "Copy image extends beyond the source image bounds");
+      }
+
+      auto copyBytesPerRow = copySize.width * bytesPerPixel;
+      auto copyDataSize = copyBytesPerRow * copySize.height;
+      auto copyData = (uint8_t *)malloc(copyDataSize);
+      for (auto y = 0; y < copySize.height; y++) {
+        auto sourceXOffset = origin.x * bytesPerPixel;
+        auto sourceYOffset = (y + origin.y) * sourceBytesPerRow;
+        auto yOffset = (flipY ? copySize.height - y - 1 : y) * copyBytesPerRow;
+        memcpy(copyData + yOffset, sourceData + sourceXOffset + sourceYOffset, copyBytesPerRow);
+      }
+      dataLayout.bytesPerRow = copyBytesPerRow;
+      dataLayout.rowsPerImage = copySize.height;
+
+      wgpuQueueWriteTexture(_value, &copyTexture, copyData, copyDataSize, &dataLayout, &copySize);
       _context->getErrorHandler()->throwPendingJSIError();
 
-      if (flipped) {
-        free(flipped);
-      }
+      free(copyData);
       return Value::undefined();
     });
   }

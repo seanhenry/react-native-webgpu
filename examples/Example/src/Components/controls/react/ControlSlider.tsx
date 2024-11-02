@@ -1,26 +1,18 @@
 import Animated, {
   runOnJS,
   runOnUI,
-  useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
 import {LayoutChangeEvent, StyleSheet, TextInput, View} from 'react-native';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {Observable} from '../../../utils/observable';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {ControlBackground} from './ControlBackground';
 import {ControlLabel} from './ControlLabel';
 import {ControlInput} from './ControlInput';
-import {
-  clamp,
-  formatSteppedNumber,
-  lerpWithStep,
-  normalizedBetween,
-} from '../sliderUtils';
+import {clamp, lerpWithStep, normalizedBetween} from '../sliderUtils';
 import {controlBackgroundColor, controlForegroundColor} from './controlsStyles';
-
-const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 type ControlSliderProps = {
   disabled: boolean;
@@ -45,6 +37,7 @@ export const ControlSlider = ({
   onFinishChange,
   observable,
 }: ControlSliderProps) => {
+  const [value, setValue] = useState(`${initialValue}`);
   const normalizedValue = useSharedValue(
     normalizedBetween(initialValue, min, max),
   );
@@ -65,14 +58,14 @@ export const ControlSlider = ({
         return;
       }
       normalizedValue.value = newValue;
-      runOnJS(onChange)(
-        lerpWithStep(
-          normalizedValue.value,
-          props.value.min,
-          props.value.max,
-          props.value.step,
-        ),
+      const steppedValue = lerpWithStep(
+        normalizedValue.value,
+        props.value.min,
+        props.value.max,
+        props.value.step,
       );
+      runOnJS(onChange)(steppedValue);
+      runOnJS(setValue)(`${steppedValue}`);
     })
     .onEnd(() => {
       runOnJS(onFinishChange)();
@@ -82,35 +75,32 @@ export const ControlSlider = ({
     width: `${clamp(normalizedValue.value, 0, 1) * 100}%`,
   }));
 
-  const animatedProps = useAnimatedProps(() => {
-    return {
-      text: formatSteppedNumber(
-        lerpWithStep(
-          normalizedValue.value,
-          props.value.min,
-          props.value.max,
-          props.value.step,
-        ),
-        props.value.step,
-      ),
-    };
-  });
-
   const onLayout = ({nativeEvent}: LayoutChangeEvent) => {
     runOnUI((width: number) => {
       sliderWidth.value = width;
     })(nativeEvent.layout.width);
   };
 
+  const onChangeText = (text: string) => {
+    setValue(text);
+    const newValue = parseFloat(text);
+    if (!isNaN(newValue)) {
+      onChange(newValue);
+      onFinishChange();
+      observable.post(newValue);
+    }
+  };
+
   useEffect(() => {
-    return observable.add(value => {
+    return observable.add(newValue => {
+      setValue(`${newValue}`);
       runOnUI((v: number) => {
         normalizedValue.value = normalizedBetween(
           v,
           props.value.min,
           props.value.max,
         );
-      })(value);
+      })(newValue);
     });
   }, [normalizedValue, observable, props]);
 
@@ -127,13 +117,13 @@ export const ControlSlider = ({
           </View>
         </GestureDetector>
         <View style={styles.textContainer}>
-          <AnimatedTextInput
-            // @ts-expect-error text is not a prop type
-            animatedProps={animatedProps}
+          <TextInput
             style={styles.text}
-            editable={false}
-            multiline
+            editable={!disabled}
+            value={value}
+            onChangeText={onChangeText}
             defaultValue={`${initialValue}`}
+            keyboardType="numeric"
           />
         </View>
       </ControlInput>

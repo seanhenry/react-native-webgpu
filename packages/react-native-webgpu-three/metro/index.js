@@ -10,7 +10,12 @@ module.exports = {
     resolveRequest: (context, moduleName, platform) => {
       const resolved = context.resolveRequest(context, moduleName, platform);
       if (
-        resolved.filePath?.endsWith('three/examples/jsm/capabilities/WebGPU.js')
+        resolved.filePath?.endsWith(
+          'three/examples/jsm/capabilities/WebGPU.js',
+        ) ||
+        resolved.filePath?.endsWith(
+          'three/examples/jsm/nodes/pmrem/PMREMNode.js',
+        )
       ) {
         resolved.filePath = path.join(
           rnThreeRoot,

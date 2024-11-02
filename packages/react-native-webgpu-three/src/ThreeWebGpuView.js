@@ -25,7 +25,11 @@ export const ThreeWebGpuView = ({onCreateSurface, ...props}) => {
         requiredFeatures: supportedFeatures,
       });
       const eventsAdapter = new TouchEventsAdapter(touchEventsRef);
-      const canvas = makeCanvasProxy({eventsAdapter, payload});
+      const weakContext = new WeakRef(payload.context);
+      const canvas = makeCanvasProxy({
+        eventsAdapter,
+        weakContext,
+      });
 
       global.createImageBitmap = __reactNativeWebGPU.createImageBitmap;
       GPUTextureFormat.BGRA8Unorm =

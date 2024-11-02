@@ -134,6 +134,7 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
       _configuredContext = device->getContext();
       throwPendingJSIError();
       surface->createTimer(device->getContext()->getJSIInstance());
+      _strongSurface = surface;
 
       return Value::undefined();
     });
@@ -152,6 +153,7 @@ Value ContextHostObject::get(Runtime &runtime, const PropNameID &propName) {
         wgpuSurfaceUnconfigure(surface->getWGPUSurface());
         throwPendingJSIError();
       }
+      _strongSurface = nullptr;
       _configuredContext = nullptr;
       return Value::undefined();
     });

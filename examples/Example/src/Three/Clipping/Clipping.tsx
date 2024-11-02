@@ -214,7 +214,7 @@ export const Clipping = () => {
       stats.end();
     }
     return () => {
-      renderer?.setAnimationLoop(null);
+      renderer?.dispose();
     };
   };
   return (

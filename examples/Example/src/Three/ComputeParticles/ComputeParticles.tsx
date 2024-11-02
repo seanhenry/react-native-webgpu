@@ -280,7 +280,7 @@ Draw ${
     }
 
     return () => {
-      renderer?.setAnimationLoop(null);
+      renderer?.dispose();
     };
   };
   return (

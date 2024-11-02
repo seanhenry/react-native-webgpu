@@ -20,10 +20,10 @@ export class Image extends EventDispatcher {
   }
 
   get width() {
-    return this._threeImageBitmap?.width;
+    return this.data?.width;
   }
 
   get height() {
-    return this._threeImageBitmap?.height;
+    return this.data?.height;
   }
 }

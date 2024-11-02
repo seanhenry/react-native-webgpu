@@ -1,14 +1,14 @@
 import {debugLogging, makeLoggingProxy} from './debugLogging';
 
-export const makeCanvasProxy = ({payload, eventsAdapter}) =>
+export const makeCanvasProxy = ({weakContext, eventsAdapter}) =>
   new Proxy(
     {},
     {
       get(target, propName, receiver) {
         if (propName === 'width') {
-          return payload.context.width;
+          return weakContext.deref()?.width ?? 0;
         } else if (propName === 'height') {
-          return payload.context.height;
+          return weakContext.deref()?.height ?? 0;
         } else if (propName === 'getRootNode') {
           return () => {
             return makeLoggingProxy(
@@ -29,7 +29,8 @@ export const makeCanvasProxy = ({payload, eventsAdapter}) =>
         } else if (propName === 'releasePointerCapture') {
           return () => {};
         } else if (propName === 'clientHeight') {
-          return payload.context.height / payload.context.scale;
+          const context = weakContext.deref();
+          return context ? context.height / context.scale : 0;
         }
         if (debugLogging) {
           console.log(

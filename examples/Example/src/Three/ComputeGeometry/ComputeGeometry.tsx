@@ -152,7 +152,7 @@ export const ComputeGeometry = () => {
       context.presentSurface();
     }
     return () => {
-      renderer?.setAnimationLoop(null);
+      renderer?.dispose();
     };
   };
 

@@ -60,7 +60,7 @@ Solution:
 
 `Renderer.setAnimationLoop` will not stop when the webgpu view is unmounted so this must be done manually.
 
-Solution: `onCreateSurface` provides a callback to perform a teardown. Call `renderer.setAnimationLoop(null)` in the teardown.
+Solution: `onCreateSurface` provides a callback to perform a teardown. Call `renderer.dispose()` in the teardown.
 
 ### TextDecoder
 
@@ -96,3 +96,16 @@ Three automatically requests all available features. See `WebGPUBackend.js:91`. 
 
 Solution: Copy implementation from Three
 See: `src/ThreeWebGpuView.js`
+
+### Memory leaks
+
+Backend is not destroyed and holds references to critical resources.
+
+Solution: Manually destroy references
+See: `src/rendererPatch.js`
+Note: This isn't ideal. We need to find what's keeping it alive.
+
+PNREMNode holds global reference to renderer (and caches it)
+
+Solution: Replace PNREMNode.js
+See: `src/examples/jsm/nodes/pmrem/PNREMNode.js`, `metro/index.js`

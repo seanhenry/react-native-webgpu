@@ -96,7 +96,7 @@ scene.add(mesh);
 
 const renderer = new THREE.WebGLRenderer({antialias: true}); // TODO: Use WebGPURenderer
 renderer.setSize(width, height);
-renderer.setAnimationLoop(animate); // TODO: Cancel animation loop on unmount
+renderer.setAnimationLoop(animate);
 document.body.appendChild(renderer.domElement); // TODO: Remove web api
 
 // animation
@@ -108,6 +108,8 @@ function animate(time) {
   renderer.render(scene, camera);
   // TODO: We need to tell the surface to present itself onscreen
 }
+
+// TODO: Clean up on unmount and cancel animation loop
 ```
 
 Here is a working (TypeScript) example. It has `FIXED:` comments to show where the changes were made.
@@ -151,13 +153,14 @@ export const HelloThree = () => {
 
       renderer.render(scene, camera);
       // FIXED: Add context.presentSurface() to display the surface
-      context.presentSurface()
+      context.presentSurface();
     }
 
     renderer.setAnimationLoop(animate);
     // FIXED: Return function called on unmount to cancel the animation loop
     return () => {
-      renderer.setAnimationLoop(null)
+      // FIXED: Clear up resources and cancel animation loop
+      renderer.dispose();
     }
   };
   return <ThreeWebGpuView onCreateSurface={onCreateSurface} style={{flex: 1}} />;

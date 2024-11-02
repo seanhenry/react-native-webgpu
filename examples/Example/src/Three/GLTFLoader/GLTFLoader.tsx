@@ -91,7 +91,7 @@ export const GLTFLoader = () => {
       context.presentSurface();
     }
     return () => {
-      renderer.setAnimationLoop(null);
+      renderer.dispose();
     };
   };
   return (

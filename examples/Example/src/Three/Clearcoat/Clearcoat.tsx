@@ -225,7 +225,7 @@ export const Clearcoat = () => {
       context.presentSurface();
     }
     return () => {
-      renderer?.setAnimationLoop(null);
+      renderer?.dispose();
     };
   };
   return (

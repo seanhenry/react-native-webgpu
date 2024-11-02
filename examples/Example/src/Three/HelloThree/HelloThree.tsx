@@ -41,7 +41,7 @@ export const HelloThree = () => {
     renderer.setAnimationLoop(animate);
 
     return () => {
-      renderer.setAnimationLoop(null);
+      renderer.dispose();
     };
   };
   return (

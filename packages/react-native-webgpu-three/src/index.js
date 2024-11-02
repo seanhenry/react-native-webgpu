@@ -1,6 +1,7 @@
 import 'three/examples/jsm/nodes/math/MathNode';
 import './nodeBuilderPatch';
 import './constNodePatch';
+import './rendererPatch';
 import 'fast-text-encoding';
 import {makeLoggingProxy} from './debugLogging';
 import {Image} from './Image';

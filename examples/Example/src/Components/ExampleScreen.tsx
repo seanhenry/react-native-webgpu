@@ -41,6 +41,7 @@ import {AdapterInfo} from '../InHouse/AdapterInfo';
 import {ExceedDeviceLimits} from '../InHouse/ExceedDeviceLimits';
 import {Crop} from '../InHouse/Crop';
 import {Outlines} from '../InHouse/Outlines/Outlines';
+import {Portal} from '../InHouse/Portal/Portal';
 
 export type Examples = 'WebGPUSamples' | 'Three' | 'InHouse';
 
@@ -91,6 +92,7 @@ export type Example =
   | 'Crop'
   | 'Video'
   | 'Outlines'
+  | 'Portal'
   | 'Thread'
   | 'AdapterInfo'
   | 'ExceedDeviceLimits';
@@ -142,6 +144,7 @@ const examples: Record<Example, ComponentType> = {
   Crop,
   Video,
   Outlines,
+  Portal,
   Thread,
   AdapterInfo,
   ExceedDeviceLimits,

@@ -8,6 +8,7 @@ import {
 import type {Routes} from '../types/navigationTypes';
 import type {Example, Examples} from './ExampleScreen';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {Portal} from '../InHouse/Portal/Portal';
 
 export function Examples() {
   const navigation = useNavigation<NavigationProp<Routes, 'example'>>();
@@ -99,6 +100,7 @@ const sections: Record<Examples, ListProps<Example>['sections']> = {
         {title: 'Crop'},
         {title: 'Video'},
         {title: 'Outlines'},
+        {title: 'Portal'},
         {title: 'Thread'},
         {title: 'AdapterInfo'},
         {title: 'ExceedDeviceLimits'},

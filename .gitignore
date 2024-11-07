@@ -16,3 +16,6 @@ __MACOSX
 
 /.idea
 /node_modules
+**/react-native-webgpu-*.tgz
+/products
+/screenshots

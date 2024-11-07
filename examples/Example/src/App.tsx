@@ -7,6 +7,8 @@ import {Appearance} from 'react-native';
 import {Root} from './Components/Root';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
+import {launchArguments} from './utils/launchArguments';
+
 Appearance.setColorScheme('light');
 const Stack = createNativeStackNavigator<Routes>();
 Animated.addWhitelistedNativeProps({text: true});
@@ -16,6 +18,7 @@ export default function App() {
     <GestureHandlerRootView>
       <NavigationContainer>
         <Stack.Navigator
+          initialRouteName={launchArguments.example ? 'example' : 'root'}
           screenOptions={{
             headerBackTitleVisible: false,
             headerTintColor: 'black',
@@ -30,7 +33,7 @@ export default function App() {
             name="example"
             component={ExampleScreen}
             options={({route}) => ({
-              title: route.params.name,
+              title: route.params?.name ?? launchArguments.example ?? '',
             })}
           />
         </Stack.Navigator>

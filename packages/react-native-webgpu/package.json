@@ -1,29 +1,27 @@
 {
   "name": "react-native-webgpu",
   "version": "0.0.1",
-  "description": "Coming soon. A [WebGPU](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API) port for react native which aims to provide direct access to Metal and Vulkan for iOS and Android, and support for libraries like [Three.js](https://threejs.org).",
+  "description": "A [WebGPU](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API) port for react providing direct access to Metal and Vulkan for iOS and Android.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/src/index.d.ts",
   "react-native": "src/index",
   "source": "src/index",
   "files": [
-    "src",
+    "android/src",
+    "android/build.gradle",
+    "android/CMakeLists.txt",
+    "android/gradle.properties",
+    "bin",
+    "cxx",
+    "include",
     "lib",
-    "android",
-    "ios",
-    "cpp",
-    "*.podspec",
-    "!ios/build",
-    "!android/build",
-    "!android/gradle",
-    "!android/gradlew",
-    "!android/gradlew.bat",
-    "!android/local.properties",
-    "!**/__tests__",
-    "!**/__fixtures__",
-    "!**/__mocks__",
-    "!**/.*"
+    "metro",
+    "src",
+    "types",
+    "wgsl-babel-transformer",
+    "react-native.config.js",
+    "react-native-webgpu.podspec"
   ],
   "scripts": {
     "example": "yarn workspace react-native-webgpu-example",
@@ -78,9 +76,6 @@
     "react": "*",
     "react-native": "*"
   },
-  "workspaces": [
-    "example"
-  ],
   "packageManager": "yarn@3.6.1",
   "jest": {
     "preset": "react-native",
@@ -89,14 +84,9 @@
       "<rootDir>/lib/"
     ]
   },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
   "release-it": {
     "git": {
-      "commitMessage": "chore: release ${version}",
+      "commitMessage": "release ${version}",
       "tagName": "v${version}"
     },
     "npm": {
@@ -104,11 +94,6 @@
     },
     "github": {
       "release": true
-    },
-    "plugins": {
-      "@release-it/conventional-changelog": {
-        "preset": "angular"
-      }
     }
   },
   "eslintConfig": {

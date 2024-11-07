@@ -44,6 +44,7 @@ import {Outlines} from '../InHouse/Outlines/Outlines';
 import {Portal} from '../InHouse/Portal/Portal';
 import {CWTriangle} from '../InHouse/CWTriangle/CWTriangle';
 import {ClearBuffer} from '../InHouse/ClearBuffer';
+import {launchArguments} from '../utils/launchArguments';
 
 export type Examples = 'WebGPUSamples' | 'Three' | 'InHouse';
 
@@ -158,6 +159,6 @@ const examples: Record<Example, ComponentType> = {
 
 export function ExampleScreen() {
   const {params} = useRoute<RouteProp<Routes, 'example'>>();
-  const Example = examples[params.name];
+  const Example = examples[params?.name ?? launchArguments.example];
   return <Example />;
 }

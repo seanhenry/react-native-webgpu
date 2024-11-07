@@ -145,10 +145,7 @@ type GPUFeatureName =
   | 'bgra8unorm-storage'
   | 'float32-filterable';
 type GPUFilterMode = 'nearest' | 'linear';
-// type GPUFrontFace =
-//
-//   | "ccw"
-//   | "cw";
+type GPUFrontFace = 'ccw' | 'cw';
 type GPUIndexFormat = 'uint16' | 'uint32';
 type GPULoadOp = 'load' | 'clear';
 type GPUMipmapFilterMode = 'nearest' | 'linear';
@@ -940,10 +937,10 @@ interface GPUPrimitiveState {
    * See [[#primitive-assembly]] for additional details.
    */
   stripIndexFormat?: GPUIndexFormat;
-  //   /**
-  //    * Defines which polygons are considered front-facing.
-  //    */
-  //   frontFace?: GPUFrontFace;
+  /**
+   * Defines which polygons are considered front-facing.
+   */
+  frontFace?: GPUFrontFace;
   /**
    * Defines which polygon orientation will be culled, if any.
    */

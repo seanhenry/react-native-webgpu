@@ -552,6 +552,13 @@ WGPUIndexFormat StringToWGPUIndexFormat(const std::string &str) {
   return WGPUIndexFormat_Undefined;
 }
 
+WGPUFrontFace StringToWGPUFrontFace(const std::string &str) {
+  if (str == "cw") {
+    return WGPUFrontFace_CW;
+  }
+  return WGPUFrontFace_CCW;
+}
+
 WGPUSamplerBindingType StringToWGPUSamplerBindingType(const std::string &str) {
   if (str == "filtering") {
     return WGPUSamplerBindingType_Filtering;

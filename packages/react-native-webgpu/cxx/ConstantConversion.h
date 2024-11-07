@@ -32,6 +32,7 @@ WGPUBufferBindingType StringToWGPUBufferBindingType(const std::string &name);
 WGPUQueryType StringToWGPUQueryType(const std::string &name);
 const char *WGPUQuerySetToString(WGPUQueryType type);
 WGPUIndexFormat StringToWGPUIndexFormat(const std::string &str);
+WGPUFrontFace StringToWGPUFrontFace(const std::string &str);
 WGPUSamplerBindingType StringToWGPUSamplerBindingType(const std::string &str);
 WGPUTextureSampleType StringToWGPUTextureSampleType(const std::string &str);
 WGPUAddressMode StringToWGPUAddressMode(const std::string &str);

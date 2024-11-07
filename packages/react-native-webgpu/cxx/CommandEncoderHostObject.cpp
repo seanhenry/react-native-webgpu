@@ -169,6 +169,21 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
     });
   }
 
+  if (name == "copyBufferToTexture") {
+    return WGPU_FUNC_FROM_HOST_FUNC(copyBufferToTexture, 3, [this]) {
+      WGPU_LOG_FUNC_ARGS(copyBufferToTexture);
+      auto source = arguments[0].asObject(runtime);
+      auto destination = arguments[1].asObject(runtime);
+      auto copySize = makeGPUExtent3D(runtime, arguments[2].asObject(runtime));
+
+      auto sourceCopyBuffer = makeWGPUImageCopyBuffer(runtime, std::move(source), copySize);
+      auto destCopyTexture = makeWGPUImageCopyTexture(runtime, destination);
+      wgpuCommandEncoderCopyBufferToTexture(_value, &sourceCopyBuffer, &destCopyTexture, &copySize);
+      _context->getErrorHandler()->throwPendingJSIError();
+      return Value::undefined();
+    });
+  }
+
   if (name == "resolveQuerySet") {
     return WGPU_FUNC_FROM_HOST_FUNC(resolveQuerySet, 5, [this]) {
       WGPU_LOG_FUNC_ARGS(resolveQuerySet);
@@ -179,6 +194,16 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
       auto destinationOffset = (uint64_t)arguments[4].asNumber();
       wgpuCommandEncoderResolveQuerySet(_value, querySet, firstQuery, queryCount, destination, destinationOffset);
       _context->getErrorHandler()->throwPendingJSIError();
+      return Value::undefined();
+    });
+  }
+
+  if (name == "clearBuffer") {
+    return WGPU_FUNC_FROM_HOST_FUNC(clearBuffer, 3, [this]) {
+      auto buffer = arguments[0].asObject(runtime).asHostObject<BufferHostObject>(runtime)->getValue();
+      auto offset = count > 1 ? arguments[1].asNumber() : 0;
+      auto size = count > 2 ? arguments[2].asNumber() : wgpuBufferGetSize(buffer) - offset;
+      wgpuCommandEncoderClearBuffer(_value, buffer, (uint64_t)offset, (uint64_t)size);
       return Value::undefined();
     });
   }
@@ -194,5 +219,6 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
 
 std::vector<PropNameID> CommandEncoderHostObject::getPropertyNames(Runtime &runtime) {
   return PropNameID::names(runtime, "beginRenderPass", "finish", "copyTextureToTexture", "beginComputePass",
-                           "copyTextureToBuffer", "copyBufferToBuffer", "resolveQuerySet", "label", "__brand");
+                           "copyTextureToBuffer", "copyBufferToBuffer", "copyBufferToTexture", "resolveQuerySet", "clearBuffer", "label",
+                           "__brand");
 }

@@ -2009,18 +2009,18 @@ interface GPUCommandEncoder
     destinationOffset: GPUSize64,
     size: GPUSize64
   ): undefined;
-  //   /**
-  //    * Encode a command into the {@link GPUCommandEncoder} that copies data from a sub-region of a
-  //    * {@link GPUBuffer} to a sub-region of one or multiple continuous texture subresources.
-  //    * @param source - Combined with `copySize`, defines the region of the source buffer.
-  //    * @param destination - Combined with `copySize`, defines the region of the destination texture subresource.
-  //    * 	`copySize`:
-  //    */
-  //   copyBufferToTexture(
-  //     source: GPUImageCopyBuffer,
-  //     destination: GPUImageCopyTexture,
-  //     copySize: GPUExtent3DStrict
-  //   ): undefined;
+  /**
+   * Encode a command into the {@link GPUCommandEncoder} that copies data from a sub-region of a
+   * {@link GPUBuffer} to a sub-region of one or multiple continuous texture subresources.
+   * @param source - Combined with `copySize`, defines the region of the source buffer.
+   * @param destination - Combined with `copySize`, defines the region of the destination texture subresource.
+   * 	`copySize`:
+   */
+  copyBufferToTexture(
+    source: GPUImageCopyBuffer,
+    destination: GPUImageCopyTexture,
+    copySize: GPUExtent3DStrict
+  ): undefined;
   /**
    * Encode a command into the {@link GPUCommandEncoder} that copies data from a sub-region of one or
    * multiple continuous texture subresources to a sub-region of a {@link GPUBuffer}.
@@ -2046,18 +2046,18 @@ interface GPUCommandEncoder
     destination: GPUImageCopyTexture,
     copySize: GPUExtent3DStrict
   ): undefined;
-  //   /**
-  //    * Encode a command into the {@link GPUCommandEncoder} that fills a sub-region of a
-  //    * {@link GPUBuffer} with zeros.
-  //    * @param buffer - The {@link GPUBuffer} to clear.
-  //    * @param offset - Offset in bytes into `buffer` where the sub-region to clear begins.
-  //    * @param size - Size in bytes of the sub-region to clear. Defaults to the size of the buffer minus `offset`.
-  //    */
-  //   clearBuffer(
-  //     buffer: GPUBuffer,
-  //     offset?: GPUSize64,
-  //     size?: GPUSize64
-  //   ): undefined;
+  /**
+   * Encode a command into the {@link GPUCommandEncoder} that fills a sub-region of a
+   * {@link GPUBuffer} with zeros.
+   * @param buffer - The {@link GPUBuffer} to clear.
+   * @param offset - Offset in bytes into `buffer` where the sub-region to clear begins.
+   * @param size - Size in bytes of the sub-region to clear. Defaults to the size of the buffer minus `offset`.
+   */
+  clearBuffer(
+    buffer: GPUBuffer,
+    offset?: GPUSize64,
+    size?: GPUSize64
+  ): undefined;
   /**
    * Resolves query results from a {@link GPUQuerySet} out into a range of a {@link GPUBuffer}.
    * 	querySet:

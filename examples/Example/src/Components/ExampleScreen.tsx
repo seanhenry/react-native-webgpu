@@ -43,6 +43,7 @@ import {Crop} from '../InHouse/Crop';
 import {Outlines} from '../InHouse/Outlines/Outlines';
 import {Portal} from '../InHouse/Portal/Portal';
 import {CWTriangle} from '../InHouse/CWTriangle/CWTriangle';
+import {ClearBuffer} from '../InHouse/ClearBuffer';
 
 export type Examples = 'WebGPUSamples' | 'Three' | 'InHouse';
 
@@ -97,7 +98,8 @@ export type Example =
   | 'Thread'
   | 'AdapterInfo'
   | 'ExceedDeviceLimits'
-  | 'CWTriangle';
+  | 'CWTriangle'
+  | 'ClearBuffer';
 
 const examples: Record<Example, ComponentType> = {
   // BasicGraphics
@@ -151,6 +153,7 @@ const examples: Record<Example, ComponentType> = {
   AdapterInfo,
   ExceedDeviceLimits,
   CWTriangle,
+  ClearBuffer,
 };
 
 export function ExampleScreen() {

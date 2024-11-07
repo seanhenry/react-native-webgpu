@@ -1,5 +1,7 @@
 #import "Surface.h"
 #import <QuartzCore/CAMetalLayer.h>
+#import <React-Core/React/RCTAssert.h>
+#import <React-Core/React/RCTCxxUtils.h>
 #include <jsi/jsi.h>
 #include "JSIInstance.h"
 
@@ -40,15 +42,21 @@ using namespace facebook::jsi;
 - (void)onAnimationFrame {
   std::swap(_animationCallbacks, _animationCallbacksForProcessing);
 
-  auto &runtime = _jsiInstance->runtime;
-  auto performance = runtime.global().getPropertyAsObject(runtime, "performance");
-  auto now =
-    performance.getPropertyAsFunction(runtime, "now").callWithThis(runtime, performance, nullptr, 0).asNumber();
+  NSError *error = facebook::react::tryAndReturnError([self]() {
+    auto &runtime = _jsiInstance->runtime;
+    auto performance = runtime.global().getPropertyAsObject(runtime, "performance");
+    auto now =
+      performance.getPropertyAsFunction(runtime, "now").callWithThis(runtime, performance, nullptr, 0).asNumber();
 
-  for (auto &callback : _animationCallbacksForProcessing) {
-    @autoreleasepool {
-      callback.call(runtime, now);
+    for (auto &callback : _animationCallbacksForProcessing) {
+      @autoreleasepool {
+        callback.call(runtime, now);
+      }
     }
+  });
+
+  if (error != nil) {
+    RCTFatal(error);
   }
 
   _animationCallbacksForProcessing.clear();

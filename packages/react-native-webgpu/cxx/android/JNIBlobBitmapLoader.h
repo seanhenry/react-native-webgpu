@@ -32,7 +32,9 @@ class JNIBlobBitmapLoader {
 
   int loadBitmap(JNIEnv *env, const char *blobID, int offset, int size) {
     auto id = env->NewStringUTF(blobID);
-    return env->CallIntMethod(_this, _methodIDs->loadBitmapId, id, offset, size);
+    auto result = env->CallIntMethod(_this, _methodIDs->loadBitmapId, id, offset, size);
+    env->DeleteLocalRef(id);
+    return result;
   }
 
   jobject getSharedMemory(JNIEnv *env) { return env->CallObjectMethod(_this, _methodIDs->getSharedMemoryId); }

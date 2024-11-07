@@ -46,12 +46,14 @@ class JNIImageLoaderFactory {
   std::shared_ptr<JNIHTTPBitmapLoader> makeHttpBitmapLoader(JNIEnv *env, std::string uri) {
     auto uriString = env->NewStringUTF(uri.data());
     auto instance = env->CallObjectMethod(_instance, _factoryMethodIDs->makeHttpBitmapLoaderId, uriString);
+    env->DeleteLocalRef(uriString);
     return std::make_shared<JNIHTTPBitmapLoader>(_httpMethodIDs, instance);
   }
 
   std::shared_ptr<JNIDrawableBitmapLoader> makeDrawableBitmapLoader(JNIEnv *env, std::string uri) {
     auto uriString = env->NewStringUTF(uri.data());
     auto instance = env->CallObjectMethod(_instance, _factoryMethodIDs->makeDrawableBitmapLoaderId, uriString);
+    env->DeleteLocalRef(uriString);
     return std::make_shared<JNIDrawableBitmapLoader>(_drawableMethodIDs, instance);
   }
 

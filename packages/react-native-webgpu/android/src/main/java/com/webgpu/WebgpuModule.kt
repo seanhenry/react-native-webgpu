@@ -11,6 +11,7 @@ import java.lang.ref.WeakReference
 class WebgpuModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
   private val weakReactContext = WeakReference(reactContext)
+  private val exceptionHandler = ExceptionHandler(reactContext)
 
   override fun getName(): String {
     return NAME
@@ -29,7 +30,7 @@ class WebgpuModule(reactContext: ReactApplicationContext) :
       val jsCallInvokerHolder = context.catalystInstance.jsCallInvokerHolder
       val blobModule = context.getNativeModule(BlobModule::class.java)
       val factory = BitmapLoaderFactory(blobModule, context)
-      return CxxBridge.installJsi(threadId, jsiRuntimeRef, jsCallInvokerHolder, factory)
+      return CxxBridge.installJsi(threadId, jsiRuntimeRef, jsCallInvokerHolder, factory, exceptionHandler)
     } catch (exception: Exception) {
       Log.e(NAME, "Failed to initialize react-native-webgpu", exception)
       return false

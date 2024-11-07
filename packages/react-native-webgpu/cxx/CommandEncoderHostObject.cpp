@@ -219,6 +219,6 @@ Value CommandEncoderHostObject::get(Runtime &runtime, const PropNameID &propName
 
 std::vector<PropNameID> CommandEncoderHostObject::getPropertyNames(Runtime &runtime) {
   return PropNameID::names(runtime, "beginRenderPass", "finish", "copyTextureToTexture", "beginComputePass",
-                           "copyTextureToBuffer", "copyBufferToBuffer", "copyBufferToTexture", "resolveQuerySet", "clearBuffer", "label",
-                           "__brand");
+                           "copyTextureToBuffer", "copyBufferToBuffer", "copyBufferToTexture", "resolveQuerySet",
+                           "clearBuffer", "label", "__brand");
 }

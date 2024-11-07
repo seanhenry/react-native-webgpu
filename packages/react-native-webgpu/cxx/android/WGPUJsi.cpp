@@ -20,15 +20,25 @@ using namespace facebook::jsi;
 using namespace facebook::jni;
 using namespace facebook::react;
 
-extern "C" JNIEXPORT jboolean JNICALL Java_com_webgpu_CxxBridge_00024Companion_installJsi(JNIEnv *env, jobject obj,
-                                                                                          jstring threadId,
-                                                                                          jlong jsiRuntimeRef,
-                                                                                          jobject jsCallInvokerHolder,
-                                                                                          jobject bitmapLoaderFactory) {
-  JavaVM *jvm = nullptr;
-  auto status = env->GetJavaVM(&jvm);
-  if (status != JNI_OK) {
-    WGPU_LOG_ERROR("%s:%i env->GetJavaVM failed.", __FILE__, __LINE__);
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
+  // Grab the context ClassLoader of the current thread, if any.
+  JNIEnv *env;
+  if (jvm->GetEnv((void **)&env, JNI_VERSION_1_6) != JNI_OK) {
+    return JNI_ERR;  // JNI version not supported.
+  }
+
+  WGPUAndroidInstance::instance = std::make_unique<WGPUAndroidInstance>(jvm, env);
+
+  return JNI_VERSION_1_6;
+}
+JNIEXPORT void JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
+}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_com_webgpu_CxxBridge_00024Companion_installJsi(
+  JNIEnv *env, jobject obj, jstring threadId, jlong jsiRuntimeRef, jobject jsCallInvokerHolder,
+  jobject bitmapLoaderFactory, jobject exceptionHandler) {
+  if (WGPUAndroidInstance::instance == nullptr) {
+    WGPU_LOG_ERROR("WGPUAndroidInstance was null");
     return false;
   }
 
@@ -38,8 +48,8 @@ extern "C" JNIEXPORT jboolean JNICALL Java_com_webgpu_CxxBridge_00024Companion_i
 
   auto jsiInstance = std::make_shared<JSIInstance>(*runtime, std::make_shared<Thread>(jsCallInvoker));
 
-  WGPUAndroidInstance::instance = std::make_unique<WGPUAndroidInstance>(jvm, env);
   WGPUAndroidInstance::instance->setBitmapLoaderFactory(env, bitmapLoaderFactory);
+  WGPUAndroidInstance::instance->setExceptionHandler(env, exceptionHandler);
 
   installRootJSI(*runtime, jsiInstance);
 

@@ -1,6 +1,7 @@
 #include "WGPUAndroidInstance.h"
 
 #include "JNIBitmapLoaderFactory.h"
+#include "JNIExceptionHandler.h"
 #include "WGPULog.h"
 
 using namespace wgpu;
@@ -14,4 +15,8 @@ void WGPUAndroidInstance::setBitmapLoaderFactory(JNIEnv *env, jobject factory) {
   auto factoryMethodIDs = std::make_shared<JNIImageLoaderFactoryMethodIDs>(env);
   _imageLoaderFactory = std::make_shared<JNIImageLoaderFactory>(factoryMethodIDs, httpMethodIDs, drawableMethodIDs,
                                                                 blobMethodIDs, env->NewGlobalRef(factory));
+}
+
+void WGPUAndroidInstance::setExceptionHandler(JNIEnv *env, jobject handler) {
+  _exceptionHandler = std::make_shared<JNIExceptionHandler>(env, handler);
 }

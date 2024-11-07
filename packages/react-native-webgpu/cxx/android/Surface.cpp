@@ -3,6 +3,7 @@
 #include <jsi/jsi.h>
 
 #include "JSIInstance.h"
+#include "WGPUAndroidInstance.h"
 
 using namespace wgpu;
 using namespace facebook::jsi;
@@ -66,13 +67,23 @@ static void wgpuChoreographerFrameCallback(long frameTimeNanos, void *data) {
 
   std::swap(callbackData->animationCallbacks, callbackData->animationCallbacksForProcessing);
 
-  auto &runtime = callbackData->jsiInstance->runtime;
-  auto performance = runtime.global().getPropertyAsObject(runtime, "performance");
-  auto now =
-    performance.getPropertyAsFunction(runtime, "now").callWithThis(runtime, performance, nullptr, 0).asNumber();
+  try {
+    auto &runtime = callbackData->jsiInstance->runtime;
+    auto performance = runtime.global().getPropertyAsObject(runtime, "performance");
+    auto now =
+      performance.getPropertyAsFunction(runtime, "now").callWithThis(runtime, performance, nullptr, 0).asNumber();
 
-  for (auto &callback : callbackData->animationCallbacksForProcessing) {
-    callback.call(runtime, now);
+    for (auto &callback : callbackData->animationCallbacksForProcessing) {
+      callback.call(runtime, now);
+    }
+  } catch (const JSError &ex) {
+    auto env = WGPUAndroidInstance::instance->getMainThreadEnv();
+    std::string message = ex.getMessage() + ", stack:\n" + ex.getStack();
+    WGPUAndroidInstance::instance->getExceptionHandler()->handleException(env, message);
+  } catch (...) {
+    auto env = WGPUAndroidInstance::instance->getMainThreadEnv();
+    std::string message = "An unknown error occurred in requestAnimationFrame callback";
+    WGPUAndroidInstance::instance->getExceptionHandler()->handleException(env, message);
   }
 
   callbackData->animationCallbacksForProcessing.clear();

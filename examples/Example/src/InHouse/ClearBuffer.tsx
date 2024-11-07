@@ -1,6 +1,6 @@
 import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
 import {useControls} from '../Components/controls/react/useControls';
-import {StyleSheet} from 'react-native';
+import {PixelRatio} from 'react-native';
 
 export const ClearBuffer = () => {
   const {gui, Controls} = useControls();
@@ -66,17 +66,19 @@ export const ClearBuffer = () => {
 
     requestAnimationFrame(frame);
   };
+
+  // copyBufferToTexture requires buffers dimensions are multiples of 256
+  const size = 256 / PixelRatio.get();
   return (
     <>
-      <WebGpuView onCreateSurface={onCreateSurface} style={styles.square} />
+      <WebGpuView
+        onCreateSurface={onCreateSurface}
+        style={{
+          width: size,
+          height: size,
+        }}
+      />
       <Controls />
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  square: {
-    width: 256,
-    height: 256,
-  },
-});

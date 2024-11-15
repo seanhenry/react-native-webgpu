@@ -1,4 +1,6 @@
-#!/usr/bin/env bash --login
+#!/usr/bin/env bash
+
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 
 VERSION="$(jq -r '.version' packages/react-native-webgpu/package.json)"
 IOS_DESTINATION="OS=18.0,name=iPhone 16"
@@ -39,15 +41,15 @@ clean_native
 
 pushd ios || exit 1
 bundle exec pod install
-build_ios Debug
-mv build/Build/Products/Debug-iphonesimulator/Example.app "${PRODUCTS_DIR}/Example-Debug-oldarch.app"
+#build_ios Debug
+#mv build/Build/Products/Debug-iphonesimulator/Example.app "${PRODUCTS_DIR}/Example-Debug-oldarch.app"
 build_ios Release
 mv build/Build/Products/Release-iphonesimulator/Example.app "${PRODUCTS_DIR}/Example-Release-oldarch.app"
 popd || exit 1
 
 pushd android || exit 1
-./gradlew assembleDebug -PnewArchEnabled=false
-mv app/build/outputs/apk/debug/app-debug.apk "${PRODUCTS_DIR}/Example-Debug-oldarch.apk"
+#./gradlew assembleDebug -PnewArchEnabled=false
+#mv app/build/outputs/apk/debug/app-debug.apk "${PRODUCTS_DIR}/Example-Debug-oldarch.apk"
 ./gradlew assembleRelease -PnewArchEnabled=false
 mv app/build/outputs/apk/release/app-release.apk "${PRODUCTS_DIR}/Example-Release-oldarch.apk"
 popd || exit 1
@@ -56,15 +58,15 @@ clean_native
 
 pushd ios || exit 1
 RCT_NEW_ARCH_ENABLED=1 bundle exec pod install
-build_ios Debug
-mv build/Build/Products/Debug-iphonesimulator/Example.app "${PRODUCTS_DIR}/Example-Debug-newarch.app"
+#build_ios Debug
+#mv build/Build/Products/Debug-iphonesimulator/Example.app "${PRODUCTS_DIR}/Example-Debug-newarch.app"
 build_ios Release
 mv build/Build/Products/Release-iphonesimulator/Example.app "${PRODUCTS_DIR}/Example-Release-newarch.app"
 popd || exit 1
 
 pushd android || exit 1
-./gradlew assembleDebug -PnewArchEnabled=true
-mv app/build/outputs/apk/debug/app-debug.apk "${PRODUCTS_DIR}/Example-Debug-newarch.apk"
+#./gradlew assembleDebug -PnewArchEnabled=true
+#mv app/build/outputs/apk/debug/app-debug.apk "${PRODUCTS_DIR}/Example-Debug-newarch.apk"
 ./gradlew assembleRelease -PnewArchEnabled=true
 mv app/build/outputs/apk/release/app-release.apk "${PRODUCTS_DIR}/Example-Release-newarch.apk"
 popd || exit 1

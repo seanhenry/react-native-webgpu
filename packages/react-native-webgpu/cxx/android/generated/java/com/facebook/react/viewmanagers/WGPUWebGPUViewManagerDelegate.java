@@ -20,6 +20,12 @@ public class WGPUWebGPUViewManagerDelegate<T extends View, U extends BaseViewMan
   }
   @Override
   public void setProperty(T view, String propName, @Nullable Object value) {
-    super.setProperty(view, propName, value);
+    switch (propName) {
+      case "pollSize":
+        mViewManager.setPollSize(view, value == null ? false : (boolean) value);
+        break;
+      default:
+        super.setProperty(view, propName, value);
+    }
   }
 }

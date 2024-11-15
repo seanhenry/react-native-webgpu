@@ -21,6 +21,8 @@ class WGPUWebGPUViewProps final : public ViewProps {
                       const RawProps &rawProps);
 
 #pragma mark - Props
+
+  bool pollSize{false};
 };
 
 }  // namespace facebook::react

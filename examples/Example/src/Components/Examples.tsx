@@ -105,6 +105,8 @@ const sections: Record<Examples, ListProps<Example>['sections']> = {
         {title: 'ExceedDeviceLimits'},
         {title: 'CWTriangle'},
         {title: 'ClearBuffer'},
+        {title: 'ResizeCanvas'},
+        {title: 'AnimateCanvas'},
       ],
     },
   ],

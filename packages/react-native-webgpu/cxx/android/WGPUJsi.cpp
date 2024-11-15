@@ -10,6 +10,7 @@
 #include "JNIBitmapLoaderFactory.h"
 #include "JSIInstance.h"
 #include "Surface.h"
+#include "SurfaceSize.h"
 #include "SurfacesManager.h"
 #include "WGPUAndroidInstance.h"
 #include "WGPULog.h"
@@ -92,19 +93,12 @@ extern "C" JNIEXPORT jboolean JNICALL Java_com_webgpu_CxxBridge_00024Companion_o
     return false;
   }
 
-  auto width = ANativeWindow_getWidth(window);
-  auto height = ANativeWindow_getHeight(window);
-
-  SurfaceSize surfaceSize = {
-    .pixelWidth = (uint32_t)width,
-    .pixelHeight = (uint32_t)height,
-    .scale = density,
-    .pointWidth = (float)width / density,
-    .pointHeight = (float)height / density,
-  };
+  auto surfaceSize = std::make_shared<PullSurfaceSize>(window, density);
   auto managedSurface = std::make_shared<Surface>(instance, surface, surfaceSize, window);
 
   SurfacesManager::getInstance()->set(uuid, managedSurface);
+
+  ANativeWindow_release(window);
 
   return true;
 }

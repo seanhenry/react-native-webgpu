@@ -105,6 +105,8 @@ EXAMPLES=(
 # 'ExceedDeviceLimits'
  'CWTriangle'
  'ClearBuffer'
+ 'ResizeCanvas'
+ 'AnimateCanvas'
 )
 
 IOS_BUNDLE_ID=react-native-webgpu.example
@@ -141,11 +143,11 @@ for ARCH in "${ARCHS[@]}"; do
 
 done
 
-pushd "${OUT_DIR}" || exit 1
+pushd "${OUT_DIR}"
 
 ../scripts/gen-examples-html.js > "index.html"
 
-popd || exit 1
+popd
 
 echo "Screenshots written to $(pwd)/${OUT_DIR}"
 open "$(pwd)/${OUT_DIR}/index.html"

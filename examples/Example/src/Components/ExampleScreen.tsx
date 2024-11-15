@@ -45,6 +45,8 @@ import {Portal} from '../InHouse/Portal/Portal';
 import {CWTriangle} from '../InHouse/CWTriangle/CWTriangle';
 import {ClearBuffer} from '../InHouse/ClearBuffer';
 import {launchArguments} from '../utils/launchArguments';
+import {ResizeCanvas} from '../InHouse/ResizeCanvas/ResizeCanvas';
+import {AnimateCanvas} from '../InHouse/AnimateCanvas/AnimateCanvas';
 
 export type Examples = 'WebGPUSamples' | 'Three' | 'InHouse';
 
@@ -100,7 +102,9 @@ export type Example =
   | 'AdapterInfo'
   | 'ExceedDeviceLimits'
   | 'CWTriangle'
-  | 'ClearBuffer';
+  | 'ClearBuffer'
+  | 'ResizeCanvas'
+  | 'AnimateCanvas';
 
 const examples: Record<Example, ComponentType> = {
   // BasicGraphics
@@ -155,6 +159,8 @@ const examples: Record<Example, ComponentType> = {
   ExceedDeviceLimits,
   CWTriangle,
   ClearBuffer,
+  ResizeCanvas,
+  AnimateCanvas,
 };
 
 export function ExampleScreen() {

@@ -1,8 +1,4 @@
-import type {
-  ImageBitmap,
-  SurfaceBackedWebGPU,
-  WGPUContext,
-} from '../types/types';
+import type { ImageBitmap, SurfaceBackedWebGPU, WGPUContext } from './types';
 import {
   type ImageSourcePropType,
   type NativeSyntheticEvent,
@@ -12,20 +8,40 @@ import {
 import { useCallback, useEffect, useRef } from 'react';
 import { WGPUWebGPUView } from './native';
 import { styles } from './styles';
-import type { OnCreateSurfaceEvent } from './specs/WebgpuNativeComponent';
+import type { OnCreateSurfaceEvent } from './specs';
 
 export interface OnCreateSurfacePayload extends SurfaceBackedWebGPU {
   createImageBitmap(source: ImageSourcePropType): Promise<ImageBitmap>;
 }
 
 export interface WebGpuViewProps extends ViewProps {
+  /**
+   * iOS only, this is a no-op on Android.
+   *
+   * Set this to true if you want to smoothly animate the size of this view.
+   * This will ensure that the `context` will provide the live `width` and `height`.
+   * Defaults to false because this may have performance implications.
+   *
+   * On Android, this is automatic and doesn't require this flag.
+   */
+  pollSize?: boolean;
+  /**
+   * This callback is called once when the surface is first created and has a non-zero size.
+   * Use this as the entry point for your WebGPU app.
+   * @param payload Contains the WebGPU api, linked to this view.
+   */
   onCreateSurface(
     payload: OnCreateSurfacePayload
   ): Promise<() => void> | (() => void) | Promise<void> | void;
+  /**
+   * A callback used to report an error is one occurs during initialization.
+   * @param error
+   */
   onError?(error: Error): void;
 }
 
 export const WebGpuView = ({
+  pollSize = false,
   onError,
   onCreateSurface,
   ...props
@@ -83,6 +99,7 @@ export const WebGpuView = ({
   return (
     <View {...props}>
       <WGPUWebGPUView
+        pollSize={pollSize}
         onCreateSurface={onCreateSurfaceInternal}
         style={styles.fill}
       />

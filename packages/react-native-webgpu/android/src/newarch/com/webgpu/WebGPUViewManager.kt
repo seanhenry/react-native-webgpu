@@ -20,4 +20,7 @@ class WebGPUViewManager(
   override fun getExportedCustomBubblingEventTypeConstants(): Map<String, Any> {
     return WebGPUViewManagerImpl.getExportedCustomBubblingEventTypeConstants()
   }
+  override fun setPollSize(view: WebGPUView, pollSize: Boolean) {
+    // no-op for Android
+  }
 }

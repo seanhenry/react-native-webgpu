@@ -22,9 +22,10 @@ exec &> "test-package.log"
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 
 PRODUCTS_DIR="$(pwd)/products"
+rm -rf "${PRODUCTS_DIR}"
 mkdir -p "${PRODUCTS_DIR}"
 
-pushd packages/react-native-webgpu || exit 1
+pushd packages/react-native-webgpu
 
 if [[ "$SKIP_PACK" != "1" ]]; then
   print "Packing react-native-webgpu"
@@ -33,15 +34,15 @@ if [[ "$SKIP_PACK" != "1" ]]; then
   npm pack
 fi
 
-popd || exit 1
+popd
 
-pushd examples/Example || exit 1
+pushd examples/Example
 
 function clean_native() {
   print "Cleaning native code"
-  pushd android || exit 1
+  pushd android
   ./gradlew clean
-  popd || exit 1
+  popd
   rm -rf 'ios/Pods' 'ios/build' 'android/build' 'android/app/.cxx' 'android/app/build'
 }
 
@@ -64,7 +65,7 @@ if [[ "$BUILD_OLD_ARCH" == "1" ]]; then
   clean_native
 
   if [[ "$BUILD_IOS" == "1" ]]; then
-    pushd ios || exit 1
+    pushd ios
     print "Installing pods for oldarch"
     bundle exec pod install
     if [[ "$BUILD_DEBUG" == "1" ]]; then
@@ -77,11 +78,11 @@ if [[ "$BUILD_OLD_ARCH" == "1" ]]; then
       build_ios Release
       mv build/Build/Products/Release-iphonesimulator/Example.app "${PRODUCTS_DIR}/Example-Release-oldarch.app"
     fi
-    popd || exit 1
+    popd
   fi
 
   if [[ "$BUILD_ANDROID" == "1" ]]; then
-    pushd android || exit 1
+    pushd android
     if [[ "$BUILD_DEBUG" == "1" ]]; then
       print "Building Android oldarch Debug"
       ./gradlew assembleDebug -PnewArchEnabled=false
@@ -92,7 +93,7 @@ if [[ "$BUILD_OLD_ARCH" == "1" ]]; then
       ./gradlew assembleRelease -PnewArchEnabled=false
       mv app/build/outputs/apk/release/app-release.apk "${PRODUCTS_DIR}/Example-Release-oldarch.apk"
     fi
-    popd || exit 1
+    popd
   fi
 fi
 
@@ -100,7 +101,7 @@ if [[ "$BUILD_NEW_ARCH" == "1" ]]; then
   clean_native
 
   if [[ "$BUILD_IOS" == "1" ]]; then
-    pushd ios || exit 1
+    pushd ios
     print "Installing pods for newarch"
     RCT_NEW_ARCH_ENABLED=1 bundle exec pod install
     if [[ "$BUILD_DEBUG" == "1" ]]; then
@@ -113,11 +114,11 @@ if [[ "$BUILD_NEW_ARCH" == "1" ]]; then
       build_ios Release
       mv build/Build/Products/Release-iphonesimulator/Example.app "${PRODUCTS_DIR}/Example-Release-newarch.app"
     fi
-    popd || exit 1
+    popd
   fi
 
   if [[ "$BUILD_ANDROID" == "1" ]]; then
-    pushd android || exit 1
+    pushd android
     if [[ "$BUILD_DEBUG" == "1" ]]; then
       print "Building Android newarch Debug"
       ./gradlew assembleDebug -PnewArchEnabled=true
@@ -128,10 +129,10 @@ if [[ "$BUILD_NEW_ARCH" == "1" ]]; then
       ./gradlew assembleRelease -PnewArchEnabled=true
       mv app/build/outputs/apk/release/app-release.apk "${PRODUCTS_DIR}/Example-Release-newarch.apk"
     fi
-    popd || exit 1
+    popd
   fi
 fi
 
-popd || exit 1
+popd
 
 print "Products moved to ${PRODUCTS_DIR}"

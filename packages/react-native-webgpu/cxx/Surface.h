@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "JSIInstance.h"
+#include "SurfaceSize.h"
 #include "WGPUWrappers.h"
 #include "webgpu.h"
 
@@ -32,34 +33,28 @@ typedef struct WGPUSurfaceCallbackData {
 
 namespace wgpu {
 
-typedef struct SurfaceSize {
-  uint32_t pixelWidth;
-  uint32_t pixelHeight;
-  float scale;
-  float pointWidth;
-  float pointHeight;
-} SurfaceSize;
-
 class Surface : public std::enable_shared_from_this<Surface> {
  public:
 #ifdef ANDROID
-  explicit Surface(WGPUInstance wgpuInstance, WGPUSurface wgpuSurface, SurfaceSize size, ANativeWindow *window)
-    : _wgpuInstance(wgpuInstance), _wgpuSurface(wgpuSurface), _size(size), _window(window) {}
+  explicit Surface(WGPUInstance wgpuInstance, WGPUSurface wgpuSurface, std::shared_ptr<PullSurfaceSize> surfaceSize,
+                   ANativeWindow *window)
+    : _wgpuInstance(wgpuInstance), _wgpuSurface(wgpuSurface), _window(window), _surfaceSize(surfaceSize) {
+    ANativeWindow_acquire(window);
+  }
 #else
-  explicit Surface(WGPUInstance wgpuInstance, WGPUSurface wgpuSurface, SurfaceSize size)
-    : _wgpuInstance(wgpuInstance), _wgpuSurface(wgpuSurface), _size(size) {}
+  explicit Surface(WGPUInstance wgpuInstance, WGPUSurface wgpuSurface, std::shared_ptr<PushSurfaceSize> surfaceSize)
+    : _wgpuInstance(wgpuInstance), _wgpuSurface(wgpuSurface), _surfaceSize(surfaceSize) {}
 #endif
   ~Surface();
   inline WGPUSurface getWGPUSurface() { return _wgpuSurface; }
   inline WGPUInstance getWGPUInstance() { return _wgpuInstance; }
   inline std::weak_ptr<AdapterWrapper> getUnownedWGPUAdapter() { return _unownedWGPUAdapter; }
   inline void setAdapter(const std::shared_ptr<AdapterWrapper> &adapter) { _unownedWGPUAdapter = adapter; }
-  inline void setSize(SurfaceSize size) { _size = size; }
-  inline uint32_t getPixelWidth() { return _size.pixelWidth; }
-  inline uint32_t getPixelHeight() { return _size.pixelHeight; }
-  inline float getScale() { return _size.scale; }
-  inline float getPointWidth() { return _size.pointWidth; }
-  inline float getPointHeight() { return _size.pointHeight; }
+  inline uint32_t getPixelWidth() { return _surfaceSize->getPixelWidth(); }
+  inline uint32_t getPixelHeight() { return _surfaceSize->getPixelHeight(); }
+  inline float getScale() { return _surfaceSize->getScale(); }
+  inline float getPointWidth() { return _surfaceSize->getPointWidth(); }
+  inline float getPointHeight() { return _surfaceSize->getPointHeight(); }
   void requestAnimationFrame(Function fn);
   void createTimer(std::shared_ptr<JSIInstance> jsiInstance);
   void invalidateTimer();
@@ -68,13 +63,14 @@ class Surface : public std::enable_shared_from_this<Surface> {
   WGPUInstance _wgpuInstance = nullptr;
   WGPUSurface _wgpuSurface = nullptr;
   std::weak_ptr<AdapterWrapper> _unownedWGPUAdapter;
-  SurfaceSize _size;
 #ifdef ANDROID
   ANativeWindow *_window = nullptr;
   AChoreographer *_choreographer = nullptr;
   WGPUSurfaceCallbackData _callbackData;
+  std::shared_ptr<PullSurfaceSize> _surfaceSize;
 #else
   void *_timer = nullptr;
+  std::shared_ptr<PushSurfaceSize> _surfaceSize;
 #endif
 };
 

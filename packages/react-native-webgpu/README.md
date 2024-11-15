@@ -70,9 +70,7 @@ const config = {
 ```json
 {
   "include": [
-    "node_modules/react-native-webgpu/types/webGpuTypes.d.ts",
-    "node_modules/react-native-webgpu/types/globals.d.ts",
-    "node_modules/react-native-webgpu/types/wgsl.d.ts"
+    "node_modules/react-native-webgpu/lib/typescript/react-native-webgpu.d.ts"
   ]
 }
 ```
@@ -255,12 +253,29 @@ export function HelloTriangle() {
 
 </details>
 
-## Experimental thread support
+## Resizing WebGpuView
 
-Thread support is only available with the new architecture and bridgeless mode.
+If you expect `WebGpuView` to change size, you need to call `context.configure()` whenever the size changes.
 
-Enable on iOS by adding this to the top of your `Podfile`:
-
+```typescript
+function frame() {
+  if (context.width !== previousWidth || context.height !== previousHeight) {
+    context.configure({device, format});
+  }
+  previousWidth = context.width;
+  previousHeight = context.height;
+  
+  const framebuffer = context.getCurrentTexture(); // Now returns updated texture
+  // ...
+}
 ```
-$WGPUEnableThreads = true
+
+### Animating the size
+
+If you want to smoothly change the size of `WebGpuView`, set the `pollSize` prop to `true`. This only affects iOS and
+polls the surface size every frame to ensure it is correct. Setting this to `true` on Android has no effect because 
+animations are supported without polling the size.
+
+```typescript jsx
+<WebGpuView onCreateSurface={onCreateSurface} pollSize />
 ```

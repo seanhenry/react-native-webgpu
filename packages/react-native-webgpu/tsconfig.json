@@ -1,9 +1,7 @@
 {
   "compilerOptions": {
     "rootDir": ".",
-    "outDir": "lib",
     "declaration": true,
-    "declarationDir": "lib/typescript",
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "esModuleInterop": true,

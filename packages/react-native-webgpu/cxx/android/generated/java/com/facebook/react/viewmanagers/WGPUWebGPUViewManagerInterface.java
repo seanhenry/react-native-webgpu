@@ -12,5 +12,5 @@ package com.facebook.react.viewmanagers;
 import android.view.View;
 
 public interface WGPUWebGPUViewManagerInterface<T extends View> {
-  // No props
+  void setPollSize(T view, boolean value);
 }

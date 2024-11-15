@@ -8,6 +8,7 @@ export type OnCreateSurfaceEvent = {
 };
 
 export interface WebgpuNativeComponentProps extends ViewProps {
+  pollSize: boolean;
   onCreateSurface: DirectEventHandler<OnCreateSurfaceEvent>;
 }
 

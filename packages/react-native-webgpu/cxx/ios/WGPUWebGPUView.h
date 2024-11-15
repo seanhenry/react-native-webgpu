@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface WGPUWebGPUView : UIView
 #endif
 
+@property(nonatomic) BOOL pollSize;
 @property(nonatomic, copy) RCTBubblingEventBlock onCreateSurface;
 @property(nonatomic, copy) NSString *uuid;
 - (CAMetalLayer *)metalLayer;

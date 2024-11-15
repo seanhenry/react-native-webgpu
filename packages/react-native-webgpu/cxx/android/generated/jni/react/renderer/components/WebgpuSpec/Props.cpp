@@ -17,8 +17,8 @@ namespace facebook::react {
 
 WGPUWebGPUViewProps::WGPUWebGPUViewProps(const PropsParserContext &context, const WGPUWebGPUViewProps &sourceProps,
                                          const RawProps &rawProps)
-  : ViewProps(context, sourceProps, rawProps)
+  : ViewProps(context, sourceProps, rawProps),
 
-{}
+    pollSize(convertRawProp(context, rawProps, "pollSize", sourceProps.pollSize, {false})) {}
 
 }  // namespace facebook::react

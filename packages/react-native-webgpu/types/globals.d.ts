@@ -14,41 +14,11 @@ declare global {
     createImageBitmap(source: ImageResolvedAssetSource): Promise<ImageBitmap>;
     getSurfaceBackedWebGPU(uuid: string): SurfaceBackedWebGPU;
     getHeadlessWebGPU(uuid: string): HeadlessWebGPU;
-    experimental: WGPUExperimental;
   };
 
   var reactNativeWebGPU: {
     createImageBitmap(source: ImageSourcePropType): Promise<ImageBitmap>;
     getSurfaceBackedWebGPU(uuid: string): SurfaceBackedWebGPU;
     getHeadlessWebGPU(uuid: string): HeadlessWebGPU;
-    experimental: WGPUExperimental;
-  };
-
-  var reactNativeWebGPUThreads: {
-    spawn(input: ThreadInput): void;
-    attachSurface(input: AttachSurfaceInput): void;
-  };
-
-  var reactNativeWebGPUThreadsInstance: {
-    onAttachSurface?: OnAttachSurfacePayload | null;
-    getContext(): ThreadInstanceContext;
   };
 }
-
-type ThreadInput = {
-  bundleId: string;
-  threadId: string;
-};
-
-type AttachSurfaceInput = {
-  uuid: string;
-  threadId: string;
-};
-
-type OnAttachSurfacePayload = {
-  uuid: string;
-};
-
-type ThreadInstanceContext = {
-  threadId: string;
-};

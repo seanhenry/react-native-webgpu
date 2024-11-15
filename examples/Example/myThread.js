@@ -1,4 +1,5 @@
 import {installWithThreadId} from 'react-native-webgpu';
+import {installWithThreadId as installExperimentalWithThreadId} from 'react-native-webgpu-experimental';
 import triangleVertWGSL from './src/WebGPUSamples/shaders/triangle.vert.wgsl';
 import redFragWGSL from './src/WebGPUSamples/shaders/red.frag.wgsl';
 
@@ -76,6 +77,6 @@ global.reactNativeWebGPUThreadsInstance.onAttachSurface = ({uuid}) => {
   run(webGPU);
 };
 
-installWithThreadId(
-  global.reactNativeWebGPUThreadsInstance.getContext().threadId,
-);
+const threadId = global.reactNativeWebGPUThreadsInstance.getContext().threadId;
+installWithThreadId(threadId);
+installExperimentalWithThreadId(threadId);

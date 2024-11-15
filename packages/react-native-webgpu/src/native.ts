@@ -37,5 +37,3 @@ export const installWithThreadId = (threadId: string) => {
 };
 
 export const install = () => installWithThreadId('__js');
-
-export const { ENABLE_THREADS } = NativeWebgpuModule.getConstants();

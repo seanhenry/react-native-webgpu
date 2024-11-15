@@ -18,7 +18,7 @@ export const Video = () => {
     const adapter = await navigator.gpu.requestAdapter();
     const device = await adapter!.requestDevice();
     const preferredFormat = navigator.gpu.getPreferredCanvasFormat();
-    const videoPlayer = reactNativeWebGPU.experimental.makeVideoPlayer(
+    const videoPlayer = reactNativeWebGPUExperimental.makeVideoPlayer(
       'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_2MB.mp4',
     );
     context.configure({

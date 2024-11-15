@@ -7,7 +7,6 @@ set(RN_DIR "${REACT_ANDROID_DIR}/..")
 
 find_package(fbjni REQUIRED CONFIG)
 find_package(ReactAndroid REQUIRED CONFIG)
-find_library(zlib z)
 
 file(GLOB SHARED_SOURCE "${WGPU_DIR}/cxx/*.cpp")
 file(GLOB ANDROID_SOURCE "${WGPU_DIR}/cxx/android/*.cpp")
@@ -34,9 +33,7 @@ target_link_libraries(react-native-webgpu
         ReactAndroid::jsi
         ReactAndroid::reactnativejni
         fbjni::fbjni
-        log
-        z
-        mediandk)
+        log)
 
 target_compile_options(react-native-webgpu PRIVATE
         -DLOG_TAG=\"ReactNative\"

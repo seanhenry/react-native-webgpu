@@ -1,4 +1,4 @@
-#ifdef WGPU_ENABLE_THREADS
+#ifdef RCT_NEW_ARCH_ENABLED
 
 #include "ThreadManager.h"
 #import <React/RCTBundleURLProvider.h>

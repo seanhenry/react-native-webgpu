@@ -3,13 +3,11 @@
 #include <sstream>
 
 #include "AdapterHostObject.h"
-#include "Compression.h"
 #include "ConstantConversion.h"
 #include "ContextHostObject.h"
 #include "CreateImageBitmap.h"
 #include "Surface.h"
 #include "SurfacesManager.h"
-#include "VideoPlayer.h"
 #include "WGPUJsiUtils.h"
 #include "WGPUPromise.h"
 
@@ -138,10 +136,6 @@ void wgpu::installRootJSI(Runtime &runtime, std::shared_ptr<JSIInstance> jsiInst
   webgpu.setProperty(runtime, "createImageBitmap", createImageBitmap(runtime, jsiInstance));
   webgpu.setProperty(runtime, "getSurfaceBackedWebGPU", std::move(getSurfaceBackedWebGPU));
   webgpu.setProperty(runtime, "getHeadlessWebGPU", std::move(getHeadlessWebGPU));
-  auto experimental = Object(runtime);
-  experimental.setProperty(runtime, "inflate", inflate(runtime));
-  experimental.setProperty(runtime, "makeVideoPlayer", VideoPlayer::factory(runtime));
-  webgpu.setProperty(runtime, "experimental", std::move(experimental));
 
   runtime.global().setProperty(runtime, "__reactNativeWebGPU", std::move(webgpu));
 }

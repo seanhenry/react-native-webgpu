@@ -2,10 +2,56 @@
 
 set -e
 
-IOS_APP="products/Example-Release-oldarch.app"
-ANDROID_APP="products/Example-Release-oldarch.apk"
-IOS_BUNDLE_ID=react-native-webgpu.example
-ANDROID_BUNDLE_ID=com.example
+ARCHS=(newarch oldarch)
+RUN_IOS=1
+RUN_ANDROID=1
+
+function print_usage() {
+  echo "Usage: $0 [-haino]"
+  echo ""
+  echo "Options:"
+  echo "  -h  Show this help message"
+  echo "  -a  Android only"
+  echo "  -i  iOS only"
+  echo "  -n  New architecture only"
+  echo "  -o  Old architecture only"
+}
+
+while getopts "haino" opt; do
+  case $opt in
+    h)
+      print_usage
+      exit 0
+      ;;
+    a)
+      RUN_IOS=0
+      RUN_ANDROID=1
+      ;;
+    i)
+      RUN_IOS=1
+      RUN_ANDROID=0
+      ;;
+    n)
+      ARCHS=(newarch)
+      ;;
+    o)
+      ARCHS=(oldarch)
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      print_usage
+      exit 1
+      ;;
+  esac
+done
+
+if [[ "$RUN_IOS" == "1" && "$RUN_ANDROID" == "1" ]]; then
+  echo "Running iOS and Android on architectures: ${ARCHS[*]}"
+elif [[ "$RUN_IOS" == "1" ]]; then
+  echo "Running iOS on architectures: ${ARCHS[*]}"
+elif [[ "$RUN_ANDROID" == "1" ]]; then
+  echo "Running Android on architectures: ${ARCHS[*]}"
+fi
 
 EXAMPLES=(
  'HelloTriangle'
@@ -61,23 +107,38 @@ EXAMPLES=(
  'ClearBuffer'
 )
 
-rm -rf screenshots
-mkdir -p screenshots/ios screenshots/android
+IOS_BUNDLE_ID=react-native-webgpu.example
+ANDROID_BUNDLE_ID=com.example
+OUT_DIR="screenshots-$(date +"%Y%m%d-%H%M%S")"
+mkdir -p "${OUT_DIR}/ios/newarch" "${OUT_DIR}/ios/oldarch" "${OUT_DIR}/android/newarch" "${OUT_DIR}/android/oldarch"
 
-xcrun simctl install booted "${IOS_APP}"
+for ARCH in "${ARCHS[@]}"; do
+  IOS_APP="products/Example-Release-${ARCH}.app"
+  ANDROID_APP="products/Example-Release-${ARCH}.apk"
 
-for EXAMPLE in "${EXAMPLES[@]}"; do
-  xcrun simctl launch booted "${IOS_BUNDLE_ID}" -example "${EXAMPLE}"
-  sleep 1;
-  xcrun simctl io booted screenshot "screenshots/ios/${EXAMPLE}.png"
-  xcrun simctl terminate booted "${IOS_BUNDLE_ID}"
+  if [[ "$RUN_IOS" == "1" ]]; then
+    xcrun simctl install booted "${IOS_APP}"
+
+    for EXAMPLE in "${EXAMPLES[@]}"; do
+      xcrun simctl launch booted "${IOS_BUNDLE_ID}" -example "${EXAMPLE}"
+      sleep 1;
+      xcrun simctl io booted screenshot "${OUT_DIR}/ios/${ARCH}/${EXAMPLE}.png"
+      xcrun simctl terminate booted "${IOS_BUNDLE_ID}"
+    done
+  fi
+
+  if [[ "$RUN_ANDROID" == "1" ]]; then
+
+    adb install -r "${ANDROID_APP}"
+
+    for EXAMPLE in "${EXAMPLES[@]}"; do
+      adb shell am start -n "${ANDROID_BUNDLE_ID}/.MainActivity" --es "example" "${EXAMPLE}"
+      sleep 1;
+      adb exec-out screencap -p > "${OUT_DIR}/android/${ARCH}/${EXAMPLE}.png"
+      adb shell am force-stop "${ANDROID_BUNDLE_ID}"
+    done
+  fi
+
 done
 
-adb install -r "${ANDROID_APP}"
-
-for EXAMPLE in "${EXAMPLES[@]}"; do
-  adb shell am start -n "${ANDROID_BUNDLE_ID}/.MainActivity" --es "example" "${EXAMPLE}"
-  sleep 1;
-  adb exec-out screencap -p > "screenshots/android/${EXAMPLE}.png"
-  adb shell am force-stop "${ANDROID_BUNDLE_ID}"
-done
+echo "Screenshots written to $(pwd)/${OUT_DIR}"

@@ -1,8 +1,13 @@
-// WARNING: Example/android/app/build/generated/autolinking/autolinking.json needs deleting as it caches these values
+// WARNING: Android builds cache these values so delete build directories when changing these values.
+// `rm -rf android/build android/app/build`
+// See android/build/generated/autolinking/autolinking.json for cached information about cxx
+// See android/app/build/generated/autolinking/.../PackageList.java for cached information about java
 module.exports = {
   dependency: {
     platforms: {
       android: {
+        packageImportPath: 'import com.webgpu.WebgpuPackage;',
+        packageInstance: 'new WebgpuPackage()',
         // CMakeLists.txt for specs because `includesGeneratedCode: true`
         cmakeListsPath: '../cxx/android/generated/jni/CMakeLists.txt',
         // CMakeLists.txt for our cxx code

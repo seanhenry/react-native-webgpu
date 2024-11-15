@@ -5,6 +5,7 @@
     "packages/react-native-webgpu/wgsl-babel-transformer",
     "packages/react-native-webgpu/metro",
     "packages/react-native-webgpu-three",
+    "packages/react-native-webgpu-experimental",
     "examples/Example"
   ],
   "packageManager": "yarn@3.6.4"

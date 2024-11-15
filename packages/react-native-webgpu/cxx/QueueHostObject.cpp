@@ -6,7 +6,6 @@
 #include "ImageBitmapHostObject.h"
 #include "Mixins.h"
 #include "TextureHostObject.h"
-#include "VideoPlayer.h"
 #include "WGPUContext.h"
 #include "WGPUConversions.h"
 #include "WGPUDefaults.h"

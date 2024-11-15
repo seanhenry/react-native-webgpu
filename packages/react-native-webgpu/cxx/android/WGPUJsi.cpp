@@ -20,44 +20,40 @@ using namespace facebook::jsi;
 using namespace facebook::jni;
 using namespace facebook::react;
 
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
-  // Grab the context ClassLoader of the current thread, if any.
+extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
   JNIEnv *env;
   if (jvm->GetEnv((void **)&env, JNI_VERSION_1_6) != JNI_OK) {
-    return JNI_ERR;  // JNI version not supported.
+    return JNI_ERR;
   }
 
   WGPUAndroidInstance::instance = std::make_unique<WGPUAndroidInstance>(jvm, env);
 
   return JNI_VERSION_1_6;
 }
-JNIEXPORT void JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {
+extern "C" JNIEXPORT void JNICALL JNI_OnUnLoad(JavaVM *jvm, void *reserved) {}
+
+extern "C" JNIEXPORT void JNICALL Java_com_webgpu_CxxBridge_00024Companion_setJavaModules(JNIEnv *env, jobject obj,
+                                                                                          jobject bitmapLoaderFactory,
+                                                                                          jobject exceptionHandler) {
+  if (WGPUAndroidInstance::instance == nullptr) {
+    WGPU_LOG_ERROR("WGPUAndroidInstance was null");
+    return;
+  }
+
+  WGPUAndroidInstance::instance->setBitmapLoaderFactory(env, bitmapLoaderFactory);
+  WGPUAndroidInstance::instance->setExceptionHandler(env, exceptionHandler);
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_com_webgpu_CxxBridge_00024Companion_installJsi(
   JNIEnv *env, jobject obj, jstring threadId, jlong jsiRuntimeRef, jobject jsCallInvokerHolder,
   jobject bitmapLoaderFactory, jobject exceptionHandler) {
-  if (WGPUAndroidInstance::instance == nullptr) {
-    WGPU_LOG_ERROR("WGPUAndroidInstance was null");
-    return false;
-  }
-
   auto runtime{reinterpret_cast<Runtime *>(jsiRuntimeRef)};
   auto jsCallInvoker{alias_ref<CallInvokerHolder::javaobject>{reinterpret_cast<CallInvokerHolder::javaobject>(
                        jsCallInvokerHolder)} -> cthis()->getCallInvoker()};
 
   auto jsiInstance = std::make_shared<JSIInstance>(*runtime, std::make_shared<Thread>(jsCallInvoker));
 
-  WGPUAndroidInstance::instance->setBitmapLoaderFactory(env, bitmapLoaderFactory);
-  WGPUAndroidInstance::instance->setExceptionHandler(env, exceptionHandler);
-
   installRootJSI(*runtime, jsiInstance);
-
-#ifdef WGPU_ENABLE_THREADS
-  std::string threadIdStr = threadId.UTF8String;
-  ThreadManager::getInstance()->setJSIInstance(jsiInstance, threadIdStr);
-  ThreadManager::getInstance()->installJsi(runtime);
-#endif
 
   return true;
 }
@@ -134,8 +130,11 @@ extern "C" JNIEXPORT void JNICALL Java_com_webgpu_CxxBridge_00024Companion_onSur
 namespace facebook::react {
 WGPUJsi::WGPUJsi(std::shared_ptr<CallInvoker> jsInvoker) : NativeWebgpuModuleCxxSpec(std::move(jsInvoker)) {}
 
-jsi::Object WGPUJsi::getConstants(Runtime &rt) { return Object(rt); }
-bool WGPUJsi::installWithThreadId(Runtime &rt, String threadId) { return true; }
+bool WGPUJsi::installWithThreadId(Runtime &runtime, String threadId) {
+  auto jsiInstance = std::make_shared<JSIInstance>(runtime, std::make_shared<Thread>(jsInvoker_));
+  installRootJSI(runtime, jsiInstance);
+  return true;
+}
 }  // namespace facebook::react
 
 #endif

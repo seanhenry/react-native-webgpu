@@ -14,12 +14,6 @@ using namespace facebook::react;
 using namespace facebook::jsi;
 using namespace wgpu;
 
-#ifdef WGPU_ENABLE_THREADS
-const BOOL WGPUEnableThreads = YES;
-#else
-const BOOL WGPUEnableThreads = NO;
-#endif
-
 @interface RCTBridge ()
 - (std::shared_ptr<CallInvoker>)jsCallInvoker;
 @end
@@ -30,12 +24,6 @@ RCT_EXPORT_MODULE(WGPUJsi)
 
 @synthesize bridge;
 @synthesize moduleRegistry;
-
-- (NSDictionary *)constantsToExport {
-  return @{
-    @"ENABLE_THREADS" : @(WGPUEnableThreads),
-  };
-}
 
 RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSNumber *, installWithThreadId:(NSString *)threadId) {
   RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
@@ -51,12 +39,6 @@ RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSNumber *, installWithThreadId:(NSString *)
 
   installRootJSI(runtime, jsiInstance);
 
-#ifdef WGPU_ENABLE_THREADS
-  std::string threadIdStr = threadId.UTF8String;
-  ThreadManager::getInstance()->setJSIInstance(jsiInstance, threadIdStr);
-  ThreadManager::getInstance()->installJsi(runtime);
-#endif
-
   return @(YES);
 }
 
@@ -65,10 +47,6 @@ RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSNumber *, installWithThreadId:(NSString *)
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
   (const facebook::react::ObjCTurboModule::InitParams &)params {
   return std::make_shared<facebook::react::NativeWebgpuModuleSpecJSI>(params);
-}
-
-- (facebook::react::ModuleConstants<JS::NativeWebgpuModule::Constants::Builder>)getConstants {
-  return [self constantsToExport];
 }
 
 #endif

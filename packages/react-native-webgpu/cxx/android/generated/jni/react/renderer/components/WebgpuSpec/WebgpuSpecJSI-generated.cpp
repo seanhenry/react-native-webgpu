@@ -11,10 +11,6 @@
 
 namespace facebook::react {
 
-static jsi::Value __hostFunction_NativeWebgpuModuleCxxSpecJSI_getConstants(jsi::Runtime &rt, TurboModule &turboModule,
-                                                                           const jsi::Value *args, size_t count) {
-  return static_cast<NativeWebgpuModuleCxxSpecJSI *>(&turboModule)->getConstants(rt);
-}
 static jsi::Value __hostFunction_NativeWebgpuModuleCxxSpecJSI_installWithThreadId(jsi::Runtime &rt,
                                                                                   TurboModule &turboModule,
                                                                                   const jsi::Value *args,
@@ -26,7 +22,6 @@ static jsi::Value __hostFunction_NativeWebgpuModuleCxxSpecJSI_installWithThreadI
 
 NativeWebgpuModuleCxxSpecJSI::NativeWebgpuModuleCxxSpecJSI(std::shared_ptr<CallInvoker> jsInvoker)
   : TurboModule("WGPUJsi", jsInvoker) {
-  methodMap_["getConstants"] = MethodMetadata{0, __hostFunction_NativeWebgpuModuleCxxSpecJSI_getConstants};
   methodMap_["installWithThreadId"] =
     MethodMetadata{1, __hostFunction_NativeWebgpuModuleCxxSpecJSI_installWithThreadId};
 }

@@ -26,6 +26,7 @@
     "react-native-safe-area-context": "^4.11.0",
     "react-native-screens": "^3.34.0",
     "react-native-webgpu": "workspace:*",
+    "react-native-webgpu-experimental": "workspace:*",
     "react-native-webgpu-three": "workspace:*",
     "teapot": "^1.0.0",
     "three": "0.166.1",

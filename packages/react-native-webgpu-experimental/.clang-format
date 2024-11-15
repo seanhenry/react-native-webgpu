@@ -1,0 +1,13 @@
+BasedOnStyle: Google
+IndentWidth: 2
+ContinuationIndentWidth: 2
+ObjCBlockIndentWidth: 2
+BracedInitializerIndentWidth: 2
+ConstructorInitializerIndentWidth: 2
+PPIndentWidth: 2
+UseTab: Never
+ColumnLimit: 120
+LambdaBodyIndentation: OuterScope
+Macros:
+- WGPU_FUNC_FROM_HOST_FUNC(x, y, z)=fn([]()
+- RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(x, y)=- (x)y

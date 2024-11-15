@@ -3917,6 +3917,7 @@ __metadata:
     react-native-safe-area-context: ^4.11.0
     react-native-screens: ^3.34.0
     react-native-webgpu: "workspace:*"
+    react-native-webgpu-experimental: "workspace:*"
     react-native-webgpu-three: "workspace:*"
     react-test-renderer: 18.3.1
     teapot: ^1.0.0
@@ -11426,6 +11427,34 @@ __metadata:
   checksum: 28c1f6e556c318ffcbd79d153b9612cc8a0b8d8b70f909d3cde2fd6d0586a7c151a449e57400d8996f4ee6c3b5140c5c4f643a427e974f6dc573b2bcd8eb7356
   languageName: node
   linkType: hard
+
+"react-native-webgpu-experimental@workspace:*, react-native-webgpu-experimental@workspace:packages/react-native-webgpu-experimental":
+  version: 0.0.0-use.local
+  resolution: "react-native-webgpu-experimental@workspace:packages/react-native-webgpu-experimental"
+  dependencies:
+    "@commitlint/config-conventional": ^17.0.2
+    "@react-native/eslint-config": ^0.73.1
+    "@release-it/conventional-changelog": ^5.0.0
+    "@types/jest": ^29.5.5
+    "@types/react": ^18.2.44
+    commitlint: ^17.0.2
+    del-cli: ^5.1.0
+    eslint: ^8.51.0
+    eslint-config-prettier: ^9.0.0
+    eslint-plugin-prettier: ^5.0.1
+    jest: ^29.7.0
+    prettier: ^3.0.3
+    react-native: "*"
+    react-native-builder-bob: ^0.27.0
+    release-it: ^15.0.0
+    turbo: ^1.10.7
+    typescript: ^5.2.2
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+    react-native-webgpu: "workspace:*"
+  languageName: unknown
+  linkType: soft
 
 "react-native-webgpu-metro@workspace:packages/react-native-webgpu/metro":
   version: 0.0.0-use.local

@@ -18,4 +18,5 @@ __MACOSX
 /node_modules
 **/react-native-webgpu-*.tgz
 /products
-/screenshots
+/screenshots-*
+/test-package.log

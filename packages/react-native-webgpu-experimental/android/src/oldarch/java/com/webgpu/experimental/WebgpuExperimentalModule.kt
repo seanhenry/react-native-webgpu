@@ -1,17 +1,15 @@
-package com.webgpu
+package com.webgpu.experimental
 
 import android.util.Log
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.modules.blob.BlobModule
 import java.lang.ref.WeakReference
 
 
-class WebgpuModule(reactContext: ReactApplicationContext) :
+class WebgpuExperimentalModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
   private val weakReactContext = WeakReference(reactContext)
-  private val exceptionHandler = ExceptionHandler(reactContext)
 
   override fun getName(): String {
     return NAME
@@ -28,11 +26,9 @@ class WebgpuModule(reactContext: ReactApplicationContext) :
 
       val jsiRuntimeRef = context.javaScriptContextHolder!!.get()
       val jsCallInvokerHolder = context.catalystInstance.jsCallInvokerHolder
-      val blobModule = context.getNativeModule(BlobModule::class.java)
-      val factory = BitmapLoaderFactory(blobModule, context)
-      return CxxBridge.installJsi(threadId, jsiRuntimeRef, jsCallInvokerHolder, factory, exceptionHandler)
+      return CxxBridge.installJsi(threadId, jsiRuntimeRef, jsCallInvokerHolder)
     } catch (exception: Exception) {
-      Log.e(NAME, "Failed to initialize react-native-webgpu", exception)
+      Log.e(NAME, "Failed to initialize react-native-webgpu-experimental", exception)
       return false
     }
   }
@@ -44,6 +40,6 @@ class WebgpuModule(reactContext: ReactApplicationContext) :
   }
 
   companion object {
-    const val NAME = "WGPUJsi"
+    const val NAME = "WGPUExperimentalJsi"
   }
 }

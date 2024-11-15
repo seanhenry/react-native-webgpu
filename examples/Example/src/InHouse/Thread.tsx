@@ -1,4 +1,4 @@
-import {ThreadWebGpuView} from 'react-native-webgpu';
+import {ThreadWebGpuView} from 'react-native-webgpu-experimental';
 import {globalStyles} from '../Components/globalStyles';
 import {Square} from '../Components/Square';
 

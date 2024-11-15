@@ -1,9 +1,12 @@
-import { type NativeSyntheticEvent, View, type ViewProps } from 'react-native';
+import {
+  type NativeSyntheticEvent,
+  View,
+  type ViewProps,
+  StyleSheet,
+} from 'react-native';
 import { useCallback, useEffect, useRef } from 'react';
-import type { WGPUContext } from '../types/types';
+import type { WGPUContext, OnCreateSurfaceEvent } from 'react-native-webgpu';
 import { ENABLE_THREADS, WGPUWebGPUView } from './native';
-import { styles } from './styles';
-import type { OnCreateSurfaceEvent } from './specs/WebgpuNativeComponent';
 
 export interface ThreadWebGpuViewProps extends ViewProps {
   threadId: string;
@@ -77,3 +80,10 @@ export const ThreadWebGpuView = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  fill: {
+    width: '100%',
+    height: '100%',
+  },
+});

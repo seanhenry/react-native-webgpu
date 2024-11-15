@@ -97,7 +97,7 @@ export const VolumeRendering = () => {
         `${WEB_GPU_SAMPLES_BASE_URL}/assets/img/volume/t1_icbm_normal_1mm_pn0_rf0_180x216x180_uint8_1x1.bin-gz`,
       );
       const arrayBuffer = await response.arrayBuffer();
-      const decompressed = reactNativeWebGPU.experimental.inflate(arrayBuffer);
+      const decompressed = reactNativeWebGPUExperimental.inflate(arrayBuffer);
       const byteArray = new Uint8Array(decompressed);
 
       volumeTexture = device.createTexture({

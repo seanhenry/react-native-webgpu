@@ -16,14 +16,8 @@ import com.facebook.proguard.annotations.DoNotStrip;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.common.build.ReactBuildConfig;
 import com.facebook.react.turbomodule.core.interfaces.TurboModule;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public abstract class NativeWebgpuModuleSpec extends ReactContextBaseJavaModule implements TurboModule {
   public static final String NAME = "WGPUJsi";
@@ -35,32 +29,6 @@ public abstract class NativeWebgpuModuleSpec extends ReactContextBaseJavaModule 
   @Override
   public @Nonnull String getName() {
     return NAME;
-  }
-
-  protected abstract Map<String, Object> getTypedExportedConstants();
-
-  @Override
-  @DoNotStrip
-  public final @Nullable Map<String, Object> getConstants() {
-    Map<String, Object> constants = getTypedExportedConstants();
-    if (ReactBuildConfig.DEBUG || ReactBuildConfig.IS_INTERNAL_BUILD) {
-      Set<String> obligatoryFlowConstants = new HashSet<>(Arrays.asList(
-          "ENABLE_THREADS"
-      ));
-      Set<String> optionalFlowConstants = new HashSet<>();
-      Set<String> undeclaredConstants = new HashSet<>(constants.keySet());
-      undeclaredConstants.removeAll(obligatoryFlowConstants);
-      undeclaredConstants.removeAll(optionalFlowConstants);
-      if (!undeclaredConstants.isEmpty()) {
-        throw new IllegalStateException(String.format("Native Module Flow doesn't declare constants: %s", undeclaredConstants));
-      }
-      undeclaredConstants = obligatoryFlowConstants;
-      undeclaredConstants.removeAll(constants.keySet());
-      if (!undeclaredConstants.isEmpty()) {
-        throw new IllegalStateException(String.format("Native Module doesn't fill in constants: %s", undeclaredConstants));
-      }
-    }
-    return constants;
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)

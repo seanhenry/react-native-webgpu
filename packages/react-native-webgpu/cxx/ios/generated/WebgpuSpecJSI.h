@@ -19,7 +19,6 @@ class JSI_EXPORT NativeWebgpuModuleCxxSpecJSI : public TurboModule {
   NativeWebgpuModuleCxxSpecJSI(std::shared_ptr<CallInvoker> jsInvoker);
 
  public:
-  virtual jsi::Object getConstants(jsi::Runtime &rt) = 0;
   virtual bool installWithThreadId(jsi::Runtime &rt, jsi::String threadId) = 0;
 };
 
@@ -41,12 +40,6 @@ class JSI_EXPORT NativeWebgpuModuleCxxSpec : public TurboModule {
     Delegate(T *instance, std::shared_ptr<CallInvoker> jsInvoker)
       : NativeWebgpuModuleCxxSpecJSI(std::move(jsInvoker)), instance_(instance) {}
 
-    jsi::Object getConstants(jsi::Runtime &rt) override {
-      static_assert(bridging::getParameterCount(&T::getConstants) == 1,
-                    "Expected getConstants(...) to have 1 parameters");
-
-      return bridging::callFromJs<jsi::Object>(rt, &T::getConstants, jsInvoker_, instance_);
-    }
     bool installWithThreadId(jsi::Runtime &rt, jsi::String threadId) override {
       static_assert(bridging::getParameterCount(&T::installWithThreadId) == 2,
                     "Expected installWithThreadId(...) to have 2 parameters");

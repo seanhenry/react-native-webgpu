@@ -12,15 +12,6 @@
 
 namespace facebook::react {
 
-static facebook::jsi::Value __hostFunction_NativeWebgpuModuleSpecJSI_getConstants(facebook::jsi::Runtime &rt,
-                                                                                  TurboModule &turboModule,
-                                                                                  const facebook::jsi::Value *args,
-                                                                                  size_t count) {
-  static jmethodID cachedMethodId = nullptr;
-  return static_cast<JavaTurboModule &>(turboModule)
-    .invokeJavaMethod(rt, ObjectKind, "getConstants", "()Ljava/util/Map;", args, count, cachedMethodId);
-}
-
 static facebook::jsi::Value __hostFunction_NativeWebgpuModuleSpecJSI_installWithThreadId(
   facebook::jsi::Runtime &rt, TurboModule &turboModule, const facebook::jsi::Value *args, size_t count) {
   static jmethodID cachedMethodId = nullptr;
@@ -30,7 +21,6 @@ static facebook::jsi::Value __hostFunction_NativeWebgpuModuleSpecJSI_installWith
 
 NativeWebgpuModuleSpecJSI::NativeWebgpuModuleSpecJSI(const JavaTurboModule::InitParams &params)
   : JavaTurboModule(params) {
-  methodMap_["getConstants"] = MethodMetadata{0, __hostFunction_NativeWebgpuModuleSpecJSI_getConstants};
   methodMap_["installWithThreadId"] = MethodMetadata{1, __hostFunction_NativeWebgpuModuleSpecJSI_installWithThreadId};
 }
 

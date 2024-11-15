@@ -1,0 +1,179 @@
+import com.android.Version
+
+import java.nio.file.Paths
+
+buildscript {
+  // Buildscript is evaluated before everything else so we can't use getExtOrDefault
+  def kotlin_version = rootProject.ext.has("kotlinVersion") ? rootProject.ext.get("kotlinVersion") : project.properties["WebgpuExperimental_kotlinVersion"]
+
+  repositories {
+    google()
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath "com.android.tools.build:gradle:7.2.1"
+    // noinspection DifferentKotlinGradleVersion
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+  }
+}
+
+def isNewArchitectureEnabled() {
+  return rootProject.hasProperty("newArchEnabled") && rootProject.getProperty("newArchEnabled") == "true"
+}
+
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+
+if (isNewArchitectureEnabled()) {
+  apply plugin: "com.facebook.react"
+}
+
+def getExtOrDefault(name) {
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["WebgpuExperimental_" + name]
+}
+
+def getExtOrIntegerDefault(name) {
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["WebgpuExperimental_" + name]).toInteger()
+}
+
+static def supportsNamespace() {
+  def parsed = Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')
+  def major = parsed[0].toInteger()
+  def minor = parsed[1].toInteger()
+
+  // Namespace support was added in 7.3.0
+  return (major == 7 && minor >= 3) || major >= 8
+}
+
+static def findReactNativeAndroidDir(baseDir) {
+  def basePath = baseDir.toPath().normalize()
+  while (basePath) {
+    def rnAndroidPath = Paths.get(basePath.toString(), "node_modules", "react-native", "ReactAndroid")
+    if (rnAndroidPath.toFile().exists()) {
+      return rnAndroidPath.toString()
+    }
+    basePath = basePath.getParent()
+  }
+  throw new GradleException("react-native-webgpu-experimental: Failed to find node_modules path")
+}
+
+def rnAndroidDir = findReactNativeAndroidDir(projectDir)
+
+tasks.register('deleteCmakeCache') {
+  doFirst {
+    delete "${projectDir}/.cxx"
+  }
+}
+
+android {
+  if (supportsNamespace()) {
+    namespace "com.webgpu.experimental"
+
+    sourceSets {
+      main {
+        manifest.srcFile "src/main/AndroidManifestNew.xml"
+      }
+    }
+  }
+
+  compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
+
+  defaultConfig {
+    minSdkVersion getExtOrIntegerDefault("minSdkVersion")
+    targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
+    buildConfigField("boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString())
+    sourceSets {
+      main {
+        if (isNewArchitectureEnabled()) {
+          java.srcDirs += ['src/newarch/java']
+          java.srcDirs += ['../cxx/android/generated/java']
+        } else {
+          java.srcDirs += ['src/oldarch/java']
+        }
+      }
+    }
+
+    if (!isNewArchitectureEnabled()) {
+      externalNativeBuild {
+        cmake {
+          arguments "-DANDROID_STL=c++_shared", "-DANDROID_TOOLCHAIN=clang", "-DREACT_ANDROID_DIR=${rnAndroidDir}", "-DIS_OLD_ARCHITECTURE=1"
+        }
+      }
+    }
+  }
+
+  buildFeatures {
+    buildConfig true
+    if (!isNewArchitectureEnabled()) {
+      prefab true
+    }
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+    }
+  }
+
+  lintOptions {
+    disable "GradleCompatible"
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+
+  if (!isNewArchitectureEnabled()) {
+    externalNativeBuild {
+      cmake {
+        path "CMakeLists.txt"
+      }
+    }
+
+    packagingOptions {
+      // https://developer.android.com/build/releases/past-releases/agp-4-0-0-release-notes#cmake-imported-targets
+      excludes = [
+              "META-INF",
+              "META-INF/**",
+              "**/libc++_shared.so",
+              "**/libfbjni.so",
+              "**/libjsi.so",
+              "**/libfolly_json.so",
+              "**/libfolly_runtime.so",
+              "**/libglog.so",
+              "**/libhermes.so",
+              "**/libhermes-executor-debug.so",
+              "**/libhermes_executor.so",
+              "**/libreactnativejni.so",
+              "**/libturbomodulejsijni.so",
+              "**/libreact_nativemodule_core.so",
+              "**/libjscexecutor.so",
+      ]
+    }
+  }
+}
+
+repositories {
+  mavenCentral()
+  google()
+}
+
+def kotlin_version = getExtOrDefault("kotlinVersion")
+
+dependencies {
+  // For < 0.71, this will be from the local maven repo
+  // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
+  //noinspection GradleDynamicVersion
+  implementation "com.facebook.react:react-native:+"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  implementation project(':react-native-webgpu')
+}
+
+tasks.configureEach { task ->
+  // C++ clean
+  if (task.name.contains("clean")) {
+    task.dependsOn(deleteCmakeCache)
+  }
+}

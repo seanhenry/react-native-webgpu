@@ -6,6 +6,7 @@
     "src/**/*.d.ts",
     "../../node_modules/react-native-webgpu/types/webGpuTypes.d.ts",
     "../../node_modules/react-native-webgpu/types/globals.d.ts",
-    "../../node_modules/react-native-webgpu/types/wgsl.d.ts"
+    "../../node_modules/react-native-webgpu/types/wgsl.d.ts",
+    "../../node_modules/react-native-webgpu-experimental/types/globals.d.ts"
   ]
 }

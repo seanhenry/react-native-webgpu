@@ -11,8 +11,9 @@ class CxxBridge {
       System.loadLibrary("react-native-webgpu")
     }
 
-    external fun installJsi(threadId: String, jsiRuntimeRef: Long, jsCallInvokerHolder: CallInvokerHolder, factory: BitmapLoaderFactory?, exceptionHandler: ExceptionHandler): Boolean
+    external fun installJsi(threadId: String, jsiRuntimeRef: Long, jsCallInvokerHolder: CallInvokerHolder): Boolean
     external fun onSurfaceCreated(surface: Surface, uuid: String, density: Float): Boolean
     external fun onSurfaceDestroyed(uuid: String)
+    external fun setJavaModules(factory: BitmapLoaderFactory?, exceptionHandler: ExceptionHandler)
   }
 }

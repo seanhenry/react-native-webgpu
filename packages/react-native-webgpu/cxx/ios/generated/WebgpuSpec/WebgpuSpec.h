@@ -30,39 +30,9 @@
 #import <optional>
 #import <vector>
 
-namespace JS {
-namespace NativeWebgpuModule {
-struct Constants {
-  struct Builder {
-    struct Input {
-      RCTRequired<bool> ENABLE_THREADS;
-    };
-
-    /** Initialize with a set of values */
-    Builder(const Input i);
-    /** Initialize with an existing Constants */
-    Builder(Constants i);
-    /** Builds the object. Generally used only by the infrastructure. */
-    NSDictionary *buildUnsafeRawValue() const { return _factory(); };
-
-   private:
-    NSDictionary * (^_factory)(void);
-  };
-
-  static Constants fromUnsafeRawValue(NSDictionary *const v) { return {v}; }
-  NSDictionary *unsafeRawValue() const { return _v; }
-
- private:
-  Constants(NSDictionary *const v) : _v(v) {}
-  NSDictionary *_v;
-};
-}  // namespace NativeWebgpuModule
-}  // namespace JS
 @protocol NativeWebgpuModuleSpec <RCTBridgeModule, RCTTurboModule>
 
 - (NSNumber *)installWithThreadId:(NSString *)threadId;
-- (facebook::react::ModuleConstants<JS::NativeWebgpuModule::Constants::Builder>)constantsToExport;
-- (facebook::react::ModuleConstants<JS::NativeWebgpuModule::Constants::Builder>)getConstants;
 
 @end
 namespace facebook::react {
@@ -74,15 +44,5 @@ class JSI_EXPORT NativeWebgpuModuleSpecJSI : public ObjCTurboModule {
   NativeWebgpuModuleSpecJSI(const ObjCTurboModule::InitParams &params);
 };
 }  // namespace facebook::react
-inline JS::NativeWebgpuModule::Constants::Builder::Builder(const Input i)
-  : _factory(^{
-      NSMutableDictionary *d = [NSMutableDictionary new];
-      auto ENABLE_THREADS = i.ENABLE_THREADS.get();
-      d[@"ENABLE_THREADS"] = @(ENABLE_THREADS);
-      return d;
-    }) {}
-inline JS::NativeWebgpuModule::Constants::Builder::Builder(Constants i)
-  : _factory(^{
-      return i.unsafeRawValue();
-    }) {}
+
 #endif  // WebgpuSpec_H

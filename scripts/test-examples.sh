@@ -141,4 +141,11 @@ for ARCH in "${ARCHS[@]}"; do
 
 done
 
+pushd "${OUT_DIR}" || exit 1
+
+../scripts/gen-examples-html.js > "index.html"
+
+popd || exit 1
+
 echo "Screenshots written to $(pwd)/${OUT_DIR}"
+open "$(pwd)/${OUT_DIR}/index.html"

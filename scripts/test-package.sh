@@ -30,7 +30,7 @@ pushd packages/react-native-webgpu
 if [[ "$SKIP_PACK" != "1" ]]; then
   print "Packing react-native-webgpu"
   rm -f "react-native-webgpu-${VERSION}.tgz"
-  yarn tsc
+  yarn build
   npm pack
 fi
 
@@ -60,6 +60,9 @@ if [[ "$SKIP_PACK" != "1" ]]; then
   rm -f "$(yarn config get globalFolder)"/cache/react-native-webgpu*
   yarn add "../../packages/react-native-webgpu/react-native-webgpu-${VERSION}.tgz"
 fi
+
+yarn typecheck
+yarn lint
 
 if [[ "$BUILD_OLD_ARCH" == "1" ]]; then
   clean_native

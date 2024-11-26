@@ -105,7 +105,6 @@ for RN_VERSION in "${RN_VERSIONS[@]}"; do
     "@types/lodash@^4.17.7" \
     "@types/three@^0.166.0" \
     "fast-text-encoding@^1.0.6" \
-    "react-native-device-info@^14.0.1" \
     "${PACKAGES_DIR}/react-native-webgpu-experimental" \
     "${PACKAGES_DIR}/react-native-webgpu-three" \
     "${PACKAGES_DIR}/react-native-webgpu/react-native-webgpu-${VERSION}.tgz"

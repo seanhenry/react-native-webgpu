@@ -69,21 +69,38 @@ const config = {
 
 ### Android emulator ⚠️
 
-The Android emulator doesn't support hardware acceleration for Vulkan so it will crash when attempting to use the Vulkan backend. To work around it, you can set the `backends` prop to GL when using the emulator.
+The Android emulator does not support Vulkan unless your machine is capable of running it. It is recommended to develop using an Android device, but you can try a workaround if that's not available to you.
 
-```typescript jsx
-<WebGpuView backends={Platform.OS === android && isEmulator ? Backends.GL : Backends.All} />
+<details>
+<summary>Expand for macOS workaround</summary>
+
+If you're using a Mac and you need to run your app on an emulator you can try [these experimental apis](https://developer.android.com/studio/releases/emulator#29.0.6-vulkan-macos).
+
+### 1. Launch emulator with experimental Vulkan support
+
+```shell
+ANDROID_EMU_VK_ICD=moltenvk emulator "@My_AVD_Name"
 ```
 
-Or you can set the default `backends` prop globally.
+### 2. Force the surface to choose Vulkan backend
+
+- Either set the `backends` prop:
+
+```typescript jsx
+<WebGpuView backends={Platform.OS === android ? Backends.Vulkan : Backends.All} />
+```
+
+- Or set the default `backends` prop globally.
 
 ```typescript
 defaultBackends.current =
-  Platform.OS === 'android' && isEmulator ? Backends.GL : Backends.All;
+  Platform.OS === 'android' ? Backends.Vulkan : Backends.All;
 ```
 
-Please note, it's not safe to assume that the GL backend will be identical to Vulkan.
-Be sure to test fully on all backends used in production.
+Please note, it's not safe to assume that the emulated backend will be identical to a real one.
+Be sure to test fully on devices before releasing to production.
+
+</details>
 
 ## Converting a WebGPU sample
 

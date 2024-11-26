@@ -123,8 +123,8 @@ EXAMPLES=(
 )
 
 ROOT="$(pwd)"
-IOS_BUNDLE_ID=react-native-webgpu.example
-ANDROID_BUNDLE_ID=com.example
+IOS_BUNDLE_ID="org.reactjs.native.example.Example"
+ANDROID_BUNDLE_ID="com.example"
 OUT_DIR="${ROOT}/.test/screenshots/$(date +"%Y%m%d-%H%M%S")"
 PRODUCTS_DIR="${ROOT}/.test/products"
 

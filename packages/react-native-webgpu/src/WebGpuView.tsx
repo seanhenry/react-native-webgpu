@@ -23,18 +23,6 @@ export interface WebGpuViewProps extends ViewProps {
    * Default is `Backends.All`. Choose which backends to allow for this surface.
    *
    * Note that this is only used once during surface initialisation.
-   *
-   * ### Android emulator
-   *
-   * The Android emulator doesn't support hardware acceleration for Vulkan so it will crash when attempting to use the Vulkan backend.
-   * To work around it, you can set the `backends` prop to GL when using the emulator.
-   *
-   * ```
-   * <WebGpuView backends={Platform.OS === android && isEmulator ? Backends.GL : Backends.All} />
-   * ```
-   *
-   * Please note, it's not safe to assume that the GL backend will be identical to Vulkan.
-   * Be sure to test fully on all backends used in production.
    */
   backends?: number;
   /**

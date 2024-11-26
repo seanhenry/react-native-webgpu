@@ -8,7 +8,7 @@
 using namespace facebook::react;
 using namespace facebook::jsi;
 
-#ifdef RCT_NEW_ARCH_ENABLED
+#if RCT_NEW_ARCH_ENABLED && DEBUG
 const BOOL WGPU_ENABLE_THREADS = YES;
 #else
 const BOOL WGPU_ENABLE_THREADS = NO;

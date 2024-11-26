@@ -1,9 +1,9 @@
 import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
-import {globalStyles} from '../../Components/globalStyles';
 import {mat4, vec3} from 'wgpu-matrix';
-import {WebIO, type Accessor} from '@gltf-transform/core';
+import {type Accessor, WebIO} from '@gltf-transform/core';
 import modelGltf from './portal.gltf';
 import portalWgsl from './portal.wgsl';
+import {StyleSheet} from 'react-native';
 
 export const Portal = () => {
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
@@ -253,10 +253,15 @@ export const Portal = () => {
     };
     requestAnimationFrame(frame);
   };
-  return (
-    <WebGpuView onCreateSurface={onCreateSurface} style={globalStyles.fill} />
-  );
+  return <WebGpuView onCreateSurface={onCreateSurface} style={styles.view} />;
 };
+
+const styles = StyleSheet.create({
+  view: {
+    width: '100%',
+    aspectRatio: 0.5,
+  },
+});
 
 type Scene = {
   positionBuffer: GPUBuffer;

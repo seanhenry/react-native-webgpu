@@ -12,17 +12,30 @@ VERSION="$(jq -r '.version' packages/react-native-webgpu/package.json)"
 IOS_DESTINATION="OS=18.0,name=iPhone 16"
 
 set -e
+set -E
 
-exec 3>&1
 function print() {
   echo "$1" >&3
 }
-exec &> "test-package.log"
+
+LOG_FILE="$(pwd)/test-package.log"
+exec 3>&1 4>&2
+exec &> "${LOG_FILE}"
+
+function on_err() {
+  exec 1>&3 2>&4
+  tail "${LOG_FILE}"
+  echo "See full log at ${LOG_FILE}"
+}
+
+trap on_err ERR
 
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 
 PRODUCTS_DIR="$(pwd)/products"
-rm -rf "${PRODUCTS_DIR}"
+if [ -d "${PRODUCTS_DIR}" ]; then
+  mv "${PRODUCTS_DIR}" ~/.Trash/"products-$(date +"%Y-%m-%d-%H.%M.%S")"
+fi
 mkdir -p "${PRODUCTS_DIR}"
 
 pushd packages/react-native-webgpu
@@ -30,7 +43,6 @@ pushd packages/react-native-webgpu
 if [[ "$SKIP_PACK" != "1" ]]; then
   print "Packing react-native-webgpu"
   rm -f "react-native-webgpu-${VERSION}.tgz"
-  yarn build
   npm pack
 fi
 
@@ -61,6 +73,7 @@ if [[ "$SKIP_PACK" != "1" ]]; then
   yarn add "../../packages/react-native-webgpu/react-native-webgpu-${VERSION}.tgz"
 fi
 
+print "Checking for TS errors"
 yarn typecheck
 yarn lint
 

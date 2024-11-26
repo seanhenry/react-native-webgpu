@@ -8,11 +8,15 @@ You can run the examples using the instructions below.
 git clone https://github.com/seanhenry/react-native-webgpu.git
 ```
 
-2. Compile react-native-webgpu
+2. Compile workspace packages
 
 ```bash
 cd packages/react-native-webgpu
-yarn tsc
+yarn build
+cd ../..
+
+cd packages/react-native-webgpu-experimental
+yarn build
 cd ../..
 ```
 

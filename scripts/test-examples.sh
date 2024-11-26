@@ -127,6 +127,28 @@ IOS_BUNDLE_ID="org.reactjs.native.example.Example"
 ANDROID_BUNDLE_ID="com.example"
 OUT_DIR="${ROOT}/.test/screenshots/$(date +"%Y%m%d-%H%M%S")"
 PRODUCTS_DIR="${ROOT}/.test/products"
+LOG_FILE="${OUT_DIR}/examples.log"
+
+mkdir -p "${OUT_DIR}"
+
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+RESET=$(tput sgr0)
+
+function print() {
+  echo "$1" >&3
+}
+
+function print_success() {
+  echo "${GREEN}${1}${RESET}" >&3
+}
+
+function print_failure() {
+  echo "${RED}${1}${RESET}" >&3
+}
+
+exec 3>&1 4>&2
+exec &> "${LOG_FILE}"
 
 for RN_VERSION in "${RN_VERSIONS[@]}"; do
   mkdir -p "${OUT_DIR}/${RN_VERSION}/ios/newarch" \
@@ -145,7 +167,14 @@ for RN_VERSION in "${RN_VERSIONS[@]}"; do
         xcrun simctl launch booted "${IOS_BUNDLE_ID}" -example "${EXAMPLE}"
         sleep 1;
         xcrun simctl io booted screenshot "${OUT_DIR}/${RN_VERSION}/ios/${ARCH}/${EXAMPLE}.png"
+        set +e
         xcrun simctl terminate booted "${IOS_BUNDLE_ID}"
+        if [ $? -ne 0 ]; then
+          print_failure "[Failed] ios-${RN_VERSION}-${ARCH} ${EXAMPLE}"
+        else
+          print_success "[Screenshot] ios-${RN_VERSION}-${ARCH} ${EXAMPLE}"
+        fi
+        set -e
       done
     fi
 
@@ -157,7 +186,17 @@ for RN_VERSION in "${RN_VERSIONS[@]}"; do
         adb shell am start -n "${ANDROID_BUNDLE_ID}/.MainActivity" --es "example" "${EXAMPLE}"
         sleep 1;
         adb exec-out screencap -p > "${OUT_DIR}/${RN_VERSION}/android/${ARCH}/${EXAMPLE}.png"
+
+        set +e
+        adb shell pidof "${ANDROID_BUNDLE_ID}"
+        if [ $? -ne 0 ]; then
+          print_failure "[Failed] android-${RN_VERSION}-${ARCH} ${EXAMPLE}"
+        else
+          print_success "[Screenshot] android-${RN_VERSION}-${ARCH} ${EXAMPLE}"
+        fi
+
         adb shell am force-stop "${ANDROID_BUNDLE_ID}"
+        set -e
       done
     fi
 
@@ -170,5 +209,5 @@ pushd "${OUT_DIR}"
 
 popd
 
-echo "Screenshots written to ${OUT_DIR}"
+print "Screenshots written to ${OUT_DIR}"
 open "${OUT_DIR}/index.html"

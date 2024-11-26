@@ -125,7 +125,7 @@ for RN_VERSION in "${RN_VERSIONS[@]}"; do
   print "Changing node_modules relative path in tsconfig.json"
   sed -i '' 's/..\/..\/node_modules/node_modules/g' "tsconfig.json"
 
-  print "Settings android minSdkVersion to 27"
+  print "Setting android minSdkVersion to 27"
   sed -E -i '' 's/minSdkVersion = [0-9]+/minSdkVersion = 27/' "android/build.gradle"
 
   print "Installing ruby dependencies"

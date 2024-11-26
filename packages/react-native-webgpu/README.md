@@ -69,6 +69,17 @@ const config = {
 }
 ```
 
+- Android only, make sure the `minSdkVersion` is `>=27`
+
+```
+// android/build.gradle
+buildscript {
+  ext {
+    minSdkVersion = 27
+  }
+}
+```
+
 ### Android emulator ⚠️
 
 The Android emulator does not support Vulkan unless your machine is capable of running it. It is recommended to develop using an Android device, but you can try a workaround if that's not available to you.

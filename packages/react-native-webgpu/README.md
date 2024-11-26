@@ -35,7 +35,9 @@ cd ..
 
 ```javascript
 // src/index.js
-import 'react-native-webgpu';
+import {install} from 'react-native-webgpu';
+
+install();
 ```
 
 - Add to `metro.config.js` to support `.wgsl` files

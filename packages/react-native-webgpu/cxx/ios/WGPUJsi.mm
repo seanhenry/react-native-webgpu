@@ -6,7 +6,6 @@
 #import "InstallRootJSI.h"
 #import "JSIInstance.h"
 #import "React/RCTBridge+Private.h"
-#import "ThreadManager.h"
 #import "WGPUObjCInstance.h"
 #import "webgpu.h"
 

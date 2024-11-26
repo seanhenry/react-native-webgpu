@@ -17,4 +17,8 @@ class WebGPUViewManager(
   fun setPollSize(view: WebGPUView, pollSize: Boolean) {
     // no-op for Android
   }
+  @ReactProp(name = "backends")
+  fun setBackends(view: WebGPUView, backends: Int?) {
+    view.backends = backends
+  }
 }

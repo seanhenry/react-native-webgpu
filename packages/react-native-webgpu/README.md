@@ -67,6 +67,24 @@ const config = {
 }
 ```
 
+### Android emulator ⚠️
+
+The Android emulator doesn't support hardware acceleration for Vulkan so it will crash when attempting to use the Vulkan backend. To work around it, you can set the `backends` prop to GL when using the emulator.
+
+```typescript jsx
+<WebGpuView backends={Platform.OS === android && isEmulator ? Backends.GL : Backends.All} />
+```
+
+Or you can set the default `backends` prop globally.
+
+```typescript
+defaultBackends.current =
+  Platform.OS === 'android' && isEmulator ? Backends.GL : Backends.All;
+```
+
+Please note, it's not safe to assume that the GL backend will be identical to Vulkan.
+Be sure to test fully on all backends used in production.
+
 ## Converting a WebGPU sample
 
 There are a few small changes you will need to make to get your project working. Below is a simple example taken from [WebGPU Samples](https://webgpu.github.io/webgpu-samples/?sample=helloTriangle). It has `TODO:`s marking the places we need to change.
@@ -294,6 +312,7 @@ Xcode Instruments and Android Studio Profiler are strongly recommended for profi
 
 The library is built and tested against 0.75 and 0.76. Other versions may work but are not supported.
 
-Only Hermes is supported.
+| react-native-webgpu | react-native | Hermes | JSC | New architecture | Old architecture |
+|---------------------|--------------|--------|-----|------------------|------------------|
+| 0.1.0               | 0.75-0.76    | ✅      | ❌   | ✅                | ✅                |
 
-Both old and new architectures are supported.

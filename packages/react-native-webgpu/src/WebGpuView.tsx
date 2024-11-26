@@ -8,13 +8,35 @@ import {
 import { useCallback, useEffect, useRef } from 'react';
 import { WGPUWebGPUView } from './native';
 import { styles } from './styles';
-import type { OnCreateSurfaceEvent } from './specs';
+import { Backends, type OnCreateSurfaceEvent } from './specs';
+
+export const defaultBackends = { current: Backends.All };
 
 export interface OnCreateSurfacePayload extends SurfaceBackedWebGPU {
   createImageBitmap(source: ImageSourcePropType): Promise<ImageBitmap>;
 }
 
 export interface WebGpuViewProps extends ViewProps {
+  /**
+   * Android only, this is a no-op on iOS.
+   *
+   * Default is `Backends.All`. Choose which backends to allow for this surface.
+   *
+   * Note that this is only used once during surface initialisation.
+   *
+   * ### Android emulator
+   *
+   * The Android emulator doesn't support hardware acceleration for Vulkan so it will crash when attempting to use the Vulkan backend.
+   * To work around it, you can set the `backends` prop to GL when using the emulator.
+   *
+   * ```
+   * <WebGpuView backends={Platform.OS === android && isEmulator ? Backends.GL : Backends.All} />
+   * ```
+   *
+   * Please note, it's not safe to assume that the GL backend will be identical to Vulkan.
+   * Be sure to test fully on all backends used in production.
+   */
+  backends?: number;
   /**
    * iOS only, this is a no-op on Android.
    *
@@ -41,6 +63,7 @@ export interface WebGpuViewProps extends ViewProps {
 }
 
 export const WebGpuView = ({
+  backends = defaultBackends.current,
   pollSize = false,
   onError,
   onCreateSurface,
@@ -99,6 +122,7 @@ export const WebGpuView = ({
   return (
     <View {...props}>
       <WGPUWebGPUView
+        backends={backends}
         pollSize={pollSize}
         onCreateSurface={onCreateSurfaceInternal}
         style={styles.fill}

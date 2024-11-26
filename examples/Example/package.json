@@ -20,6 +20,7 @@
     "lodash": "^4.17.21",
     "react": "*",
     "react-native": "*",
+    "react-native-device-info": "^14.0.1",
     "react-native-gesture-handler": "^2.21.2",
     "react-native-launch-arguments": "^4.0.2",
     "react-native-reanimated": "^3.16.2",
@@ -53,6 +54,7 @@
     "eslint": "*",
     "jest": "*",
     "prettier": "*",
+    "prettier-eslint": "^16.3.0",
     "react-test-renderer": "*",
     "typescript": "*"
   },

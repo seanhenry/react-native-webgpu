@@ -23,4 +23,7 @@ class WebGPUViewManager(
   override fun setPollSize(view: WebGPUView, pollSize: Boolean) {
     // no-op for Android
   }
+  override fun setBackends(view: WebGPUView, backends: Int) {
+    view.backends = backends
+  }
 }

@@ -15,6 +15,7 @@
 #include "WGPUAndroidInstance.h"
 #include "WGPULog.h"
 #include "webgpu.h"
+#include "wgpu.h"
 
 using namespace wgpu;
 using namespace facebook::jsi;
@@ -60,7 +61,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_com_webgpu_CxxBridge_00024Companion_i
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_com_webgpu_CxxBridge_00024Companion_onSurfaceCreated(
-  JNIEnv *env, jobject obj, jobject inSurface, jstring inUUID, jfloat density) {
+  JNIEnv *env, jobject obj, jobject inSurface, jstring inUUID, jfloat density, jint backends) {
   ANativeWindow *window = ANativeWindow_fromSurface(env, inSurface);
   const char *uuidChars = env->GetStringUTFChars(inUUID, nullptr);
   std::string uuid(uuidChars);
@@ -77,7 +78,20 @@ extern "C" JNIEXPORT jboolean JNICALL Java_com_webgpu_CxxBridge_00024Companion_o
     .nextInChain = (const WGPUChainedStruct *)&descriptorFromNativeWindow,
   };
 
-  WGPUInstance instance = wgpuCreateInstance(nullptr);
+  auto extras = (const WGPUInstanceExtras){
+    .backends = (uint32_t)backends,
+    .flags = WGPUInstanceFlag_Default,
+    .dx12ShaderCompiler = WGPUDx12Compiler_Undefined,
+    .gles3MinorVersion = WGPUGles3MinorVersion_Automatic,
+    .dxilPath = nullptr,
+    .dxcPath = nullptr,
+  };
+  extras.chain.sType = (WGPUSType)WGPUSType_InstanceExtras;
+  auto instanceDescriptor = (const WGPUInstanceDescriptor){
+    .nextInChain = (const WGPUChainedStruct *)&extras,
+  };
+
+  WGPUInstance instance = wgpuCreateInstance(&instanceDescriptor);
 
   if (instance == nullptr) {
     WGPU_LOG_ERROR("%s:%i wgpuCreateInstance() failed.", __FILE__, __LINE__);

@@ -15,6 +15,7 @@ import java.util.UUID
 
 class WebGPUView : SurfaceView, SurfaceHolder.Callback2 {
   private val uuid = UUID.randomUUID().toString()
+  var backends: Int? = null
 
   constructor(context: Context) : super(context)
   constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -31,7 +32,7 @@ class WebGPUView : SurfaceView, SurfaceHolder.Callback2 {
     holder.let { h ->
 
       val density = context.resources.displayMetrics.density
-      val result = CxxBridge.onSurfaceCreated(h.surface, uuid, density)
+      val result = CxxBridge.onSurfaceCreated(h.surface, uuid, density, backends ?: 0)
       if (result) {
         setWillNotDraw(false)
 

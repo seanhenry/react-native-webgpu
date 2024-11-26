@@ -1,6 +1,6 @@
 #ifdef RCT_NEW_ARCH_ENABLED
 
-#import "generated/WebgpuExperimentalSpec/WebgpuExperimentalSpec.h"
+#import <WebgpuExperimentalSpec/WebgpuExperimentalSpec.h>
 
 @interface WGPUExperimentalJsi : NSObject <NativeWebgpuExperimentalModuleSpec>
 #else

@@ -53,20 +53,43 @@ function show(str) {
 }
 </script>
   `);
-  const sections = [
-    { id: "iOS-oldarch", dir: "ios/oldarch" },
-    { id: "iOS-newarch", dir: "ios/newarch" },
-    { id: "Android-oldarch", dir: "android/oldarch" },
-    { id: "Android-newarch", dir: "android/newarch" },
-  ];
+  const rnVersions = ["0.75.4", "0.76.2"];
+  const sections = (
+    await Promise.allSettled(
+      rnVersions
+        .flatMap((version) => {
+          const versionId = version.replaceAll(".", "-");
+          return [
+            { id: `v${versionId}-ios-oldarch`, dir: `${version}/ios/oldarch` },
+            { id: `v${versionId}-ios-newarch`, dir: `${version}/ios/newarch` },
+            {
+              id: `v${versionId}-android-oldarch`,
+              dir: `${version}/android/oldarch`,
+            },
+            {
+              id: `v${versionId}-android-newarch`,
+              dir: `${version}/android/newarch`,
+            },
+          ];
+        })
+        .map(async (section) => ({
+          ...section,
+          files: await fs.readdir(section.dir),
+        }))
+    )
+  )
+    .filter(
+      (result) => result.status === "fulfilled" && result.value.files.length > 0
+    )
+    .map((result) => result.value);
+
   println("<div class='nav'>");
   sections.forEach(({ id }) => {
     println(`<button onClick="show('#${id}')">${id}</button>`);
   });
   println("</div>");
 
-  for (const { id, dir } of sections) {
-    const files = await fs.readdir(dir);
+  for (const { id, dir, files } of sections) {
     println(`<div id="${id}" class="section">`);
     println(`<div class="title">${id}</div>`);
     println(`<div class="items">`);

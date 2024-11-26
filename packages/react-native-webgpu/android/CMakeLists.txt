@@ -27,11 +27,17 @@ set_target_properties(wgpu_native
         PROPERTIES IMPORTED_LOCATION
         "${WGPU_DIR}/bin/${ANDROID_ABI}/libwgpu_native.a")
 
+# Note, REACTNATIVE_MERGED_SO is not defined on old architecture
+if (REACTNATIVE_MERGED_SO OR ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
+    target_link_libraries(react-native-webgpu ReactAndroid::reactnative)
+else ()
+    target_link_libraries(react-native-webgpu ReactAndroid::reactnativejni)
+endif ()
+
 target_link_libraries(react-native-webgpu
         wgpu_native
         android
         ReactAndroid::jsi
-        ReactAndroid::reactnativejni
         fbjni::fbjni
         log)
 

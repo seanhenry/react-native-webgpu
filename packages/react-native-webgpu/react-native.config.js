@@ -8,8 +8,6 @@ module.exports = {
       android: {
         packageImportPath: 'import com.webgpu.WebgpuPackage;',
         packageInstance: 'new WebgpuPackage()',
-        // CMakeLists.txt for specs because `includesGeneratedCode: true`
-        cmakeListsPath: '../cxx/android/generated/jni/CMakeLists.txt',
         // CMakeLists.txt for our cxx code
         cxxModuleCMakeListsPath: './CMakeLists.txt',
         // The same name as add_library in CMakeLists.txt

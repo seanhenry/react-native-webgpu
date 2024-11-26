@@ -170,6 +170,7 @@ vendor/
 /bin
 /android/.cxx
 /android/build
+/android/app/build
 /android/gradle
 /android/gradlew
 /android/gradlew.bat

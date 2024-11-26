@@ -20,7 +20,7 @@ export default function App() {
         <Stack.Navigator
           initialRouteName={launchArguments.example ? 'example' : 'root'}
           screenOptions={{
-            headerBackTitleVisible: false,
+            headerBackButtonDisplayMode: 'minimal',
             headerTintColor: 'black',
           }}>
           <Stack.Screen

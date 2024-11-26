@@ -26,10 +26,16 @@ target_include_directories(react-native-webgpu-experimental PUBLIC
         "${WGPU_DIR}/include"
 )
 
+# Note, REACTNATIVE_MERGED_SO is not defined on old architecture
+if (REACTNATIVE_MERGED_SO OR ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
+    target_link_libraries(react-native-webgpu-experimental ReactAndroid::reactnative)
+else ()
+    target_link_libraries(react-native-webgpu-experimental ReactAndroid::reactnativejni)
+endif ()
+
 target_link_libraries(react-native-webgpu-experimental
         android
         ReactAndroid::jsi
-        ReactAndroid::reactnativejni
         fbjni::fbjni
         log
         z

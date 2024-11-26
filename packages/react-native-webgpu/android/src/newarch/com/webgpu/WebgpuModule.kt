@@ -1,6 +1,5 @@
 package com.webgpu
 
-import com.facebook.fbreact.specs.NativeWebgpuModuleSpec
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.modules.blob.BlobModule
 

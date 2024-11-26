@@ -1,29 +1,21 @@
 # react-native-webgpu
 
-Coming soon. A [WebGPU](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API) port for react native which aims to provide direct access to Metal and Vulkan for iOS and Android, and support for libraries like [Three.js](https://threejs.org).
-
-Interested in this project? Star it in GitHub to show your support.
-
-Other projects:
-
-- [react-native-webgpu-three](../react-native-webgpu-three)
+A [WebGPU](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API) port for react native to provide direct access to Metal and Vulkan for iOS and Android via the WebGPU api.
 
 ## Contents
 
 - [Running the examples](#running-the-examples)
 - [Getting started](#getting-started)
 - [Converting a WebGPU sample](#converting-a-webgpu-sample)
+- [Resizing WebGpuView](#resizing-webgpuview)
+- [Production usage](#production-use)
+- [Supported react-native versions](#supported-react-native-versions)
 
 ## Running the examples
 
-You can find instructions to run the examples [here](../../examples/Example).
+The best way to learn WebGPU is to check out the examples. You can find instructions to run the examples [here](../../examples/Example).
 
 ## Getting started
-
-<details>
-<summary>
-⚠️ Please note that these instructions don't work since this package has not yet been published
-</summary>
 
 - Install packages
 
@@ -75,14 +67,12 @@ const config = {
 }
 ```
 
-</details>
-
 ## Converting a WebGPU sample
 
 There are a few small changes you will need to make to get your project working. Below is a simple example taken from [WebGPU Samples](https://webgpu.github.io/webgpu-samples/?sample=helloTriangle). It has `TODO:`s marking the places we need to change.
 
 <details>
-<summary>Click to expand</summary>
+<summary>Expand to view the code</summary>
 
 ```typescript
 import triangleVertWGSL from '../../shaders/triangle.vert.wgsl';
@@ -164,7 +154,7 @@ requestAnimationFrame(frame);
 Here is a working (TypeScript) example. It has `FIXED:` comments to show where the changes were made.
 
 <details>
-<summary>Click to expand</summary>
+<summary>Expand to view the code</summary>
 
 ```typescript jsx
 import React from 'react';
@@ -257,7 +247,14 @@ export function HelloTriangle() {
 
 If you expect `WebGpuView` to change size, you need to call `context.configure()` whenever the size changes.
 
+<details>
+<summary>Expand to view the code</summary>
+
 ```typescript
+let previousWidth = context.width;
+let previousHeight = context.height;
+// ...
+
 function frame() {
   if (context.width !== previousWidth || context.height !== previousHeight) {
     context.configure({device, format});
@@ -270,6 +267,8 @@ function frame() {
 }
 ```
 
+</details>
+
 ### Animating the size
 
 If you want to smoothly change the size of `WebGpuView`, set the `pollSize` prop to `true`. This only affects iOS and
@@ -279,3 +278,22 @@ animations are supported without polling the size.
 ```typescript jsx
 <WebGpuView onCreateSurface={onCreateSurface} pollSize />
 ```
+
+## Production use
+
+Like any third party code you introduce into your app, ensure that you thoroughly test on your supported platforms.
+
+### Memory
+
+Running loop-based, resource-heavy code in JavaScript environments can be challenging. The library is profiled for memory
+usage, but you will need to test your app to make sure you're not accidentally introducing memory leaks.
+
+Xcode Instruments and Android Studio Profiler are strongly recommended for profiling your app before releasing it to production.
+
+## Supported react-native versions
+
+The library is built and tested against 0.75 and 0.76. Other versions may work but are not supported.
+
+Only Hermes is supported.
+
+Both old and new architectures are supported.

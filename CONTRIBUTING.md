@@ -1,122 +1,59 @@
 # Contributing
 
-Contributions are always welcome, no matter how large or small!
+## Setup
 
-We want this community to be friendly and respectful to each other. Please follow it in all your interactions with the project. Before contributing, please read the [code of conduct](./CODE_OF_CONDUCT.md).
+### Development OS
 
-## Development workflow
+Please note that this project is only run using macOS so scripts will likely not work on other operating systems.
 
-This project is a monorepo managed using [Yarn workspaces](https://yarnpkg.com/features/workspaces). It contains the following packages:
+### Bash
 
-- The library package in the root directory.
-- An example app in the `example/` directory.
+Some scripts may contain feature unavailable to the system version of bash. Install a newer version using Homebrew:
 
-To get started with the project, run `yarn` in the root directory to install the required dependencies for each package:
-
-```sh
-yarn
+```shell
+brew install bash
 ```
 
-> Since the project relies on Yarn workspaces, you cannot use [`npm`](https://github.com/npm/cli) for development.
+## Manually building wgpu dependencies
 
-The [example app](/example/) demonstrates usage of the library. You need to run it to test any changes you make.
+[wgpu-native](https://github.com/gfx-rs/wgpu-native) is the underlying library used for WebGPU.
 
-It is configured to use the local version of the library, so any changes you make to the library's source code will be reflected in the example app. Changes to the library's JavaScript code will be reflected in the example app without a rebuild, but native code changes will require a rebuild of the example app.
+- [Install Rust](https://www.rust-lang.org/tools/install)
+- Install submodules
 
-If you want to use Android Studio or XCode to edit the native code, you can open the `example/android` or `example/ios` directories respectively in those editors. To edit the Objective-C or Swift files, open `example/ios/WebgpuExample.xcworkspace` in XCode and find the source files at `Pods > Development Pods > react-native-webgpu`.
-
-To edit the Java or Kotlin files, open `example/android` in Android studio and find the source files at `react-native-webgpu` under `Android`.
-
-You can use various commands from the root directory to work with the project.
-
-To start the packager:
-
-```sh
-yarn example start
+```shell
+git submodule update --init --recursive
 ```
 
-To run the example app on Android:
+- Build libraries
 
-```sh
-yarn example android
+```shell
+./scripts/build-android.sh
+./scripts/build-ios.sh
 ```
 
-To run the example app on iOS:
+- Copy headers
 
-```sh
-yarn example ios
+```shell
+./scripts/copy-headers.sh
 ```
 
-Make sure your code passes TypeScript and ESLint. Run the following to verify:
+## Formatting native code
 
-```sh
-yarn typecheck
-yarn lint
-```
+Please use `./scripts/format-cxx.sh` to format c++ and Objective-C
 
-To fix formatting errors, run the following:
+## Testing
 
-```sh
-yarn lint --fix
-```
+### Examples
 
-Remember to add tests for your change if possible. Run the unit tests by:
+All `react-native-webgpu` features have been built by providing an example to prove the feature works, and to prevent regressions. Please provide a working example when adding a new feature.
 
-```sh
-yarn test
-```
+### Check package
 
-### Commit message convention
+To test `react-native-webgpu` is packaged correctly, run `./scripts/test-package.sh`. This will make a local npm package and build the example app for iOS, and Android on both architectures.
 
-We follow the [conventional commits specification](https://www.conventionalcommits.org/en) for our commit messages:
+### Check examples
 
-- `fix`: bug fixes, e.g. fix crash due to deprecated method.
-- `feat`: new features, e.g. add new method to the module.
-- `refactor`: code refactor, e.g. migrate from class components to hooks.
-- `docs`: changes into documentation, e.g. add usage example for the module..
-- `test`: adding or updating tests, e.g. add integration tests using detox.
-- `chore`: tooling changes, e.g. change CI config.
+You can run all examples using `./scripts/test-examples.sh`. Check the generated screenshots for regressions.
 
-Our pre-commit hooks verify that your commit message matches this format when committing.
-
-### Linting and tests
-
-[ESLint](https://eslint.org/), [Prettier](https://prettier.io/), [TypeScript](https://www.typescriptlang.org/)
-
-We use [TypeScript](https://www.typescriptlang.org/) for type checking, [ESLint](https://eslint.org/) with [Prettier](https://prettier.io/) for linting and formatting the code, and [Jest](https://jestjs.io/) for testing.
-
-Our pre-commit hooks verify that the linter and tests pass when committing.
-
-### Publishing to npm
-
-We use [release-it](https://github.com/release-it/release-it) to make it easier to publish new versions. It handles common tasks like bumping version based on semver, creating tags and releases etc.
-
-To publish new versions, run the following:
-
-```sh
-yarn release
-```
-
-### Scripts
-
-The `package.json` file contains various scripts for common tasks:
-
-- `yarn`: setup project by installing dependencies.
-- `yarn typecheck`: type-check files with TypeScript.
-- `yarn lint`: lint files with ESLint.
-- `yarn test`: run unit tests with Jest.
-- `yarn example start`: start the Metro server for the example app.
-- `yarn example android`: run the example app on Android.
-- `yarn example ios`: run the example app on iOS.
-
-### Sending a pull request
-
-> **Working on your first pull request?** You can learn how from this _free_ series: [How to Contribute to an Open Source Project on GitHub](https://app.egghead.io/playlists/how-to-contribute-to-an-open-source-project-on-github).
-
-When you're sending a pull request:
-
-- Prefer small pull requests focused on one change.
-- Verify that linters and tests are passing.
-- Review the documentation to make sure it looks good.
-- Follow the pull request template when opening a pull request.
-- For pull requests that change the API or implementation, discuss with maintainers first by opening an issue.
+This script requires that you build the examples first using `./scripts/test-package.sh`

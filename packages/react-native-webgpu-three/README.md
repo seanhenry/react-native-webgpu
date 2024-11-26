@@ -26,7 +26,7 @@ You can find instructions to run the examples [here](../../examples/Example).
 - Install packages
 
 ```shell
-yarn add react-native-webgpu-three react-native-webgpu three
+yarn add react-native-webgpu-three react-native-webgpu three fast-text-encoding
 yarn add -D @babel/plugin-transform-export-namespace-from
 # For TypeScript also:
 yarn add -D @types/three

@@ -5,19 +5,21 @@ set -e
 ARCHS=(newarch oldarch)
 RUN_IOS=1
 RUN_ANDROID=1
+RN_VERSIONS=("0.75.4" "0.76.2")
 
 function print_usage() {
   echo "Usage: $0 [-haino]"
   echo ""
   echo "Options:"
-  echo "  -h  Show this help message"
-  echo "  -a  Android only"
-  echo "  -i  iOS only"
-  echo "  -n  New architecture only"
-  echo "  -o  Old architecture only"
+  echo "  -h           Show this help message"
+  echo "  -a           Android only"
+  echo "  -i           iOS only"
+  echo "  -n           New architecture only"
+  echo "  -o           Old architecture only"
+  echo "  -v rnversion Specified react native version only (75 or 76)"
 }
 
-while getopts "haino" opt; do
+while getopts "hainov:" opt; do
   case $opt in
     h)
       print_usage
@@ -37,6 +39,17 @@ while getopts "haino" opt; do
     o)
       ARCHS=(oldarch)
       ;;
+    v)
+      if [[ "$OPTARG" == "76" ]]; then
+        RN_VERSIONS=("0.76.2")
+      elif [[ "$OPTARG" == "75" ]]; then
+        RN_VERSIONS=("0.75.4")
+      else
+        echo "Invalid react-native version: -v $OPTARG" >&2
+        print_usage
+        exit 1
+      fi
+      ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
       print_usage
@@ -46,11 +59,11 @@ while getopts "haino" opt; do
 done
 
 if [[ "$RUN_IOS" == "1" && "$RUN_ANDROID" == "1" ]]; then
-  echo "Running iOS and Android on architectures: ${ARCHS[*]}"
+  echo "platforms=(ios android) archs=(${ARCHS[*]}) rnversions=(${RN_VERSIONS[*]})"
 elif [[ "$RUN_IOS" == "1" ]]; then
-  echo "Running iOS on architectures: ${ARCHS[*]}"
+  echo "platforms=(ios) archs=(${ARCHS[*]}) rnversions=(${RN_VERSIONS[*]})"
 elif [[ "$RUN_ANDROID" == "1" ]]; then
-  echo "Running Android on architectures: ${ARCHS[*]}"
+  echo "platforms=(android) archs=(${ARCHS[*]}) rnversions=(${RN_VERSIONS[*]})"
 fi
 
 EXAMPLES=(
@@ -109,45 +122,53 @@ EXAMPLES=(
  'AnimateCanvas'
 )
 
+ROOT="$(pwd)"
 IOS_BUNDLE_ID=react-native-webgpu.example
 ANDROID_BUNDLE_ID=com.example
-OUT_DIR="screenshots-$(date +"%Y%m%d-%H%M%S")"
-mkdir -p "${OUT_DIR}/ios/newarch" "${OUT_DIR}/ios/oldarch" "${OUT_DIR}/android/newarch" "${OUT_DIR}/android/oldarch"
+OUT_DIR="${ROOT}/.test/screenshots/$(date +"%Y%m%d-%H%M%S")"
+PRODUCTS_DIR="${ROOT}/.test/products"
 
-for ARCH in "${ARCHS[@]}"; do
-  IOS_APP="products/Example-Release-${ARCH}.app"
-  ANDROID_APP="products/Example-Release-${ARCH}.apk"
+for RN_VERSION in "${RN_VERSIONS[@]}"; do
+  mkdir -p "${OUT_DIR}/${RN_VERSION}/ios/newarch" \
+    "${OUT_DIR}/${RN_VERSION}/ios/oldarch" \
+    "${OUT_DIR}/${RN_VERSION}/android/newarch" \
+    "${OUT_DIR}/${RN_VERSION}/android/oldarch"
 
-  if [[ "$RUN_IOS" == "1" ]]; then
-    xcrun simctl install booted "${IOS_APP}"
+  for ARCH in "${ARCHS[@]}"; do
+    IOS_APP="${PRODUCTS_DIR}/Example-Release-${ARCH}-${RN_VERSION}.app"
+    ANDROID_APP="${PRODUCTS_DIR}/Example-Release-${ARCH}-${RN_VERSION}.apk"
 
-    for EXAMPLE in "${EXAMPLES[@]}"; do
-      xcrun simctl launch booted "${IOS_BUNDLE_ID}" -example "${EXAMPLE}"
-      sleep 1;
-      xcrun simctl io booted screenshot "${OUT_DIR}/ios/${ARCH}/${EXAMPLE}.png"
-      xcrun simctl terminate booted "${IOS_BUNDLE_ID}"
-    done
-  fi
+    if [[ "$RUN_IOS" == "1" ]]; then
+      xcrun simctl install booted "${IOS_APP}"
 
-  if [[ "$RUN_ANDROID" == "1" ]]; then
+      for EXAMPLE in "${EXAMPLES[@]}"; do
+        xcrun simctl launch booted "${IOS_BUNDLE_ID}" -example "${EXAMPLE}"
+        sleep 1;
+        xcrun simctl io booted screenshot "${OUT_DIR}/${RN_VERSION}/ios/${ARCH}/${EXAMPLE}.png"
+        xcrun simctl terminate booted "${IOS_BUNDLE_ID}"
+      done
+    fi
 
-    adb install -r "${ANDROID_APP}"
+    if [[ "$RUN_ANDROID" == "1" ]]; then
 
-    for EXAMPLE in "${EXAMPLES[@]}"; do
-      adb shell am start -n "${ANDROID_BUNDLE_ID}/.MainActivity" --es "example" "${EXAMPLE}"
-      sleep 1;
-      adb exec-out screencap -p > "${OUT_DIR}/android/${ARCH}/${EXAMPLE}.png"
-      adb shell am force-stop "${ANDROID_BUNDLE_ID}"
-    done
-  fi
+      adb install -r "${ANDROID_APP}"
 
+      for EXAMPLE in "${EXAMPLES[@]}"; do
+        adb shell am start -n "${ANDROID_BUNDLE_ID}/.MainActivity" --es "example" "${EXAMPLE}"
+        sleep 1;
+        adb exec-out screencap -p > "${OUT_DIR}/${RN_VERSION}/android/${ARCH}/${EXAMPLE}.png"
+        adb shell am force-stop "${ANDROID_BUNDLE_ID}"
+      done
+    fi
+
+  done
 done
 
 pushd "${OUT_DIR}"
 
-../scripts/gen-examples-html.js > "index.html"
+"${ROOT}/scripts/gen-examples-html.js" > "index.html"
 
 popd
 
-echo "Screenshots written to $(pwd)/${OUT_DIR}"
-open "$(pwd)/${OUT_DIR}/index.html"
+echo "Screenshots written to ${OUT_DIR}"
+open "${OUT_DIR}/index.html"

@@ -7,10 +7,10 @@
 #include "webgpu.h"
 
 #ifdef RCT_NEW_ARCH_ENABLED
-#import "generated/WebgpuSpec/ComponentDescriptors.h"
-#import "generated/WebgpuSpec/EventEmitters.h"
-#import "generated/WebgpuSpec/Props.h"
-#import "generated/WebgpuSpec/RCTComponentViewHelpers.h"
+#import <react/renderer/components/WebgpuSpec/ComponentDescriptors.h>
+#import <react/renderer/components/WebgpuSpec/EventEmitters.h>
+#import <react/renderer/components/WebgpuSpec/Props.h>
+#import <react/renderer/components/WebgpuSpec/RCTComponentViewHelpers.h>
 #endif
 
 using namespace wgpu;

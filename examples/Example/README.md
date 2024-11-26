@@ -40,7 +40,7 @@ unzip Bin+Headers.zip -d ../../packages/react-native-webgpu
 5. Install pods (iOS only)
 
 ```bash
-yarn pod:install:newArch
+yarn pod:install
 ```
 
 6. Build and run

@@ -150,6 +150,7 @@ android {
               "**/libturbomodulejsijni.so",
               "**/libreact_nativemodule_core.so",
               "**/libjscexecutor.so",
+              "**/libreactnative.so",
       ]
     }
   }

@@ -192,7 +192,6 @@ export const Outlines = () => {
     gui.add(params, 'outlineScale', 1, 2, 0.01);
     gui.draw();
 
-    // @ts-expect-error missing type for performance
     let time = performance.now();
 
     const frame = (t: number) => {

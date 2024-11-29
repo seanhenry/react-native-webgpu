@@ -7,7 +7,6 @@ export const useStats = () => {
     frameDurations: [] as number[],
     current: -1,
     now() {
-      // @ts-expect-error No types for performance.now()
       return performance.now();
     },
     begin() {

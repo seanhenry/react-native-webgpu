@@ -1,10 +1,8 @@
 {
   "extends": "@react-native/typescript-config/tsconfig.json",
   "include": [
-    "index.js",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "../../node_modules/react-native-webgpu-experimental/types/globals.d.ts",
-    "../../node_modules/react-native-webgpu/lib/typescript/react-native-webgpu.d.ts"
+    "**/*",
+    "../../node_modules/react-native-webgpu/lib/typescript/react-native-webgpu.d.ts",
+    "../../node_modules/react-native-webgpu-experimental/types/globals.d.ts"
   ]
 }

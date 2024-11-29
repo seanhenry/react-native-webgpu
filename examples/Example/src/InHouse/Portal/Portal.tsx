@@ -176,7 +176,6 @@ export const Portal = () => {
     );
     const sceneModelMat = mat4.identity();
 
-    // @ts-expect-error missing type for performance
     let time = performance.now();
 
     const frame = (t: number) => {

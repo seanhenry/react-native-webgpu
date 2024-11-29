@@ -50,7 +50,6 @@ export const SamplerParameters = () => {
     } as const;
     const config = {...kInitConfig};
     const updateConfigBuffer = () => {
-      // @ts-expect-error performance not typed
       const t = (performance.now() / 1000) * 0.5;
       const data = new Float32Array([
         Math.cos(t) * config.animation,

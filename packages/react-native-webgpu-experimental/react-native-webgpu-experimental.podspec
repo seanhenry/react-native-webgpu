@@ -16,6 +16,7 @@ Pod::Spec.new do |s|
 
   s.source_files = ["cxx/*.{hpp,h,cpp,c}", "cxx/ios/**/*.{hpp,h,m,mm,cpp,c}"]
   s.dependency "react-native-webgpu"
+  s.frameworks = ["AVFoundation", "CoreMedia"]
 
   # Extra headers required for thread support
   s.pod_target_xcconfig = {

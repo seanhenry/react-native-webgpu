@@ -1,0 +1,6 @@
+{
+  "name": "react-native-webgpu-three-metro",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index"
+}

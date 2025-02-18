@@ -1,6 +1,6 @@
 {
   "name": "react-native-webgpu",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A [WebGPU](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API) port for react native to provide direct access to Metal and Vulkan for iOS and Android via the WebGPU api.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -137,6 +137,11 @@
     "jsSrcsDir": "./src/specs",
     "android": {
       "javaPackageName": "com.webgpu"
+    },
+    "ios": {
+      "componentProvider": {
+        "WGPUWebGPUView": "WGPUWebGPUView"
+      }
     }
   }
 }

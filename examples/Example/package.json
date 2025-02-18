@@ -15,16 +15,16 @@
   },
   "dependencies": {
     "@gltf-transform/core": "^4.0.10",
-    "@react-navigation/native": "^7.0.3",
-    "@react-navigation/native-stack": "^7.1.0",
+    "@react-navigation/native": "^7.0.14",
+    "@react-navigation/native-stack": "^7.2.0",
     "lodash": "^4.17.21",
     "react": "*",
     "react-native": "*",
-    "react-native-gesture-handler": "^2.21.2",
-    "react-native-launch-arguments": "^4.0.2",
-    "react-native-reanimated": "^3.16.2",
-    "react-native-safe-area-context": "^4.14.0",
-    "react-native-screens": "^4.2.0",
+    "react-native-gesture-handler": "^2.23.1",
+    "react-native-launch-arguments": "^4.0.4",
+    "react-native-reanimated": "^3.16.7",
+    "react-native-safe-area-context": "5.2.0",
+    "react-native-screens": "^4.7.0",
     "react-native-webgpu": "workspace:*",
     "react-native-webgpu-experimental": "workspace:*",
     "react-native-webgpu-three": "workspace:*",
@@ -59,6 +59,5 @@
   },
   "engines": {
     "node": ">=18"
-  },
-  "packageManager": "yarn@3.6.4"
+  }
 }

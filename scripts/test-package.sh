@@ -7,10 +7,13 @@ BUILD_IOS=1
 BUILD_ANDROID=1
 BUILD_NEW_ARCH=1
 BUILD_OLD_ARCH=1
-RN_VERSIONS=("0.75.4" "0.76.2")
+RN_VERSIONS=("0.77.1" "0.76.7")
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 VERSION="$(jq -r '.version' packages/react-native-webgpu/package.json)"
 IOS_DESTINATION="OS=18.0,name=iPhone 16"
+
+export GRADLE_OPTS="-Xmx4g -XX:MaxMetaspaceSize=1g"
 
 set -e
 set -E
@@ -44,18 +47,42 @@ if [ -d "${PRODUCTS_DIR}" ]; then
 fi
 mkdir -p "${PRODUCTS_DIR}"
 
+if [[ "$SKIP_PACK" != "1" ]]; then
+  # Important, yarn caches local .tgz so delete it from the cache
+  print "Clearing webgpu packages from yarn caches"
+  rm -f "$(yarn config get cacheFolder)"/react-native-webgpu*
+  rm -f "$(yarn config get globalFolder)"/cache/react-native-webgpu*
+fi
+
 pushd packages/react-native-webgpu
 
 if [[ "$SKIP_PACK" != "1" ]]; then
   print "Packing react-native-webgpu"
   rm -f "react-native-webgpu-${VERSION}.tgz"
-  # Important, yarn caches local .tgz so delete it from the cache
-  rm -f "$(yarn config get cacheFolder)"/react-native-webgpu*
-  rm -f "$(yarn config get globalFolder)"/cache/react-native-webgpu*
   npm pack
 fi
 
 popd # packages/react-native-webgpu
+
+pushd packages/react-native-webgpu-experimental
+
+if [[ "$SKIP_PACK" != "1" ]]; then
+  print "Packing react-native-webgpu-experimental"
+  rm -f "react-native-webgpu-experimental-0.0.1.tgz"
+  npm pack
+fi
+
+popd # packages/react-native-webgpu-experimental
+
+pushd packages/react-native-webgpu-three
+
+if [[ "$SKIP_PACK" != "1" ]]; then
+  print "Packing react-native-webgpu-three"
+  rm -f "react-native-webgpu-three-0.0.1.tgz"
+  npm pack
+fi
+
+popd # packages/react-native-webgpu-three
 
 function clean_native() {
   print "Cleaning native code"
@@ -87,27 +114,15 @@ for RN_VERSION in "${RN_VERSIONS[@]}"; do
   PACKAGES_DIR="../../../packages"
   EXAMPLE_PROJ="../../../examples/Example"
 
-  print "Installing dependencies"
+  print "Installing packages for react native ${RN_VERSION}"
+  yarn set version 3.6.4
   touch yarn.lock
-  yarn add "@gltf-transform/core@^4.0.10" \
-    "@react-navigation/native@^7.0.3" \
-    "@react-navigation/native-stack@^7.1.0" \
-    "lodash@^4.17.21" \
-    "react-native-gesture-handler@^2.21.2" \
-    "react-native-launch-arguments@^4.0.2" \
-    "react-native-reanimated@^3.16.2" \
-    "react-native-safe-area-context@^4.14.0" \
-    "react-native-screens@^4.2.0" \
-    "teapot@^1.0.0" \
-    "three@0.166.1" \
-    "wgpu-matrix@^3.0.1" \
-    "@babel/plugin-transform-export-namespace-from@^7.24.7" \
-    "@types/lodash@^4.17.7" \
-    "@types/three@^0.166.0" \
-    "fast-text-encoding@^1.0.6" \
-    "${PACKAGES_DIR}/react-native-webgpu-experimental" \
-    "${PACKAGES_DIR}/react-native-webgpu-three" \
-    "${PACKAGES_DIR}/react-native-webgpu/react-native-webgpu-${VERSION}.tgz"
+  "${SCRIPT_DIR}/dependencies/${RN_VERSION}.sh"
+
+  print "Installing webgpu packages"
+  yarn add "${PACKAGES_DIR}/react-native-webgpu-experimental/react-native-webgpu-experimental-0.0.1.tgz" \
+    "${PACKAGES_DIR}/react-native-webgpu/react-native-webgpu-${VERSION}.tgz" \
+    "${PACKAGES_DIR}/react-native-webgpu-three/react-native-webgpu-three-0.0.1.tgz"
 
   print "Copying config and source"
   cp -r "${EXAMPLE_PROJ}/babel.config.js" \
@@ -161,11 +176,13 @@ for RN_VERSION in "${RN_VERSIONS[@]}"; do
       pushd android
       if [[ "$BUILD_DEBUG" == "1" ]]; then
         print "Building Android oldarch Debug"
+        ./gradlew --stop
         ./gradlew assembleDebug -PnewArchEnabled=false
         mv app/build/outputs/apk/debug/app-debug.apk "${PRODUCTS_DIR}/Example-Debug-oldarch-${RN_VERSION}.apk"
       fi
       if [[ "$BUILD_RELEASE" == "1" ]]; then
         print "Building Android oldarch Release"
+        ./gradlew --stop
         ./gradlew assembleRelease -PnewArchEnabled=false
         mv app/build/outputs/apk/release/app-release.apk "${PRODUCTS_DIR}/Example-Release-oldarch-${RN_VERSION}.apk"
       fi
@@ -197,11 +214,13 @@ for RN_VERSION in "${RN_VERSIONS[@]}"; do
       pushd android
       if [[ "$BUILD_DEBUG" == "1" ]]; then
         print "Building Android newarch Debug"
+        ./gradlew --stop
         ./gradlew assembleDebug -PnewArchEnabled=true
         mv app/build/outputs/apk/debug/app-debug.apk "${PRODUCTS_DIR}/Example-Debug-newarch-${RN_VERSION}.apk"
       fi
       if [[ "$BUILD_RELEASE" == "1" ]]; then
         print "Building Android newarch Release"
+        ./gradlew --stop
         ./gradlew assembleRelease -PnewArchEnabled=true
         mv app/build/outputs/apk/release/app-release.apk "${PRODUCTS_DIR}/Example-Release-newarch-${RN_VERSION}.apk"
       fi

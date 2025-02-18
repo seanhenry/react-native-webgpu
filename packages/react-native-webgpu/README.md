@@ -345,4 +345,5 @@ The library is built and tested against 0.75 and 0.76. Other versions may work b
 | react-native-webgpu | react-native | Hermes | JSC | New architecture | Old architecture |
 |---------------------|--------------|--------|-----|------------------|------------------|
 | 0.1.1               | 0.75-0.76    | ✅      | ❌   | ✅                | ✅                |
+| 0.1.2               | 0.76-0.77    | ✅      | ❌   | ✅                | ✅                |
 

@@ -8,20 +8,20 @@
     "packages/react-native-webgpu-experimental",
     "examples/Example"
   ],
-  "packageManager": "yarn@3.6.4",
   "resolutions": {
     "react": "18.3.1",
-    "react-native": "0.76.2",
+    "react-native": "0.77.1",
     "@babel/core": "7.26.0",
     "@babel/preset-env": "7.26.0",
     "@babel/runtime": "7.26.0",
     "@react-native-community/cli": "15.0.1",
     "@react-native-community/cli-platform-android": "15.0.1",
     "@react-native-community/cli-platform-ios": "15.0.1",
-    "@react-native/babel-preset": "0.76.2",
-    "@react-native/eslint-config": "0.76.2",
-    "@react-native/metro-config": "0.76.2",
-    "@react-native/typescript-config": "0.76.2",
+    "@react-native/babel-preset": "0.77.1",
+    "@react-native/eslint-config": "0.77.1",
+    "@react-native/metro-config": "0.77.1",
+    "@react-native/typescript-config": "0.77.1",
+    "@types/jest": "^29.5.13",
     "@types/react": "18.3.12",
     "@types/react-test-renderer": "18.3.0",
     "babel-jest": "29.7.0",
@@ -30,5 +30,6 @@
     "prettier": "2.8.8",
     "react-test-renderer": "18.3.1",
     "typescript": "5.0.4"
-  }
+  },
+  "packageManager": "yarn@3.6.4"
 }

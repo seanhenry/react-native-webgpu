@@ -5,7 +5,7 @@ set -e
 ARCHS=(newarch oldarch)
 RUN_IOS=1
 RUN_ANDROID=1
-RN_VERSIONS=("0.75.4" "0.76.2")
+RN_VERSIONS=("0.77.1" "0.76.7")
 
 function print_usage() {
   echo "Usage: $0 [-haino]"
@@ -16,7 +16,7 @@ function print_usage() {
   echo "  -i           iOS only"
   echo "  -n           New architecture only"
   echo "  -o           Old architecture only"
-  echo "  -v rnversion Specified react native version only (75 or 76)"
+  echo "  -v rnversion Specified react native version only (76 or 77)"
 }
 
 while getopts "hainov:" opt; do
@@ -41,9 +41,9 @@ while getopts "hainov:" opt; do
       ;;
     v)
       if [[ "$OPTARG" == "76" ]]; then
-        RN_VERSIONS=("0.76.2")
-      elif [[ "$OPTARG" == "75" ]]; then
-        RN_VERSIONS=("0.75.4")
+        RN_VERSIONS=("0.76.7")
+      elif [[ "$OPTARG" == "77" ]]; then
+        RN_VERSIONS=("0.77.1")
       else
         echo "Invalid react-native version: -v $OPTARG" >&2
         print_usage

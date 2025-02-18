@@ -4,6 +4,13 @@ project(react-native-webgpu)
 set(CMAKE_CXX_STANDARD 17)
 set(WGPU_DIR "${CMAKE_CURRENT_LIST_DIR}/..")
 set(RN_DIR "${REACT_ANDROID_DIR}/..")
+set(WGPU_NATIVE_PATH "${WGPU_DIR}/bin/${ANDROID_ABI}")
+
+find_library(WGPU_NATIVE
+    wgpu_native
+    PATHS ${WGPU_NATIVE_PATH}
+    NO_CMAKE_FIND_ROOT_PATH
+)
 
 find_package(fbjni REQUIRED CONFIG)
 find_package(ReactAndroid REQUIRED CONFIG)
@@ -22,11 +29,6 @@ target_include_directories(react-native-webgpu PUBLIC
         "${RN_DIR}/ReactCommon/jsi"
 )
 
-add_library(wgpu_native SHARED IMPORTED)
-set_target_properties(wgpu_native
-        PROPERTIES IMPORTED_LOCATION
-        "${WGPU_DIR}/bin/${ANDROID_ABI}/libwgpu_native.a")
-
 # Note, REACTNATIVE_MERGED_SO is not defined on old architecture
 if (REACTNATIVE_MERGED_SO OR ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
     target_link_libraries(react-native-webgpu ReactAndroid::reactnative)
@@ -35,7 +37,7 @@ else ()
 endif ()
 
 target_link_libraries(react-native-webgpu
-        wgpu_native
+        ${WGPU_NATIVE}
         android
         ReactAndroid::jsi
         fbjni::fbjni

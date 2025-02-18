@@ -1,40 +1,37 @@
 #!/bin/bash -e
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+export WGPU_NATIVE_VERSION="v22.1.0.5"
+
 pushd submodules/wgpu-native
 
-# iOS (sim arm64)
-export CARGO_BUILD_TARGET=aarch64-apple-ios-sim
+out_dir="${SCRIPT_DIR}/../packages/react-native-webgpu/bin"
+targets=(aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios)
+out_framework_dir="${out_dir}/wgpu_native.xcframework"
 
-rustup target add $CARGO_BUILD_TARGET
-cargo build --release
+rm -rf "${out_framework_dir:?}"
 
-# iOS (sim x86_64)
-export CARGO_BUILD_TARGET=x86_64-apple-ios
+for target in "${targets[@]}"; do
+  rustup target add "$target"
+  RUSTFLAGS="-C embed-bitcode=yes -C lto=fat -C codegen-units=1 -C panic=abort -C opt-level=3" cargo build --release --target "$target"
 
-rustup target add $CARGO_BUILD_TARGET
-cargo build --release
+  pushd "target/${target}/release"
+  mv libwgpu_native.a libwgpu_native_bitcode.a
+  xcrun bitcode_strip libwgpu_native_bitcode.a -r -o libwgpu_native.a
+  popd
+done
 
-# iOS (arm64)
-export CARGO_BUILD_TARGET=aarch64-apple-ios
+mkdir -p 'sim-fat'
+lipo "target/${targets[1]}/release/libwgpu_native.a" "target/${targets[2]}/release/libwgpu_native.a" -create -output "sim-fat/libwgpu_native.a"
 
-rustup target add $CARGO_BUILD_TARGET
-cargo build --release
-
-popd
-
-OUT_DIR="packages/react-native-webgpu/bin"
-TARGET_DIR="submodules/wgpu-native/target"
-HEADERS_DIR="submodules/wgpu-native/ffi"
-
-rm -rf "$OUT_DIR/ios" "$OUT_DIR/ios-simulator" "$OUT_DIR/wgpu_native.xcframework"
-mkdir -p "$OUT_DIR/ios" "$OUT_DIR/ios-simulator"
-
-lipo "$TARGET_DIR/aarch64-apple-ios-sim/release/libwgpu_native.a" "$TARGET_DIR/x86_64-apple-ios/release/libwgpu_native.a" -create -output "$OUT_DIR/ios-simulator/libwgpu_native.a"
-cp "$TARGET_DIR/aarch64-apple-ios/release/libwgpu_native.a" "$OUT_DIR/ios/libwgpu_native.a"
+wgpu_header="ffi/wgpu.h"
+webgpu_header="ffi/webgpu-headers/webgpu.h"
 
 xcodebuild -create-xcframework \
- -library "$OUT_DIR/ios-simulator/libwgpu_native.a" -headers "$HEADERS_DIR/wgpu.h" -headers "$HEADERS_DIR/webgpu-headers/webgpu.h" \
- -library "$OUT_DIR/ios/libwgpu_native.a" -headers "$HEADERS_DIR/wgpu.h" -headers "$HEADERS_DIR/webgpu-headers/webgpu.h" \
- -output "$OUT_DIR/wgpu_native.xcframework" \
+ -library "target/${targets[0]}/release/libwgpu_native.a" -headers "$wgpu_header" -headers "$webgpu_header" \
+ -library "sim-fat/libwgpu_native.a" -headers "$wgpu_header" -headers "$webgpu_header" \
+ -output "$out_framework_dir"
 
-rm -rf "$OUT_DIR/ios" "$OUT_DIR/ios-simulator"
+rm -rf 'sim-fat'
+
+popd

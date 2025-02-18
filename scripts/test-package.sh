@@ -76,7 +76,7 @@ for RN_VERSION in "${RN_VERSIONS[@]}"; do
 
   pushd "${TEST_DIR}/${RN_VERSION}"
 
-  npx @react-native-community/cli@latest init Example --version "${RN_VERSION}" --skip-install
+  npx -y @react-native-community/cli@latest init Example --version "${RN_VERSION}" --skip-install
 
   # Required because >= operator not supported for rvm
   cp "../../examples/Example/Gemfile" "Example"

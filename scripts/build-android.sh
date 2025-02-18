@@ -1,77 +1,52 @@
 #!/bin/bash -e
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+export WGPU_NATIVE_VERSION="v22.1.0.5"
+export WGPU_ANDROID_NDK_VERSION="27.2.12479018"
+
 pushd submodules/wgpu-native
 
-# Taken from https://github.com/gfx-rs/wgpu-native/issues/183 and modified
+rm -rf dist
 
-MIN_SDK_VERSION=21
-NDK_VERSION=25.0.8775105
-PLATFORM=darwin-x86_64
-# This changes depending on platform e.g. linux-x86_64
+out_dir="$SCRIPT_DIR/../packages/react-native-webgpu/bin"
+targets=(aarch64-linux-android armv7-linux-androideabi x86_64-linux-android i686-linux-android)
+triples=(aarch64-linux-android armv7a-linux-androideabi x86_64-linux-android i686-linux-android)
+archs=(arm64-v8a armeabi-v7a x86_64 x86)
+envs=(CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER CARGO_TARGET_X86_64_LINUX_ANDROID_LINKER CARGO_TARGET_I686_LINUX_ANDROID_LINKER)
 
-# workaround missing libgcc in ndk r23+
-mkdir -p tmp-lib
-echo "INPUT(-lunwind)" | tee tmp-lib/libgcc.a
-export RUSTFLAGS="-L $PWD/tmp-lib"
+min_sdk_version=21
+platform=darwin-x86_64 # Platform of local machine e.g. linux-x86_64
+android_ndk_home=$ANDROID_HOME/ndk/27.2.12479018
+llvm_objcopy="$android_ndk_home/toolchains/llvm/prebuilt/$platform/bin/llvm-objcopy"
 
-# common
-export LIBCLANG_PATH=$ANDROID_SDK_ROOT/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/$PLATFORM/lib64/libclang.dylib # depends on NDK_VERSION
-export LLVM_CONFIG_PATH=$ANDROID_SDK_ROOT/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/$PLATFORM/bin/llvm-config
-export BINDGEN_EXTRA_CLANG_ARGS="-isysroot $ANDROID_SDK_ROOT/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/$PLATFORM/sysroot/"
+for arch in "${archs[@]}"; do
+  rm -rf "${out_dir:?}/$arch"
+done
 
-# aarch64
-export CLANG_PATH=$ANDROID_SDK_ROOT/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/$PLATFORM/bin/aarch64-linux-android$MIN_SDK_VERSION-clang
-export CC=$CLANG_PATH
-export CXX=$CLANG_PATH++
-export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$CLANG_PATH
-export CARGO_BUILD_TARGET=aarch64-linux-android
+for i in "${!targets[@]}"; do
 
-rustup target add $CARGO_BUILD_TARGET
-cargo build --release
+  target="${targets[$i]}"
+  triple="${triples[$i]}"
+  arch="${archs[$i]}"
+  env="${envs[$i]}"
+  cc="$android_ndk_home/toolchains/llvm/prebuilt/$platform/bin/${triple}${min_sdk_version}-clang"
 
-# armv7a
-export CLANG_PATH=$ANDROID_SDK_ROOT/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/$PLATFORM/bin/armv7a-linux-androideabi$MIN_SDK_VERSION-clang
-export CC=$CLANG_PATH
-export CXX=$CLANG_PATH++
-export CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER=$CLANG_PATH
-export CARGO_BUILD_TARGET=armv7-linux-androideabi
+  rustup target add "$target"
 
-rustup target add $CARGO_BUILD_TARGET
-cargo build --release
+  export "$env=$cc"
+  CC="$cc" \
+    CXX="$cc++" \
+    CLANG_PATH="$cc" \
+    LLVM_CONFIG_PATH="$android_ndk_home/toolchains/llvm/prebuilt/$platform/bin/llvm-config" \
+    BINDGEN_EXTRA_CLANG_ARGS="'-isysroot $android_ndk_home/toolchains/llvm/prebuilt/$platform/sysroot'" \
+    RUSTFLAGS="-C embed-bitcode=yes -C lto=fat -C codegen-units=1 -C panic=abort" \
+    cargo build --release --target "$target"
 
-# x86_64
-export CLANG_PATH=$ANDROID_SDK_ROOT/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/$PLATFORM/bin/x86_64-linux-android$MIN_SDK_VERSION-clang
-export CC=$CLANG_PATH
-export CXX=$CLANG_PATH++
-export CARGO_TARGET_X86_64_LINUX_ANDROID_LINKER=$CLANG_PATH
-export CARGO_BUILD_TARGET=x86_64-linux-android
+  "$llvm_objcopy" --strip-unneeded "target/$target/release/libwgpu_native.a"
 
-rustup target add $CARGO_BUILD_TARGET
-cargo build --release
+  mkdir -p "$out_dir/$arch"
+  mv "target/$target/release/libwgpu_native.a" "$out_dir/$arch"
 
-# i686
-export CLANG_PATH=$ANDROID_SDK_ROOT/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/$PLATFORM/bin/i686-linux-android$MIN_SDK_VERSION-clang
-export CC=$CLANG_PATH
-export CXX=$CLANG_PATH++
-export CARGO_TARGET_I686_LINUX_ANDROID_LINKER=$CLANG_PATH
-export CARGO_BUILD_TARGET=i686-linux-android
-
-rustup target add $CARGO_BUILD_TARGET
-cargo build --release
-
-rm -rf tmp-lib
+done
 
 popd
-
-function mv_lib {
-  TRIPLE="$1"
-  ARCH="$2"
-  OUT_DIR="packages/react-native-webgpu/bin/$ARCH"
-  mkdir -p "$OUT_DIR"
-  mv "submodules/wgpu-native/target/$TRIPLE/release/libwgpu_native.a" "$OUT_DIR"
-}
-
-mv_lib aarch64-linux-android arm64-v8a
-mv_lib armv7-linux-androideabi armeabi-v7a
-mv_lib x86_64-linux-android x86_64
-mv_lib i686-linux-android x86

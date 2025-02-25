@@ -5,7 +5,7 @@ set -e
 ARCHS=(newarch oldarch)
 RUN_IOS=1
 RUN_ANDROID=1
-RN_VERSIONS=("0.77.1" "0.76.7")
+RN_VERSIONS=("0.78.0" "0.77.1")
 
 function print_usage() {
   echo "Usage: $0 [-haino]"

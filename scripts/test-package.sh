@@ -7,7 +7,7 @@ BUILD_IOS=1
 BUILD_ANDROID=1
 BUILD_NEW_ARCH=1
 BUILD_OLD_ARCH=1
-RN_VERSIONS=("0.77.1" "0.76.7")
+RN_VERSIONS=("0.78.0" "0.77.1")
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 VERSION="$(jq -r '.version' packages/react-native-webgpu/package.json)"

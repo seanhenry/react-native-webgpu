@@ -7,7 +7,6 @@
 #import <ReactCommon/RCTTurboModule.h>
 #import <ReactCommon/RCTTurboModuleManager.h>
 #include <jsi/jsi.h>
-#include <react/config/ReactNativeConfig.h>
 #include <functional>
 #include "WGPUJsiUtils.h"
 
@@ -124,7 +123,7 @@ void ThreadInstance::attachSurface(std::string &uuid) {
       hostDelegate:self
       turboModuleManagerDelegate:self
       jsEngineProvider:^std::shared_ptr<JSRuntimeFactory>() {
-        return std::make_shared<RCTHermesInstance>(std::make_shared<EmptyReactNativeConfig>(), nullptr);
+        return std::make_shared<RCTHermesInstance>();
       }
       launchOptions:@{}];
     self.reactHost.runtimeDelegate = self;
@@ -186,8 +185,6 @@ void ThreadInstance::attachSurface(std::string &uuid) {
 #pragma mark - RCTContextContainerHandling
 
 - (void)didCreateContextContainer:(std::shared_ptr<ContextContainer>)contextContainer {
-  auto config = std::make_shared<EmptyReactNativeConfig>();
-  contextContainer->insert("ReactNativeConfig", config);
 }
 
 #pragma mark - RCTTurboModuleManagerDelegate

@@ -53,7 +53,7 @@ function show(str) {
 }
 </script>
   `);
-  const rnVersions = ["0.77.1", "0.76.7"];
+  const rnVersions = ["0.78.0", "0.77.1"];
   const sections = (
     await Promise.allSettled(
       rnVersions

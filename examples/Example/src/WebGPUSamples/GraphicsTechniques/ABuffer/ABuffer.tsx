@@ -9,6 +9,7 @@ import opaqueWGSL from './opaque.wgsl';
 import translucentWGSL from './translucent.wgsl';
 import compositeWGSL from './composite.wgsl';
 import React from 'react';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 function roundUp(n: number, k: number): number {
   return Math.ceil(n / k) * k;
@@ -625,6 +626,7 @@ export const ABuffer = () => {
 
         device.queue.submit([commandEncoder.finish()]);
 
+        examplesCallback(device.queue);
         context.presentSurface();
       };
     };

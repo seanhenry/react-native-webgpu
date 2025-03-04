@@ -9,6 +9,7 @@ import solidColorLitWGSL from './solidColorLit.wgsl';
 import wireframeWGSL from './wireframe.wgsl';
 import {useControls} from '../../../Components/controls/react/useControls';
 import {Controller} from '../../../Components/controls/dat.gui/Controller';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export const Wireframe = () => {
   const {gui, Controls} = useControls();
@@ -496,6 +497,7 @@ export const Wireframe = () => {
       const commandBuffer = encoder.finish();
       device.queue.submit([commandBuffer]);
 
+      examplesCallback(device.queue);
       context.presentSurface();
       requestAnimationFrame(render);
     }

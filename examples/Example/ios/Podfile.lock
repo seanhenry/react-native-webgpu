@@ -2095,7 +2095,7 @@ SPEC CHECKSUMS:
   react-native-launch-arguments: 7e0626a16be51b4624ee154c02f36429c5030306
   react-native-safe-area-context: 9c33120e9eac7741a5364cc2d9f74665049b76b3
   react-native-webgpu: 458db721398d3d5bfdd8f2c60126bd1ec39c986a
-  react-native-webgpu-experimental: 5b3417770950c98e02547b626eb99d5714ead822
+  react-native-webgpu-experimental: a02d794babeb2561209537737169f1150b08ab6f
   React-NativeModulesApple: 16fbd5b040ff6c492dacc361d49e63cba7a6a7a1
   React-perflogger: ab51b7592532a0ea45bf6eed7e6cae14a368b678
   React-performancetimeline: bc2e48198ec814d578ac8401f65d78a574358203

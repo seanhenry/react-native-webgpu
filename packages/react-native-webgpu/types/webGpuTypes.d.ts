@@ -2565,14 +2565,14 @@ interface GPUQueue extends GPUObjectBase {
    * 	`commandBuffers`:
    */
   submit(commandBuffers: Iterable<GPUCommandBuffer>): undefined;
-  //   /**
-  //    * Returns a {@link Promise} that resolves once this queue finishes processing all the work submitted
-  //    * up to this moment.
-  //    * Resolution of this {@link Promise} implies the completion of
-  //    * {@link GPUBuffer#mapAsync} calls made prior to that call,
-  //    * on {@link GPUBuffer}s last used exclusively on that queue.
-  //    */
-  //   onSubmittedWorkDone(): Promise<undefined>;
+  /**
+   * Returns a {@link Promise} that resolves once this queue finishes processing all the work submitted
+   * up to this moment.
+   * Resolution of this {@link Promise} implies the completion of
+   * {@link GPUBuffer#mapAsync} calls made prior to that call,
+   * on {@link GPUBuffer}s last used exclusively on that queue.
+   */
+  onSubmittedWorkDone(): Promise<undefined>;
   /**
    * Issues a write operation of the provided data into a {@link GPUBuffer}.
    * @param buffer - The buffer to write to.

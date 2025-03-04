@@ -4,6 +4,7 @@ import {type Accessor, WebIO} from '@gltf-transform/core';
 import modelGltf from './portal.gltf';
 import portalWgsl from './portal.wgsl';
 import {StyleSheet} from 'react-native';
+import {examplesCallback} from '../../utils/examplesCallback';
 
 export const Portal = () => {
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
@@ -247,6 +248,7 @@ export const Portal = () => {
         depthStencilAttachment,
       });
 
+      examplesCallback(device.queue);
       context.presentSurface();
       requestAnimationFrame(frame);
     };

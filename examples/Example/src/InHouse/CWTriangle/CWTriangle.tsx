@@ -2,6 +2,7 @@
 import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
 import triangleWGSL from './cw-triangle.wgsl';
 import {Square} from '../../Components/Square';
+import {examplesCallback} from '../../utils/examplesCallback';
 
 export function CWTriangle() {
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
@@ -73,6 +74,7 @@ export function CWTriangle() {
       passEncoder.end();
 
       device.queue.submit([commandEncoder.finish()]);
+      examplesCallback(device.queue);
       context.presentSurface();
       requestAnimationFrame(frame);
     }

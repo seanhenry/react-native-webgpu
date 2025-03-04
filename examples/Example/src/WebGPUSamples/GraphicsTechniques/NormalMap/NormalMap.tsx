@@ -11,6 +11,7 @@ import {
   createTextureFromImage,
 } from './utils';
 import {useControls} from '../../../Components/controls/react/useControls';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 enum TextureAtlas {
   Spiral,
@@ -403,6 +404,7 @@ export const NormalMap = () => {
       passEncoder.end();
       device.queue.submit([commandEncoder.finish()]);
 
+      examplesCallback(device.queue);
       context.presentSurface();
       requestAnimationFrame(frame);
     }

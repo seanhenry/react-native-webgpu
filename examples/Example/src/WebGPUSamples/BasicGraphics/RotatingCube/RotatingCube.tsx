@@ -14,6 +14,7 @@ import vertexPositionColorWGSL from '../../shaders/vertexPositionColor.frag.wgsl
 import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
 import {Square} from '../../../Components/Square';
 import {globalStyles} from '../../../Components/globalStyles';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export function RotatingCube() {
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
@@ -193,6 +194,7 @@ export function RotatingCube() {
       passEncoder.draw(cubeVertexCount);
       passEncoder.end();
       device.queue.submit([commandEncoder.finish()]);
+      examplesCallback(device.queue);
       context.presentSurface();
       requestAnimationFrame(frame);
     }

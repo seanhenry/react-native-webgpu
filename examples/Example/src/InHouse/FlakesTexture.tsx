@@ -3,6 +3,7 @@ import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
 import {globalStyles} from '../Components/globalStyles';
 import quadWgsl from '../utils/shaders/quad.wgsl';
 import {FlakesTextureGenerator} from '../utils/FlakesTextureGenerator';
+import {examplesCallback} from '../utils/examplesCallback';
 
 /**
  * Three provides FlakesTexture class for generating a rough texture using canvas 2d api.
@@ -86,6 +87,7 @@ export const FlakesTexture = () => {
     renderPass.end();
     device.queue.submit([encoder.finish()]);
     context.presentSurface();
+    examplesCallback(); // device.queue.onSubmittedWorkDone() not fulfilling for some reason
   };
 
   return (

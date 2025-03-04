@@ -6,6 +6,7 @@ import computeWGSL from './compute.wgsl';
 import vertWGSL from './vert.wgsl';
 import fragWGSL from './frag.wgsl';
 import {useControls} from '../../../Components/controls/react/useControls';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export const GameOfLife = () => {
   const {gui, Controls} = useControls();
@@ -265,6 +266,7 @@ export const GameOfLife = () => {
         passEncoderRender.end();
 
         device.queue.submit([commandEncoder.finish()]);
+        examplesCallback(device.queue);
 
         context.presentSurface();
       };

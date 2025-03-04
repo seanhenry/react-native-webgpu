@@ -1,7 +1,7 @@
-import {LaunchArguments} from 'react-native-launch-arguments';
+import {LaunchArguments as RNLaunchArguments} from 'react-native-launch-arguments';
 
 interface LaunchArguments {
   example?: string;
 }
 
-export const launchArguments = LaunchArguments.value<LaunchArguments>();
+export const launchArguments = RNLaunchArguments.value<LaunchArguments>();

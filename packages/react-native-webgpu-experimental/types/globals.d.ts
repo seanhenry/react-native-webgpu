@@ -2,6 +2,7 @@ declare global {
   var reactNativeWebGPUExperimental: {
     inflate(arrayBuffer: ArrayBuffer): ArrayBuffer;
     makeVideoPlayer(url: string): VideoPlayer;
+    socketCallback(exampleName: string): void;
   };
 
   var reactNativeWebGPUThreads: {

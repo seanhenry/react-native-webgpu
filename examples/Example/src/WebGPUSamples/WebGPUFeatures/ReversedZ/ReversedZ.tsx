@@ -11,6 +11,7 @@ import {Square} from '../../../Components/Square';
 import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
 import {globalStyles} from '../../../Components/globalStyles';
 import {useControls} from '../../../Components/controls/react/useControls';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export const ReversedZ = () => {
   const {gui, Controls} = useControls();
@@ -706,6 +707,7 @@ export const ReversedZ = () => {
         }
       }
       device.queue.submit([commandEncoder.finish()]);
+      examplesCallback(device.queue);
       context.presentSurface();
       requestAnimationFrame(frame);
     }

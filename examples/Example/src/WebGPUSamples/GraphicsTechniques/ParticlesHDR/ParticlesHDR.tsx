@@ -8,6 +8,7 @@ import {WebGpuView} from 'react-native-webgpu';
 import {globalStyles} from '../../../Components/globalStyles';
 import {WebGpuViewProps} from 'react-native-webgpu/src/WebGpuView';
 import {useControls} from '../../../Components/controls/react/useControls';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 const numParticles = 50000;
 const particlePositionOffset = 0;
@@ -485,6 +486,7 @@ export const ParticlesHDR = () => {
 
       device.queue.submit([commandEncoder.finish()]);
 
+      examplesCallback(device.queue);
       context.presentSurface();
       requestAnimationFrame(frame);
     }

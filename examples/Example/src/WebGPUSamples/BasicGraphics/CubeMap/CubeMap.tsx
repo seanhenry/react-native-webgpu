@@ -14,6 +14,7 @@ import {
 
 import basicVertWGSL from '../../shaders/basic.vert.wgsl';
 import sampleCubemapWGSL from './sampleCubemap.frag.wgsl';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export const CubeMap = () => {
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
@@ -259,6 +260,7 @@ export const CubeMap = () => {
       passEncoder.draw(cubeVertexCount);
       passEncoder.end();
       device.queue.submit([commandEncoder.finish()]);
+      examplesCallback(device.queue);
 
       context.presentSurface();
       requestAnimationFrame(frame);

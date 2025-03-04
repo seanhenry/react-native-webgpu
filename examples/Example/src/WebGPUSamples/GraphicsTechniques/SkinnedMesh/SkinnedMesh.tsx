@@ -14,6 +14,7 @@ import {
 import {gridIndices} from './gridData';
 import {useControls} from '../../../Components/controls/react/useControls';
 import {WEB_GPU_SAMPLES_BASE_URL} from '../../../utils/constants';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export const SkinnedMesh = () => {
   const {gui, Controls} = useControls();
@@ -566,6 +567,7 @@ export const SkinnedMesh = () => {
       }
 
       device.queue.submit([commandEncoder.finish()]);
+      examplesCallback(device.queue);
       context.presentSurface();
 
       requestAnimationFrame(frame);

@@ -16,7 +16,7 @@ function print_usage() {
   echo "  -i           iOS only"
   echo "  -n           New architecture only"
   echo "  -o           Old architecture only"
-  echo "  -v rnversion Specified react native version only (76 or 77)"
+  echo "  -v rnversion Specified react native version only (77 or 78)"
 }
 
 while getopts "hainov:" opt; do
@@ -40,8 +40,8 @@ while getopts "hainov:" opt; do
       ARCHS=(oldarch)
       ;;
     v)
-      if [[ "$OPTARG" == "76" ]]; then
-        RN_VERSIONS=("0.76.7")
+      if [[ "$OPTARG" == "78" ]]; then
+        RN_VERSIONS=("0.78.0")
       elif [[ "$OPTARG" == "77" ]]; then
         RN_VERSIONS=("0.77.1")
       else
@@ -150,6 +150,16 @@ function print_failure() {
 exec 3>&1 4>&2
 exec &> "${LOG_FILE}"
 
+source scripts/test-examples-callback.sh
+listen_for_callbacks &
+socket_pid=$!
+cleanup_socket() {
+  print "Killing socket $socket_pid"
+  kill $socket_pid
+}
+trap cleanup_socket EXIT SIGINT SIGTERM SIGHUP
+wait_for_warmup
+
 for RN_VERSION in "${RN_VERSIONS[@]}"; do
   mkdir -p "${OUT_DIR}/${RN_VERSION}/ios/newarch" \
     "${OUT_DIR}/${RN_VERSION}/ios/oldarch" \
@@ -161,11 +171,12 @@ for RN_VERSION in "${RN_VERSIONS[@]}"; do
     ANDROID_APP="${PRODUCTS_DIR}/Example-Release-${ARCH}-${RN_VERSION}.apk"
 
     if [[ "$RUN_IOS" == "1" ]]; then
+      xcrun simctl terminate booted "${IOS_BUNDLE_ID}" || true
       xcrun simctl install booted "${IOS_APP}"
 
       for EXAMPLE in "${EXAMPLES[@]}"; do
         xcrun simctl launch booted "${IOS_BUNDLE_ID}" -example "${EXAMPLE}"
-        sleep 1;
+        wait_for_example "${EXAMPLE}"
         xcrun simctl io booted screenshot "${OUT_DIR}/${RN_VERSION}/ios/${ARCH}/${EXAMPLE}.png"
         set +e
         xcrun simctl terminate booted "${IOS_BUNDLE_ID}"
@@ -184,7 +195,7 @@ for RN_VERSION in "${RN_VERSIONS[@]}"; do
 
       for EXAMPLE in "${EXAMPLES[@]}"; do
         adb shell am start -n "${ANDROID_BUNDLE_ID}/.MainActivity" --es "example" "${EXAMPLE}"
-        sleep 1;
+        wait_for_example "${EXAMPLE}"
         adb exec-out screencap -p > "${OUT_DIR}/${RN_VERSION}/android/${ARCH}/${EXAMPLE}.png"
 
         set +e

@@ -4,6 +4,7 @@ import triangleVertWGSL from '../../shaders/triangle.vert.wgsl';
 import redFragWGSL from '../../shaders/red.frag.wgsl';
 import {Square} from '../../../Components/Square';
 import {globalStyles} from '../../../Components/globalStyles';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export function HelloTriangle() {
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
@@ -73,6 +74,7 @@ export function HelloTriangle() {
       passEncoder.end();
 
       device.queue.submit([commandEncoder.finish()]);
+      examplesCallback(device.queue);
       context.presentSurface();
       requestAnimationFrame(frame);
     }

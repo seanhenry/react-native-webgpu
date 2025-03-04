@@ -14,6 +14,7 @@ import sampleTextureMixColorWGSL from './sampleTextureMixColor.frag.wgsl';
 import {Square} from '../../../Components/Square';
 import {WebGpuView, type WebGpuViewProps} from 'react-native-webgpu';
 import {globalStyles} from '../../../Components/globalStyles';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export const TexturedCube = () => {
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
@@ -232,6 +233,7 @@ export const TexturedCube = () => {
       passEncoder.draw(cubeVertexCount);
       passEncoder.end();
       device.queue.submit([commandEncoder.finish()]);
+      examplesCallback(device.queue);
 
       context.presentSurface();
       requestAnimationFrame(frame);

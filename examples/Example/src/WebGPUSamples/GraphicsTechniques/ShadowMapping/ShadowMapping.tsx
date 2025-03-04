@@ -9,6 +9,7 @@ import {mesh} from '../../meshes/stanfordDragon';
 import vertexShadowWGSL from './vertexShadow.wgsl';
 import vertexWGSL from './vertex.wgsl';
 import fragmentWGSL from './fragment.wgsl';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export const ShadowMapping = () => {
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
@@ -391,6 +392,7 @@ export const ShadowMapping = () => {
         renderPass.end();
       }
       device.queue.submit([commandEncoder.finish()]);
+      examplesCallback(device.queue);
       context.presentSurface();
       requestAnimationFrame(frame);
     }

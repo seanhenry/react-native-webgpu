@@ -13,6 +13,7 @@ import vertexTextureQuad from './vertexTextureQuad.wgsl';
 import fragmentGBuffersDebugView from './fragmentGBuffersDebugView.wgsl';
 import fragmentDeferredRendering from './fragmentDeferredRendering.wgsl';
 import {useControls} from '../../../Components/controls/react/useControls';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export const DeferredRendering = () => {
   const {gui, Controls} = useControls();
@@ -598,6 +599,7 @@ export const DeferredRendering = () => {
       }
       device.queue.submit([commandEncoder.finish()]);
 
+      examplesCallback(device.queue);
       context.presentSurface();
       requestAnimationFrame(frame);
     }

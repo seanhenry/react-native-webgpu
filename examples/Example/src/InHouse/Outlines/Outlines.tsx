@@ -6,6 +6,7 @@ import {WebIO} from '@gltf-transform/core';
 import modelGltf from './cube.gltf';
 import outlinesWgsl from './outlines.wgsl';
 import {useControls} from '../../Components/controls/react/useControls';
+import {examplesCallback} from '../../utils/examplesCallback';
 
 export const Outlines = () => {
   const {gui, Controls} = useControls();
@@ -281,6 +282,7 @@ export const Outlines = () => {
       pass.end();
 
       device.queue.submit([encoder.finish()]);
+      examplesCallback(device.queue);
       context.presentSurface();
       requestAnimationFrame(frame);
     };

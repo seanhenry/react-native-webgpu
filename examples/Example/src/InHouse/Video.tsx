@@ -4,6 +4,7 @@ import videoQuad from '../utils/shaders/videoQuad.wgsl';
 import yuv8420torgba8 from '../utils/shaders/yuv8420torgba8.wgsl';
 import {StyleSheet, View} from 'react-native';
 import {useControls} from '../Components/controls/react/useControls';
+import {examplesCallback} from '../utils/examplesCallback';
 
 const kFlipYFlag = 1;
 const kIsInterleavedFlag = 2;
@@ -177,6 +178,7 @@ export const Video = () => {
       renderPass.draw(6);
       renderPass.end();
       device.queue.submit([commandEncoder.finish()]);
+      examplesCallback(device.queue);
       context.presentSurface();
       pixelBuffer.release();
 

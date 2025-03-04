@@ -13,6 +13,7 @@ import {
 import instancedVertWGSL from './instanced.vert.wgsl';
 import vertexPositionColorWGSL from '../../shaders/vertexPositionColor.frag.wgsl';
 import {globalStyles} from '../../../Components/globalStyles';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export const InstancedCube = () => {
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
@@ -238,6 +239,7 @@ export const InstancedCube = () => {
       passEncoder.draw(cubeVertexCount, numInstances, 0, 0);
       passEncoder.end();
       device.queue.submit([commandEncoder.finish()]);
+      examplesCallback(device.queue);
 
       context.presentSurface();
       requestAnimationFrame(frame);

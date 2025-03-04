@@ -7,6 +7,7 @@ import {globalStyles} from '../../../Components/globalStyles';
 import {useControls} from '../../../Components/controls/react/useControls';
 import {HudContainer} from '../../../Components/stats/HudContainer';
 import {useHudText} from '../../../Components/stats/useHudText';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export const OcclusionQueries = () => {
   const {gui, Controls} = useControls();
@@ -353,6 +354,7 @@ export const OcclusionQueries = () => {
         });
       }
 
+      examplesCallback(device.queue);
       context.presentSurface();
       requestAnimationFrame(render);
     }

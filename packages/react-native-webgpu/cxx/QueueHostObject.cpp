@@ -10,9 +10,14 @@
 #include "WGPUConversions.h"
 #include "WGPUDefaults.h"
 #include "WGPUJsiUtils.h"
+#include "WGPUPromise.h"
 
 using namespace facebook::jsi;
 using namespace wgpu;
+
+namespace wgpu {
+void wgpuOnSubmittedWorkDone(WGPUQueueWorkDoneStatus status, WGPU_NULLABLE void *userdata);
+}
 
 Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
   auto name = propName.utf8(runtime);
@@ -164,6 +169,14 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
     });
   }
 
+  if (name == "onSubmittedWorkDone") {
+    return WGPU_FUNC_FROM_HOST_FUNC(onSubmittedWorkDone, 0, [this]) {
+      return Promise::makeJSPromise(_context->getJSIInstance(), [this](auto &runtime, auto &promise) {
+        wgpuQueueOnSubmittedWorkDone(_value, wgpuOnSubmittedWorkDone, promise->toCData());
+      });
+    });
+  }
+
   WGPU_GET_BRAND(GPUQueue)
 
   WGPU_LOG_UNIMPLEMENTED_GET_PROP;
@@ -172,5 +185,16 @@ Value QueueHostObject::get(Runtime &runtime, const PropNameID &propName) {
 }
 
 std::vector<PropNameID> QueueHostObject::getPropertyNames(Runtime &runtime) {
-  return PropNameID::names(runtime, "submit", "writeBuffer", "copyExternalImageToTexture", "__brand");
+  return PropNameID::names(runtime, "submit", "writeBuffer", "copyExternalImageToTexture", "writeTexture",
+                           "onSubmittedWorkDone", "__brand");
+}
+
+void wgpu::wgpuOnSubmittedWorkDone(WGPUQueueWorkDoneStatus status, WGPU_NULLABLE void *userdata) {
+  Promise::fromCData(userdata, [status](auto &promise) {
+    if (status == WGPUQueueWorkDoneStatus_Success) {
+      promise->resolve([](auto &runtime) { return Value::undefined(); });
+    } else {
+      promise->reject([](auto &runtime) { return makeJSError(runtime, "GPUQueue.onSubmittedWorkDone failed"); });
+    }
+  });
 }

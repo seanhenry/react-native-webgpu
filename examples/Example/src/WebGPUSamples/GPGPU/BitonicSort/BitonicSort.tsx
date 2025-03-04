@@ -10,6 +10,7 @@ import {useControls} from '../../../Components/controls/react/useControls';
 import {useStats} from '../../../Components/stats/useStats';
 import atomicToZero from './atomicToZero.wgsl';
 import {HudContainer} from '../../../Components/stats/HudContainer';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export const BitonicSort = () => {
   const {gui, Controls} = useControls();
@@ -939,6 +940,7 @@ export const BitonicSort = () => {
             }
           }
           settings.executeStep = false;
+          examplesCallback(device.queue);
           context.presentSurface();
           requestAnimationFrame(frame);
         }

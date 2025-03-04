@@ -7,6 +7,7 @@ import updateSpritesWGSL from './updateSprites.wgsl';
 import {useControls} from '../../../Components/controls/react/useControls';
 import {HudContainer} from '../../../Components/stats/HudContainer';
 import {useHudText} from '../../../Components/stats/useHudText';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export const ComputeBoids = () => {
   const {gui, Controls} = useControls();
@@ -305,6 +306,7 @@ export const ComputeBoids = () => {
       }
 
       device.queue.submit([commandEncoder.finish()]);
+      examplesCallback(device.queue);
 
       context.presentSurface();
 

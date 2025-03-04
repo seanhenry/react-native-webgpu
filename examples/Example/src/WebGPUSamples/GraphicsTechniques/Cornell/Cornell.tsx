@@ -8,6 +8,7 @@ import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
 import {Square} from '../../../Components/Square';
 import {globalStyles} from '../../../Components/globalStyles';
 import {useControls} from '../../../Components/controls/react/useControls';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export const Cornell = () => {
   const {gui, Controls} = useControls();
@@ -147,6 +148,7 @@ export const Cornell = () => {
       }
 
       device.queue.submit([commandEncoder.finish()]);
+      examplesCallback(device.queue);
       context.presentSurface();
 
       requestAnimationFrame(frame);

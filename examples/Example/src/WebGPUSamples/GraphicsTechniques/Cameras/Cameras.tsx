@@ -18,6 +18,7 @@ import {Square} from '../../../Components/Square';
 import {useControls} from '../../../Components/controls/react/useControls';
 import {HudContainer} from '../../../Components/stats/HudContainer';
 import {HudLabel} from '../../../Components/stats/HudLabel';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export const Cameras = () => {
   const inputHandlersRef = useRef<InputHandlers>({});
@@ -251,6 +252,7 @@ export const Cameras = () => {
       passEncoder.end();
       device.queue.submit([commandEncoder.finish()]);
 
+      examplesCallback(device.queue);
       context.presentSurface();
       requestAnimationFrame(frame);
     }

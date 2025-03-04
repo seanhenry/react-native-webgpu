@@ -14,6 +14,7 @@ import {
 
 import basicVertWGSL from '../../shaders/basic.vert.wgsl';
 import sampleSelfWGSL from './sampleSelf.frag.wgsl';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export const FractalCube = () => {
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
@@ -231,6 +232,7 @@ export const FractalCube = () => {
       );
 
       device.queue.submit([commandEncoder.finish()]);
+      examplesCallback(device.queue);
 
       context.presentSurface();
       requestAnimationFrame(frame);

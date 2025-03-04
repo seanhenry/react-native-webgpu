@@ -3,6 +3,7 @@ import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
 import {useControls} from '../Components/controls/react/useControls';
 import {Controller} from '../Components/controls/dat.gui/Controller';
 import videoQuad from '../utils/shaders/videoQuad.wgsl';
+import {examplesCallback} from '../utils/examplesCallback';
 
 export const Crop = () => {
   const {gui, Controls} = useControls();
@@ -145,6 +146,7 @@ export const Crop = () => {
       render.draw(6);
       render.end();
       device.queue.submit([encoder.finish()]);
+      examplesCallback(device.queue);
       context.presentSurface();
 
       requestAnimationFrame(frame);

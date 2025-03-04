@@ -4,6 +4,7 @@ import {Square} from '../../../Components/Square';
 import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
 import {globalStyles} from '../../../Components/globalStyles';
 import {useControls} from '../../../Components/controls/react/useControls';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export const ImageBlur = () => {
   const {gui, Controls} = useControls();
@@ -296,6 +297,7 @@ export const ImageBlur = () => {
       passEncoder.end();
       device.queue.submit([commandEncoder.finish()]);
 
+      examplesCallback(device.queue);
       context.presentSurface();
       requestAnimationFrame(frame);
     }

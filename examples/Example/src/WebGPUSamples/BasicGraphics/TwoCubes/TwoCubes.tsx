@@ -15,6 +15,7 @@ import {
 import basicVertWGSL from '../../shaders/basic.vert.wgsl';
 import vertexPositionColorWGSL from '../../shaders/vertexPositionColor.frag.wgsl';
 import {globalStyles} from '../../../Components/globalStyles';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 export const TwoCubes = () => {
   const onCreateSurface: WebGpuViewProps['onCreateSurface'] = async ({
@@ -250,6 +251,7 @@ export const TwoCubes = () => {
 
       passEncoder.end();
       device.queue.submit([commandEncoder.finish()]);
+      examplesCallback(device.queue);
       context.presentSurface();
       requestAnimationFrame(frame);
     }

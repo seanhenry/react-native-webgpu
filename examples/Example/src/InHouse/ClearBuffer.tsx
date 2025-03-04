@@ -1,6 +1,7 @@
 import {WebGpuView, WebGpuViewProps} from 'react-native-webgpu';
 import {useControls} from '../Components/controls/react/useControls';
 import {PixelRatio} from 'react-native';
+import {examplesCallback} from '../utils/examplesCallback';
 
 export const ClearBuffer = () => {
   const {gui, Controls} = useControls();
@@ -60,6 +61,7 @@ export const ClearBuffer = () => {
       );
 
       device.queue.submit([encoder.finish()]);
+      examplesCallback(device.queue);
       context.presentSurface();
       requestAnimationFrame(frame);
     };

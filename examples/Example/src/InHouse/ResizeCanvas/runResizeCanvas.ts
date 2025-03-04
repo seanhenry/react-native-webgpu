@@ -1,6 +1,7 @@
 import {mat4, vec3} from 'wgpu-matrix';
 import {OnCreateSurfacePayload} from 'react-native-webgpu';
 import triangleWGSL from './triangle.wgsl';
+import {examplesCallback} from '../../utils/examplesCallback';
 
 export const runResizeCanvas = async ({
   context,
@@ -137,6 +138,7 @@ export const runResizeCanvas = async ({
     passEncoder.end();
 
     device.queue.submit([commandEncoder.finish()]);
+    examplesCallback(device.queue);
     context.presentSurface();
     requestAnimationFrame(frame);
   }

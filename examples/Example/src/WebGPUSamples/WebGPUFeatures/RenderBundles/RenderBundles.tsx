@@ -9,6 +9,7 @@ import meshWGSL from './mesh.wgsl';
 import {useStats} from '../../../Components/stats/useStats';
 import {HudContainer} from '../../../Components/stats/HudContainer';
 import {useControls} from '../../../Components/controls/react/useControls';
+import {examplesCallback} from '../../../utils/examplesCallback';
 
 interface Renderable {
   vertices: GPUBuffer;
@@ -429,6 +430,7 @@ export const RenderBundles = () => {
 
       passEncoder.end();
       device.queue.submit([commandEncoder.finish()]);
+      examplesCallback(device.queue);
 
       stats.end();
 

@@ -6,6 +6,7 @@ import androidx.core.graphics.drawable.toBitmap
 import com.facebook.proguard.annotations.DoNotStrip
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper
+import kotlin.math.round
 
 @DoNotStrip
 class DrawableBitmapLoader(private val name: String, private val context: ReactApplicationContext) {
@@ -30,7 +31,12 @@ class DrawableBitmapLoader(private val name: String, private val context: ReactA
       errorMessage = "Could not find drawable $name"
       return;
     }
-    val bitmap = drawable.toBitmap()
+    val density = context.resources.displayMetrics.density
+    // toBitmap() automatically scales the image by the density so explicitly ask for the image's width and height
+    val bitmap = drawable.toBitmap(
+      width = round(drawable.intrinsicWidth.toFloat() / density).toInt(),
+      height = round(drawable.intrinsicHeight.toFloat() / density).toInt(),
+    )
     this.sharedMemory = SharedMemory.create(name, bitmap.width * bitmap.height * 4).apply {
       bitmap.copyPixelsToBuffer(mapReadWrite())
       setProtect(OsConstants.PROT_READ)

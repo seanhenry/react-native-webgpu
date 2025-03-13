@@ -4,15 +4,16 @@ let once = false;
 
 export function examplesCallback(queue?: GPUQueue) {
   const {example} = launchArguments;
+  const message = `${example}\n`;
   if (!example || once) {
     return;
   }
   once = true;
   if (!queue) {
-    reactNativeWebGPUExperimental.socketCallback(example);
+    reactNativeWebGPUExperimental.socketCallback(message);
     return;
   }
   queue.onSubmittedWorkDone().then(() => {
-    reactNativeWebGPUExperimental.socketCallback(example);
+    reactNativeWebGPUExperimental.socketCallback(message);
   });
 }

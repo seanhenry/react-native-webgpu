@@ -143,6 +143,24 @@ for RN_VERSION in "${RN_VERSIONS[@]}"; do
   print "Setting android minSdkVersion to 27"
   sed -E -i '' 's/minSdkVersion = [0-9]+/minSdkVersion = 27/' "android/build.gradle"
 
+  print "Setting android network config to allow socket callback"
+  pushd android
+  NETWORK_CONFIG_FILE="app/src/main/res/xml/network_security_config.xml"
+  NETWORK_FILE="<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<network-security-config>
+  <domain-config cleartextTrafficPermitted=\"true\">
+    <domain includeSubdomains=\"false\">127.0.0.1</domain>
+  </domain-config>
+</network-security-config>
+  "
+
+  mkdir -p "$(dirname "$NETWORK_CONFIG_FILE")"
+  echo "$NETWORK_FILE" > "$NETWORK_CONFIG_FILE"
+
+  sed -i '' '/<application/a\
+      android:networkSecurityConfig="@xml/network_security_config" ' "app/src/main/AndroidManifest.xml"
+  popd # android
+
   print "Installing ruby dependencies"
   bundle
 

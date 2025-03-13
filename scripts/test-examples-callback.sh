@@ -6,12 +6,7 @@ callback_file_path="${SCRIPT_DIR}/../.test/test-examples-callback.txt"
 
 listen_for_callbacks() {
   rm -f "$callback_file_path"
-  touch "$callback_file_path"
-  while true; do
-    local response
-    response=$(nc -l "$callback_port")
-    printf "%s\n" "$response" >> "$callback_file_path"
-  done
+  ncat -o "$callback_file_path" -kl 8888
 }
 
 wait_for_example() {
@@ -37,7 +32,7 @@ wait_for_warmup() {
     if [ "$(tail -n 1 "$callback_file_path")" = "WARMUP" ]; then
       break
     fi
-    echo "WARMUP" | nc localhost "$callback_port" || true
+    printf 'WARMUP\n' | nc localhost "$callback_port" || true
     sleep 1
   done
 }

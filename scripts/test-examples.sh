@@ -192,6 +192,7 @@ for RN_VERSION in "${RN_VERSIONS[@]}"; do
 
     if [[ "$RUN_ANDROID" == "1" ]]; then
 
+      adb reverse tcp:8888 tcp:8888 || true
       adb install -r "${ANDROID_APP}"
 
       for EXAMPLE in "${EXAMPLES[@]}"; do

@@ -59,7 +59,7 @@
     "del-cli": "^5.1.0",
     "eslint": "*",
     "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
     "jest": "*",
     "prettier": "*",
     "react-native": "*",

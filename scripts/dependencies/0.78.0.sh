@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+# Note, >0.81.0 introduces "_interopRequireDefault is not a function" error when `unstable_enablePackageExports` is `true` in metro.config.js (required for three.js)
+npm pkg set resolutions.metro=0.81.0
+npm pkg set resolutions.metro-config=0.81.0
+npm pkg set resolutions.metro-core=0.81.0
+npm pkg set resolutions.metro-resolver=0.81.0
+npm pkg set resolutions.metro-runtime=0.81.0
+npm pkg set resolutions.metro-source-map=0.81.0
+
 yarn add "@gltf-transform/core@4.0.10" \
   "@react-navigation/native@7.0.14" \
   "@react-navigation/native-stack@7.2.0" \

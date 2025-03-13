@@ -11,9 +11,9 @@
   "resolutions": {
     "react": "19.0.0",
     "react-native": "0.78.0",
-    "@babel/core": "7.26.0",
-    "@babel/preset-env": "7.26.0",
-    "@babel/runtime": "7.26.0",
+    "@babel/core": "7.26.10",
+    "@babel/preset-env": "7.26.9",
+    "@babel/runtime": "7.26.10",
     "@react-native-community/cli": "15.0.1",
     "@react-native-community/cli-platform-android": "15.0.1",
     "@react-native-community/cli-platform-ios": "15.0.1",
@@ -29,7 +29,13 @@
     "jest": "29.7.0",
     "prettier": "2.8.8",
     "react-test-renderer": "19.0.0",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "metro": "0.81.0",
+    "metro-config": "0.81.0",
+    "metro-core": "0.81.0",
+    "metro-resolver": "0.81.0",
+    "metro-runtime": "0.81.0",
+    "metro-source-map": "0.81.0"
   },
   "packageManager": "yarn@3.6.4"
 }

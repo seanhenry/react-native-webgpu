@@ -2,6 +2,7 @@
 
 set -e
 
+CONFIGURATION=Release
 ARCHS=(newarch oldarch)
 RUN_IOS=1
 RUN_ANDROID=1
@@ -167,8 +168,8 @@ for RN_VERSION in "${RN_VERSIONS[@]}"; do
     "${OUT_DIR}/${RN_VERSION}/android/oldarch"
 
   for ARCH in "${ARCHS[@]}"; do
-    IOS_APP="${PRODUCTS_DIR}/Example-Release-${ARCH}-${RN_VERSION}.app"
-    ANDROID_APP="${PRODUCTS_DIR}/Example-Release-${ARCH}-${RN_VERSION}.apk"
+    IOS_APP="${PRODUCTS_DIR}/Example-${CONFIGURATION}-${ARCH}-${RN_VERSION}.app"
+    ANDROID_APP="${PRODUCTS_DIR}/Example-${CONFIGURATION}-${ARCH}-${RN_VERSION}.apk"
 
     if [[ "$RUN_IOS" == "1" ]]; then
       xcrun simctl terminate booted "${IOS_BUNDLE_ID}" || true

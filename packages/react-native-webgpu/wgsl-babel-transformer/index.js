@@ -1,4 +1,9 @@
-const babelTransformer = require('@react-native/metro-babel-transformer');
+const { getDefaultConfig } = require('@react-native/metro-config');
+const defaultBabelTransformer =
+  getDefaultConfig()?.transformer?.babelTransformerPath;
+const babelTransformer = defaultBabelTransformer
+  ? require(defaultBabelTransformer)
+  : require('@react-native/metro-babel-transformer');
 
 module.exports = { ...babelTransformer };
 module.exports.transform = function transformWgsl(options) {

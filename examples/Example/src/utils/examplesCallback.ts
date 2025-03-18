@@ -3,12 +3,12 @@ import {launchArguments} from './launchArguments';
 let once = false;
 
 export function examplesCallback(queue?: GPUQueue) {
-  const {example} = launchArguments;
-  const message = `${example}\n`;
-  if (!example || once) {
+  const {example, callbackid} = launchArguments;
+  if (!example || !callbackid || once) {
     return;
   }
   once = true;
+  const message = `${example}-${callbackid}`;
   if (!queue) {
     reactNativeWebGPUExperimental.socketCallback(message);
     return;

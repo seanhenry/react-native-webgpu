@@ -6,6 +6,7 @@
     "packages/react-native-webgpu/metro",
     "packages/react-native-webgpu-three",
     "packages/react-native-webgpu-experimental",
+    "packages/react-native-webgpu-tests",
     "examples/Example"
   ],
   "resolutions": {

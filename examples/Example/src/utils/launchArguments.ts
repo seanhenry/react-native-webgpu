@@ -2,6 +2,7 @@ import {LaunchArguments as RNLaunchArguments} from 'react-native-launch-argument
 
 interface LaunchArguments {
   example?: string;
+  callbackid?: string;
 }
 
 export const launchArguments = RNLaunchArguments.value<LaunchArguments>();

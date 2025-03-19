@@ -9,6 +9,10 @@
     "packages/react-native-webgpu-tests",
     "examples/Example"
   ],
+  "scripts": {
+    "test:package": "cd packages/react-native-webgpu-tests; yarn run:package",
+    "test:examples": "cd packages/react-native-webgpu-tests; yarn run:examples"
+  },
   "resolutions": {
     "react": "19.0.0",
     "react-native": "0.78.0",

@@ -11,7 +11,7 @@ namespace wgpu {
 
 Value socketCallback(Runtime &runtime) {
   return WGPU_FUNC_FROM_HOST_FUNC(socketCallback, 1, []) {
-    auto exampleName = arguments[0].asString(runtime).utf8(runtime);
+    auto message = arguments[0].asString(runtime).utf8(runtime);
     static dispatch_queue_t queue;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -19,7 +19,7 @@ Value socketCallback(Runtime &runtime) {
     });
     dispatch_async(queue, ^{
       CFWriteStreamRef writeStream;
-      CFDataRef messageData = CFDataCreate(NULL, (UInt8 *)exampleName.c_str(), exampleName.size());
+      CFDataRef messageData = CFDataCreate(NULL, (UInt8 *)message.c_str(), message.size());
       CFStringRef hostString = CFStringCreateWithCString(NULL, HOST, kCFStringEncodingUTF8);
       CFHostRef host = CFHostCreateWithName(NULL, hostString);
       CFStreamCreatePairWithSocketToCFHost(NULL, host, PORT, NULL, &writeStream);

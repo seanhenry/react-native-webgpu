@@ -14,8 +14,8 @@ using namespace facebook::jsi;
 
 Value wgpu::socketCallback(Runtime &runtime) {
   return WGPU_FUNC_FROM_HOST_FUNC(socketCallback, 1, []) {
-    auto exampleName = arguments[0].asString(runtime).utf8(runtime);
-    auto thread = std::thread([exampleName] {
+    auto message = arguments[0].asString(runtime).utf8(runtime);
+    auto thread = std::thread([message] {
       int sockfd;
       struct sockaddr_in server_addr;
 
@@ -40,7 +40,7 @@ Value wgpu::socketCallback(Runtime &runtime) {
         return;
       }
 
-      if (send(sockfd, exampleName.c_str(), exampleName.length(), 0) < 0) {
+      if (send(sockfd, message.c_str(), message.length(), 0) < 0) {
         WGPU_LOG_ERROR("Failed to send data");
         close(sockfd);
         return;

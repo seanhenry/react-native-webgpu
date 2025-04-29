@@ -10,6 +10,21 @@
 #include <functional>
 #include "WGPUJsiUtils.h"
 
+#if WGPU_RN_MINOR_VERSION >= 79
+
+// TODO: Can't see where this is set
+// #if RN_DISABLE_OSS_PLUGIN_HEADER
+// #import <RCTTurboModulePlugin/RCTTurboModulePlugin.h>
+// #else
+#import <React/CoreModulesPlugins.h>
+// #endif
+
+#import <react/nativemodule/defaults/DefaultTurboModules.h>
+#import "RCTAppSetupUtils.h"
+#import "ReactAppDependencyProvider/RCTAppDependencyProvider.h"
+
+#endif
+
 using namespace facebook::react;
 using namespace facebook::jsi;
 
@@ -29,6 +44,10 @@ using namespace facebook::jsi;
 @property(class, nonatomic, readonly) BOOL newArchEnabled;
 @property(nonatomic) RCTHost *reactHost;
 @property(nonatomic, copy) NSString *threadId;
+
+#if WGPU_RN_MINOR_VERSION >= 79
+@property(nonatomic) RCTAppDependencyProvider *dependencyProvider;
+#endif
 
 - (instancetype)initWithBundleURL:(NSURL *)url threadId:(NSString *)threadId;
 - (void)start;
@@ -115,6 +134,9 @@ void ThreadInstance::attachSurface(std::string &uuid) {
 - (instancetype)initWithBundleURL:(NSURL *)url threadId:(NSString *)threadId {
   self = [super init];
   if (self) {
+#if WGPU_RN_MINOR_VERSION >= 79
+    self.dependencyProvider = [[RCTAppDependencyProvider alloc] init];
+#endif
     self.threadId = threadId;
     self.reactHost = [[RCTHost alloc]
       initWithBundleURLProvider:^{
@@ -190,29 +212,73 @@ void ThreadInstance::attachSurface(std::string &uuid) {
 #pragma mark - RCTTurboModuleManagerDelegate
 
 - (Class)getModuleClassFromName:(const char *)name {
-  return [((id)UIApplication.sharedApplication.delegate) getModuleClassFromName:name];
+#if WGPU_RN_MINOR_VERSION >= 79
+  // #if RN_DISABLE_OSS_PLUGIN_HEADER
+  //   return RCTTurboModulePluginClassProvider(name);
+  // #else
+  return RCTCoreModulesClassProvider(name);
+// #endif
+#else
+  id delegate = UIApplication.sharedApplication.delegate;
+  return [delegate getModuleClassFromName:name];
+#endif
 }
 
 - (std::shared_ptr<TurboModule>)getTurboModule:(const std::string &)name
                                      jsInvoker:(std::shared_ptr<CallInvoker>)jsInvoker {
-  return [((id)UIApplication.sharedApplication.delegate) getTurboModule:name jsInvoker:jsInvoker];
+  id delegate = UIApplication.sharedApplication.delegate;
+  if ([delegate respondsToSelector:@selector(getTurboModule:jsInvoker:)]) {
+    return [delegate getTurboModule:name jsInvoker:jsInvoker];
+  }
+
+#if WGPU_RN_MINOR_VERSION >= 79
+  return facebook::react::DefaultTurboModules::getTurboModule(name, jsInvoker);
+#else
+  return nullptr;
+#endif
 }
 
 - (std::shared_ptr<TurboModule>)getTurboModule:(const std::string &)name
                                     initParams:(const ObjCTurboModule::InitParams &)params {
-  return [((id)UIApplication.sharedApplication.delegate) getTurboModule:name initParams:params];
+  id delegate = UIApplication.sharedApplication.delegate;
+  if ([delegate respondsToSelector:@selector(getTurboModule:initParams:)]) {
+    return [delegate getTurboModule:name initParams:params];
+  }
+  return nullptr;  // Removed in RN 79
 }
 
 - (id<RCTTurboModule>)getModuleInstanceFromClass:(Class)moduleClass {
-  return [((id)UIApplication.sharedApplication.delegate) getModuleInstanceFromClass:moduleClass];
+  id delegate = UIApplication.sharedApplication.delegate;
+  if ([delegate respondsToSelector:@selector(getModuleInstanceFromClass:)]) {
+    return [delegate getModuleInstanceFromClass:moduleClass];
+  }
+#if WGPU_RN_MINOR_VERSION >= 79
+  return RCTAppSetupDefaultModuleFromClass(moduleClass, self.dependencyProvider);
+#else
+  return nil;
+#endif
 }
 
 + (BOOL)bridgelessEnabled {
-  return [((id)UIApplication.sharedApplication.delegate) bridgelessEnabled];
+  id delegate = UIApplication.sharedApplication.delegate;
+  if ([delegate respondsToSelector:@selector(bridgelessEnabled)]) {
+    return [delegate bridgelessEnabled];
+  }
+
+  return [self newArchEnabled];
 }
 
 + (BOOL)newArchEnabled {
-  return [((id)UIApplication.sharedApplication.delegate) newArchEnabled];
+  id delegate = UIApplication.sharedApplication.delegate;
+  if ([delegate respondsToSelector:@selector(newArchEnabled)]) {
+    return [delegate newArchEnabled];
+  }
+
+#if RCT_NEW_ARCH_ENABLED
+  return YES;
+#else
+  return NO;
+#endif
 }
 
 @end

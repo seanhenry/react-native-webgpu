@@ -27,7 +27,7 @@ const RN_WEBGPU_EXPERIMENTAL_PACKAGE_JSON = parsePackageJson(
   WEBGPU_EXPERIMENTAL_DIR,
 );
 
-export const REACT_NATIVE_VERSIONS = Object.freeze(['0.78.0', '0.77.1']);
+export const REACT_NATIVE_VERSIONS = Object.freeze(['0.79.1', '0.78.0']);
 export const WEBGPU_VERSION = RN_WEBGPU_PACKAGE_JSON.version;
 export const WEBGPU_THREE_VERSION = RN_WEBGPU_THREE_PACKAGE_JSON.version;
 export const WEBGPU_EXPERIMENTAL_VERSION =

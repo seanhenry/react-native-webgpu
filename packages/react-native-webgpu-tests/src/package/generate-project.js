@@ -155,6 +155,27 @@ class ProjectGenerator {
    */
   async _reactNativeVersionSpecificSetup() {
     switch (this.reactNativeVersion) {
+      case '0.79.1': {
+        await this.exec(
+          'yarn add "@gltf-transform/core@4.1.3" \
+        "@react-navigation/native@7.1.6" \
+        "@react-navigation/native-stack@7.3.10" \
+        "lodash@4.17.21" \
+        "react-native-gesture-handler@2.25.0" \
+        "react-native-launch-arguments@4.1.0" \
+        "react-native-reanimated@3.17.5" \
+        "react-native-safe-area-context@5.4.0" \
+        "react-native-screens@4.10.0" \
+        "teapot@1.0.0" \
+        "three@0.166.1" \
+        "wgpu-matrix@3.4.0" \
+        "@babel/plugin-transform-export-namespace-from@7.24.7" \
+        "@types/lodash@4.17.7" \
+        "@types/three@0.166.0" \
+        "fast-text-encoding@1.0.6"',
+        );
+        break;
+      }
       case '0.78.0': {
         // Note, >0.81.0 introduces "_interopRequireDefault is not a function" error when `unstable_enablePackageExports` is `true` in metro.config.js (required for three.js)
         await this.exec(

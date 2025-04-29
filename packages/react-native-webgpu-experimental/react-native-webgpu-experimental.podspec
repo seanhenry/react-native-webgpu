@@ -3,6 +3,22 @@ require "json"
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 folly_compiler_flags = '-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -Wno-comma -Wno-shorten-64-to-32'
 
+rn_path = ENV['REACT_NATIVE_PATH']
+rn_flags = ''
+if !rn_path.nil?
+  rn_package_json_path = File.join(Pod::Config.instance.installation_root.to_s, rn_path, 'package.json')
+  rn_package_json = JSON.parse(File.read(rn_package_json_path))
+  rn_version = rn_package_json['version']
+  rn_minor_version = rn_version.split('.')[1]
+
+  # Required for using things like RCTAppSetupUtils
+  # Taken from React-Core.podspec
+  use_hermes = ENV['USE_HERMES'] == nil || ENV['USE_HERMES'] == '1'
+  use_hermes_flag = use_hermes ? "-DUSE_HERMES=1" : ""
+
+  rn_flags = "-DWGPU_RN_MINOR_VERSION=#{rn_minor_version} #{use_hermes_flag}"
+end
+
 Pod::Spec.new do |s|
   s.name         = "react-native-webgpu-experimental"
   s.version      = package["version"]
@@ -23,6 +39,8 @@ Pod::Spec.new do |s|
     "HEADER_SEARCH_PATHS" => %("$(PODS_ROOT)/Headers/Private/React-RuntimeApple" "$(PODS_ROOT)/Headers/Private/React-RuntimeCore" "$(PODS_ROOT)/Headers/Private/React-RuntimeHermes" "$(PODS_ROOT)/Headers/Private/React-jserrorhandler"),
   }
 
+  s.compiler_flags = rn_flags
+
   # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.
   # See https://github.com/facebook/react-native/blob/febf6b7f33fdb4904669f99d795eba4c0f95d7bf/scripts/cocoapods/new_architecture.rb#L79.
   if respond_to?(:install_modules_dependencies, true)
@@ -32,7 +50,7 @@ Pod::Spec.new do |s|
 
     # Don't install the dependencies when we run `pod install` in the old architecture.
     if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
-      s.compiler_flags = folly_compiler_flags + " -DRCT_NEW_ARCH_ENABLED=1"
+      s.compiler_flags += " " + folly_compiler_flags + " -DRCT_NEW_ARCH_ENABLED=1"
       s.pod_target_xcconfig    = {
           "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
           "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1",
